@@ -1,0 +1,3434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topology Routing Demo</title>
+  <link rel="stylesheet" href="./vendor/tippy.css" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef2f7;
+      --panel: #ffffff;
+      --panel-border: #e5e8ef;
+      --header-bg: #0b0e13;
+      --header-text: #f5f7fa;
+      --text: #1f2329;
+      --muted: #6b7280;
+      --line: #d6dde8;
+      --line-hover: #c2ccd9;
+      --line-active: #1890ff;
+      --node-border: #cfd7e3;
+      --node-fill: #ffffff;
+      --node-start: #1664ff;
+      --node-accent: #1890ff;
+      --tag-positive-bg: #fff1f0;
+      --tag-positive-border: #ffb5ad;
+      --tag-positive-text: #cf4d40;
+      --tag-negative-bg: #edf8ee;
+      --tag-negative-border: #a9d7b4;
+      --tag-negative-text: #2d8d52;
+      --dim-opacity: 0.3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #ffffff;
+      color: var(--text);
+      font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    .page {
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page-shell {
+      width: min(1176px, calc(100vw - 48px));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .page-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .scheme-switch {
+      display: inline-flex;
+      align-items: stretch;
+      min-width: 320px;
+      height: 32px;
+      border-radius: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 0 1px #dde2e9;
+      overflow: hidden;
+    }
+
+    .scheme-label {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      align-self: stretch;
+      border-right: 1px solid #dde2e9;
+      background: #ffffff;
+      padding: 5px 12px;
+      color: #42464e;
+      font-size: 13px;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+    }
+
+    .scheme-select-wrap {
+      position: relative;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    .scheme-select {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      padding: 5px 32px 5px 12px;
+      color: #42464e;
+      font-size: 13px;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .scheme-select:focus {
+      box-shadow: inset 0 0 0 1px #1664ff;
+    }
+
+    .scheme-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      transform: translateY(-50%);
+      color: #737a87;
+      font-size: 12px;
+      line-height: 12px;
+      pointer-events: none;
+    }
+
+    .card {
+      width: 100%;
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #eaedf1;
+      padding: 7px 15px 8px;
+      min-height: 38px;
+      background: #ffffff;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .title {
+      color: #020814;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 500;
+      letter-spacing: 0.04px;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      display: none;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 16px;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      align-items: flex-start;
+      column-gap: 2px;
+      border-radius: 4px;
+      background: #f1f3f5;
+      padding: 3px;
+      height: 32px;
+    }
+
+    .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #42464e;
+      padding: 2px 12px;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .mode-btn.is-active {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(213, 219, 227, 0.7);
+      background: #ffffff;
+      color: #1664ff;
+      font-weight: 500;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: #42464e;
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      padding: 0 7px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .legend-chip.positive {
+      background: rgba(255, 241, 240, 0.96);
+      border-color: rgba(255, 181, 173, 0.9);
+      color: var(--tag-positive-text);
+    }
+
+    .legend-chip.negative {
+      background: rgba(237, 248, 238, 0.96);
+      border-color: rgba(169, 215, 180, 0.95);
+      color: var(--tag-negative-text);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px #cfd7e3;
+    }
+
+    .legend-dot.start {
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px #3d7dfe, 0 0 0 1px rgba(61, 125, 254, 0.2);
+    }
+
+    .legend-dot.start::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .legend-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      color: #42464e;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .legend-node {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      padding: 1px;
+    }
+
+    .legend-node.start {
+      background: rgba(61, 125, 254, 0.2);
+      border: 1px solid rgba(61, 125, 254, 0.12);
+    }
+
+    .legend-node.start::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #3d7dfe;
+    }
+
+    .legend-node.regular {
+      background: #dde2e9;
+    }
+
+    .legend-node.regular::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: #fcfdfe;
+    }
+
+    .canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #fcfdfe;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .canvas.is-dragging {
+      cursor: grabbing;
+    }
+
+    .hud {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .zoom-panel {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      row-gap: 1px;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px #dde2e9, 0 2px 1px rgba(0, 0, 0, 0.08);
+      background: #eaedf1;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
+    .zoom-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 0;
+      background: #ffffff;
+      color: #4e5969;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .zoom-btn:hover {
+      color: var(--line-active);
+      background: #f7f9fc;
+    }
+
+    .zoom-btn:active {
+      background: #f1f3f5;
+    }
+
+    .zoom-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    .grid-line {
+      stroke: rgba(15, 23, 42, 0.04);
+      stroke-width: 1;
+    }
+
+    .grid-line.major {
+      stroke: rgba(15, 23, 42, 0.06);
+    }
+
+    .edge-group,
+    .node-group,
+    .tag-group {
+      transition: opacity 0.14s ease;
+    }
+
+    .layer-backdrop {
+      transition: opacity 0.14s ease;
+    }
+
+    .edge-route {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.14s ease, stroke-width 0.14s ease, opacity 0.14s ease;
+      marker-end: url(#arrow-default);
+    }
+
+    .edge-group.is-active .edge-route {
+      stroke: var(--line-hover);
+      marker-end: url(#arrow-hover);
+    }
+
+    .edge-hit {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 18;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      cursor: pointer;
+    }
+
+    .tag-bg {
+      fill: #ebf1ff;
+      stroke: #6e9fff;
+      stroke-width: 1;
+      transition: fill 0.14s ease, stroke 0.14s ease, opacity 0.14s ease;
+    }
+
+    .tag-underlay {
+      fill: #ffffff;
+      stroke: none;
+    }
+
+    .tag-value {
+      fill: #1664ff;
+      font-size: 10px;
+      font-weight: 500;
+      dominant-baseline: middle;
+      text-anchor: middle;
+      pointer-events: none;
+      transition: fill 0.14s ease, opacity 0.14s ease;
+    }
+
+    .tag-unit {
+      fill: #737a87;
+      font-size: 10px;
+      font-weight: 400;
+      dominant-baseline: middle;
+      text-anchor: middle;
+      pointer-events: none;
+      transition: fill 0.14s ease, opacity 0.14s ease;
+    }
+
+    .tag-group.is-error .tag-bg {
+      fill: #ffecec;
+      stroke: #ff706d;
+    }
+
+    .tag-group.is-error .tag-value {
+      fill: #d7312a;
+    }
+
+    .tag-hit {
+      fill: rgba(255, 255, 255, 0.01);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .tippy-box[data-theme~='topology'] {
+      background: #ffffff;
+      color: #1f2937;
+      border: 1px solid #dbe3ee;
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .tippy-box[data-theme~='topology'] .tippy-content {
+      padding: 8px 10px;
+      white-space: normal;
+    }
+
+    .tippy-box[data-theme~='topology'] > .tippy-arrow {
+      color: #ffffff;
+    }
+
+    .tooltip-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tooltip-line {
+      white-space: nowrap;
+    }
+
+    .tooltip-amount {
+      font-weight: 700;
+    }
+
+    .node-shadow {
+      fill: rgba(24, 144, 255, 0.08);
+      opacity: 0;
+      transition: opacity 0.14s ease;
+    }
+
+    .node-card {
+      fill: var(--node-fill);
+      stroke: #dde2e9;
+      stroke-width: 1;
+      transition: stroke 0.14s ease, stroke-width 0.14s ease, fill 0.14s ease, transform 0.14s ease;
+    }
+
+    .node-group.is-start .node-card {
+      stroke: #8eb6ff;
+    }
+
+    .node-group.is-initiator .node-card {
+      stroke: #1664ff;
+      stroke-width: 1.2;
+    }
+
+    .node-group.is-initiator .node-title {
+      fill: #1664ff;
+      font-weight: 500;
+    }
+
+    .node-title {
+      fill: #0c0d0e;
+      font-size: 12px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-meta-label {
+      fill: #42464e;
+      font-size: 10px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-meta-value {
+      fill: #42464e;
+      font-size: 10px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-meta-unit {
+      fill: #737a87;
+      font-size: 10px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-meta-divider,
+    .node-meta-strike {
+      stroke: #c7ccd6;
+      stroke-width: 1;
+      shape-rendering: crispEdges;
+    }
+
+    .node-meta-divider {
+      stroke: #eaedf1;
+    }
+
+    .orbit-ring {
+      fill: none;
+      stroke: rgba(24, 144, 255, 0.16);
+      stroke-width: 1;
+      stroke-dasharray: 6 8;
+    }
+
+    @media (max-width: 1080px) {
+      .page {
+        padding: 16px;
+      }
+
+      .page-shell,
+      .card {
+        width: 100%;
+      }
+
+      .page-topbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .scheme-switch,
+      .mode-switch {
+        width: 100%;
+      }
+
+      .mode-btn {
+        flex: 1;
+      }
+
+
+      .header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .zoom-panel {
+        align-self: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-shell">
+      <div class="page-topbar">
+        <div class="scheme-switch">
+          <div class="scheme-label">方案</div>
+          <div class="scheme-select-wrap">
+            <select id="scheme-select" class="scheme-select" aria-label="选择方案">
+              <option value="scheme1">方案一：线上方案+高亮</option>
+              <option value="scheme2">方案二：弧线连接+高亮</option>
+              <option value="scheme3">方案三：合计展示重叠金额+高亮</option>
+            </select>
+            <span class="scheme-select-arrow">⌄</span>
+          </div>
+        </div>
+
+        <div class="mode-switch">
+          <button id="mode-tree" class="mode-btn is-active" type="button">普通数据</button>
+          <button id="mode-mesh" class="mode-btn" type="button">复杂数据</button>
+        </div>
+      </div>
+
+      <section class="card">
+      <header class="header">
+        <div class="title-wrap">
+          <div class="title">调整链路</div>
+        </div>
+        <div class="toolbar">
+          <div class="legend">
+            <span class="legend-item">
+              <span class="legend-icon">◉</span>
+              <span>点击节点配置/查看明细</span>
+            </span>
+            <span class="legend-item">
+              <span class="legend-node start"></span>
+              <span>发起方节点</span>
+            </span>
+            <span class="legend-item">
+              <span class="legend-node regular"></span>
+              <span>上下游节点</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="stage">
+        <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
+          <defs>
+            <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d6dde8"></path>
+            </marker>
+            <marker id="arrow-hover" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2ccd9"></path>
+            </marker>
+            <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#1890ff"></path>
+            </marker>
+          </defs>
+          <g id="viewport-layer"></g>
+        </svg>
+
+        <div class="hud">
+          <div class="zoom-panel">
+            <button id="zoom-in" class="zoom-btn" type="button" aria-label="Zoom in">
+              <img src="./icon/放大.svg" class="zoom-icon" alt="" />
+            </button>
+            <button id="zoom-out" class="zoom-btn" type="button" aria-label="Zoom out">
+              <img src="./icon/缩小.svg" class="zoom-icon" alt="" />
+            </button>
+            <button id="zoom-fit" class="zoom-btn" type="button" aria-label="Fit view">
+              <img src="./icon/适配.svg" class="zoom-icon" alt="" />
+            </button>
+          </div>
+        </div>
+      </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="./vendor/popper.min.js"></script>
+  <script src="./vendor/tippy-bundle.umd.min.js"></script>
+  <script>
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const EXCLUSIVE_SEGMENT = 36;
+    const TAG_SOURCE_EXIT_OFFSET = 24;
+    const TAG_TARGET_ENTRY_OFFSET = 36;
+    const TAG_ORBIT_RADIUS = 120;
+    const TAG_ORBIT_MIN_GAP = 20;
+    const TAG_BOX_GAP = 10;
+    const LAYER_NODE_GAP = 50;
+    const LAYER_SIDE_PADDING = 48;
+    const LAYER_GAP_EXPAND_STEP = 24;
+    const MAX_TAG_LAYOUT_PASSES = 8;
+    const MAX_SCHEME_ONE_TAG_LAYOUT_PASSES = 14;
+    const LANE_GAP = 18;
+    const CORNER_RADIUS = 14;
+    const NODE_PADDING_X = 18;
+    const NODE_WIDTH = 265;
+    const NODE_TITLE_HORIZONTAL_PADDING = 18;
+    const PORT_INSET = 26;
+
+    const datasets = {
+      tree: {
+        label: "普通数据",
+        canvas: { width: 1520, height: 760 },
+        compactLayers: true,
+        layers: [
+          { y: 110, label: "TOP" },
+          { y: 320, label: "CENTER" },
+          { y: 560, label: "BOTTOM" }
+        ],
+        nodes: [
+          { id: "a-douyin-video", x: 180, y: 110, width: 168, title: "抖音短视频" },
+          { id: "a-toutiao", x: 430, y: 110, width: 168, title: "今日头条" },
+          { id: "a-fiction", x: 700, y: 110, width: 168, title: "小说" },
+          { id: "a-appbuffer", x: 980, y: 110, width: 172, title: "appbuffer号源池" },
+          { id: "a-mall", x: 1270, y: 110, width: 184, title: "抖音商城capp" },
+          {
+            id: "a-core",
+            x: 760,
+            y: 320,
+            width: 164,
+            title: "抖音业务",
+            meta: "收支偏差  0.31元   0.00%",
+            role: "initiator"
+          },
+          { id: "a-data-aml", x: 120, y: 560, width: 174, title: "研发商品中心-Data-AML" },
+          { id: "a-data-platform", x: 370, y: 560, width: 198, title: "研发商品中心-Data-数据平台" },
+          { id: "a-dev-infra", x: 620, y: 560, width: 186, title: "研发商品中心-Dev Infra" },
+          { id: "a-basic", x: 890, y: 560, width: 174, title: "研发商品中心-基础架构" },
+          { id: "a-co-build", x: 1160, y: 560, width: 228, title: "研发商品中心-Data-基架中心共建组" },
+          { id: "a-user-platform", x: 1410, y: 560, width: 174, title: "研发商品中心-用户中台" }
+        ],
+        edges: [
+          { id: "a-e1", source: "a-core", target: "a-douyin-video", amount: "+124230364.24元" },
+          { id: "a-e2", source: "a-core", target: "a-toutiao", amount: "+129.70元" },
+          { id: "a-e3", source: "a-core", target: "a-fiction", amount: "+665761.01元" },
+          { id: "a-e4", source: "a-core", target: "a-appbuffer", amount: "+20737.84元" },
+          { id: "a-e5", source: "a-core", target: "a-mall", amount: "+34843676.33元" },
+          { id: "a-e6", source: "a-core", target: "a-data-aml", amount: "+358.46元" },
+          { id: "a-e7", source: "a-core", target: "a-data-platform", amount: "+70802.28元" },
+          { id: "a-e8", source: "a-core", target: "a-dev-infra", amount: "+76660.93元" },
+          { id: "a-e9", source: "a-core", target: "a-basic", amount: "+50488269.95元" },
+          { id: "a-e10", source: "a-core", target: "a-co-build", amount: "+1165080.63元" },
+          { id: "a-e11", source: "a-core", target: "a-user-platform", amount: "+8730.88元" }
+        ]
+      },
+      mesh: {
+        label: "复杂数据",
+        canvas: { width: 1520, height: 860 },
+        compactLayers: true,
+        scheme1FanAlignment: false,
+        scheme1ReferenceXs: {
+          "m-toutiao": 160,
+          "m-douyin": 620,
+          "m-data-top": 910,
+          "m-chuan": 1200,
+          "m-prd-arch": 560,
+          "m-volcano": 1270,
+          "m-core": 910,
+          "m-bottom-arch": 910
+        },
+        layers: [
+          { y: 92, label: "LAYER 1" },
+          { y: 255, label: "LAYER 2" },
+          { y: 430, label: "LAYER 3" },
+          { y: 640, label: "LAYER 4" }
+        ],
+        nodes: [
+          { id: "m-toutiao", x: 110, y: 265, width: 168, height: 44, title: "今日头条" },
+          { id: "m-douyin", x: 670, y: 92, width: 184, height: 44, title: "抖音短视频" },
+          { id: "m-data-top", x: 905, y: 92, width: 176, height: 44, title: "Data-系统" },
+          { id: "m-chuan", x: 1200, y: 92, width: 184, height: 44, title: "穿山甲平台" },
+          {
+            id: "m-prd-arch",
+            x: 560,
+            y: 255,
+            width: 260,
+            height: 64,
+            title: "产品研发和工程架构部-架构",
+            meta: "收支偏差  -39.71元   -89.00%"
+          },
+          {
+            id: "m-volcano",
+            x: 1270,
+            y: 255,
+            width: 268,
+            height: 64,
+            title: "火山引擎-公共职能资源池运营",
+            meta: "收支偏差  -760.45元   -124.46%"
+          },
+          {
+            id: "m-core",
+            x: 900,
+            y: 430,
+            width: 220,
+            height: 64,
+            title: "Data-系统",
+            meta: "收支偏差  -1895元   -114.6%",
+            role: "initiator"
+          },
+          {
+            id: "m-bottom-arch",
+            x: 900,
+            y: 640,
+            width: 164,
+            height: 44,
+            title: "预算单元B"
+          }
+        ],
+        edges: [
+          { id: "m-e1", source: "m-prd-arch", target: "m-douyin", amount: "-86.00元" },
+          { id: "m-e2", source: "m-prd-arch", target: "m-data-top", amount: "+128.00元" },
+          { id: "m-e3", source: "m-prd-arch", target: "m-chuan", amount: "+54.00元" },
+          { id: "m-e4", source: "m-volcano", target: "m-douyin", amount: "-33.00元" },
+          { id: "m-e5", source: "m-volcano", target: "m-chuan", amount: "+72.00元" },
+          { id: "m-e6", source: "m-core", target: "m-toutiao", amount: "+61.00元" },
+          { id: "m-e7", source: "m-core", target: "m-prd-arch", amount: "+401.00元" },
+          { id: "m-e8", source: "m-core", target: "m-volcano", amount: "+65.00元" },
+          { id: "m-e9", source: "m-core", target: "m-bottom-arch", amount: "-180.00元" }
+        ]
+      }
+    };
+
+    const stage = document.querySelector(".stage");
+    const svg = document.getElementById("topology-canvas");
+    const viewportLayer = document.getElementById("viewport-layer");
+    const schemeSelect = document.getElementById("scheme-select");
+    const modeButtons = {
+      tree: document.getElementById("mode-tree"),
+      mesh: document.getElementById("mode-mesh")
+    };
+
+    const measureCanvas = document.createElement("canvas");
+    const measureContext = measureCanvas.getContext("2d");
+
+    const state = {
+      mode: "tree",
+      scheme: "scheme1",
+      active: null,
+      camera: { x: 0, y: 0, scale: 1 },
+      dragging: false,
+      dragOrigin: null,
+      graph: null,
+      tooltipInstances: []
+    };
+
+    // #region debug-point A:report-helper
+    const DEBUG_SERVER_URL = "http://127.0.0.1:7777/event";
+    const DEBUG_SESSION_ID = "scheme3-tag-tooltip";
+    const DEBUG_RUN_ID = "post-fix";
+    function reportDebugEvent(hypothesisId, location, msg, data = {}) {
+      fetch(DEBUG_SERVER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: DEBUG_SESSION_ID,
+          runId: DEBUG_RUN_ID,
+          hypothesisId,
+          location,
+          msg: `[DEBUG] ${msg}`,
+          data,
+          ts: Date.now()
+        })
+      }).catch(() => {});
+    }
+    // #endregion
+
+    function measureTextWidth(text, font = "700 12px Inter") {
+      measureContext.font = font;
+      return measureContext.measureText(text).width;
+    }
+
+    function truncateTextToWidth(text, maxWidth, font = "500 12px Inter") {
+      const safeText = String(text || "");
+      if (measureTextWidth(safeText, font) <= maxWidth) {
+        return safeText;
+      }
+
+      const ellipsis = "...";
+      const ellipsisWidth = measureTextWidth(ellipsis, font);
+      if (ellipsisWidth >= maxWidth) {
+        return ellipsis;
+      }
+
+      let low = 0;
+      let high = safeText.length;
+
+      while (low < high) {
+        const middle = Math.ceil((low + high) / 2);
+        const candidate = `${safeText.slice(0, middle)}${ellipsis}`;
+        if (measureTextWidth(candidate, font) <= maxWidth) {
+          low = middle;
+        } else {
+          high = middle - 1;
+        }
+      }
+
+      return `${safeText.slice(0, low)}${ellipsis}`;
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function buildTooltipHtml(rawText) {
+      const lines = String(rawText || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (!lines.length) {
+        return "";
+      }
+
+      const formatTooltipLine = (line) => {
+        const match = line.match(/^(.*?[：:]\s*)([+-]?\d+(?:\.\d+)?元)$/);
+        if (!match) {
+          return escapeHtml(line);
+        }
+
+        return `${escapeHtml(match[1])}<span class="tooltip-amount">${escapeHtml(match[2])}</span>`;
+      };
+
+      return `<div class="tooltip-lines">${lines
+        .map((line) => `<div class="tooltip-line">${formatTooltipLine(line)}</div>`)
+        .join("")}</div>`;
+    }
+
+    function createSvg(tag, attrs = {}) {
+      const node = document.createElementNS(SVG_NS, tag);
+      Object.entries(attrs).forEach(([key, value]) => {
+        node.setAttribute(key, value);
+      });
+      return node;
+    }
+
+    function buildPortX(node, count, index) {
+      if (count <= 1) {
+        return node.x;
+      }
+
+      const usable = Math.max(node.width - PORT_INSET * 2, 24);
+      const step = usable / (count - 1);
+      return node.x - usable / 2 + step * index;
+    }
+
+    function buildBiasedPortX(node, side) {
+      if (side === "left") {
+        return node.x - node.width / 2 + PORT_INSET;
+      }
+
+      if (side === "right") {
+        return node.x + node.width / 2 - PORT_INSET;
+      }
+
+      return node.x;
+    }
+
+    function buildPortClearance(node, count) {
+      if (count <= 1) {
+        return node.width - PORT_INSET * 2;
+      }
+      return Math.max((node.width - PORT_INSET * 2) / (count - 1), 24);
+    }
+
+    function smoothCurvePath(points) {
+      const filtered = points.filter((point, index) => {
+        if (index === 0) {
+          return true;
+        }
+        const prev = points[index - 1];
+        return prev.x !== point.x || prev.y !== point.y;
+      });
+
+      if (filtered.length < 2) {
+        return "";
+      }
+
+      let d = `M ${filtered[0].x} ${filtered[0].y}`;
+
+      if (filtered.length === 2) {
+        d += ` L ${filtered[1].x} ${filtered[1].y}`;
+        return d;
+      }
+
+      const start = filtered[0];
+      const end = filtered[filtered.length - 1];
+      const next = filtered[1];
+      const prev = filtered[filtered.length - 2];
+
+      const startDx = next.x - start.x;
+      const startDy = next.y - start.y;
+      const endDx = end.x - prev.x;
+      const endDy = end.y - prev.y;
+
+      const startLength = Math.hypot(startDx, startDy) || 1;
+      const endLength = Math.hypot(endDx, endDy) || 1;
+      const totalLength = Math.hypot(end.x - start.x, end.y - start.y);
+      const handle = Math.max(22, Math.min(72, totalLength * 0.22));
+
+      const cp1x = start.x + (startDx / startLength) * handle;
+      const cp1y = start.y + (startDy / startLength) * handle;
+      const cp2x = end.x - (endDx / endLength) * handle;
+      const cp2y = end.y - (endDy / endLength) * handle;
+
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${end.x} ${end.y}`;
+
+      return d;
+    }
+
+    function buildRoundedOrthogonalPath(points, radius = CORNER_RADIUS) {
+      const filtered = points.filter((point, index) => {
+        if (index === 0) {
+          return true;
+        }
+        const prev = points[index - 1];
+        return prev.x !== point.x || prev.y !== point.y;
+      });
+
+      if (filtered.length < 2) {
+        return "";
+      }
+
+      let d = `M ${filtered[0].x} ${filtered[0].y}`;
+
+      for (let index = 1; index < filtered.length - 1; index += 1) {
+        const prev = filtered[index - 1];
+        const current = filtered[index];
+        const next = filtered[index + 1];
+        const inDx = current.x - prev.x;
+        const inDy = current.y - prev.y;
+        const outDx = next.x - current.x;
+        const outDy = next.y - current.y;
+        const inLength = Math.hypot(inDx, inDy);
+        const outLength = Math.hypot(outDx, outDy);
+
+        if (!inLength || !outLength) {
+          continue;
+        }
+
+        const sameDirection = (inDx === 0 && outDx === 0) || (inDy === 0 && outDy === 0);
+        if (sameDirection) {
+          d += ` L ${current.x} ${current.y}`;
+          continue;
+        }
+
+        const cornerRadius = Math.min(radius, inLength / 2, outLength / 2);
+        const before = {
+          x: current.x - (inDx / inLength) * cornerRadius,
+          y: current.y - (inDy / inLength) * cornerRadius
+        };
+        const after = {
+          x: current.x + (outDx / outLength) * cornerRadius,
+          y: current.y + (outDy / outLength) * cornerRadius
+        };
+
+        d += ` L ${before.x} ${before.y}`;
+        d += ` Q ${current.x} ${current.y} ${after.x} ${after.y}`;
+      }
+
+      const end = filtered[filtered.length - 1];
+      d += ` L ${end.x} ${end.y}`;
+
+      return d;
+    }
+
+    function normalizeNodes(rawNodes) {
+      const map = new Map();
+      rawNodes.forEach((node) => {
+        const hasMeta = Boolean(node.meta);
+        map.set(node.id, {
+          ...node,
+          width: NODE_WIDTH,
+          height: node.role === "initiator" || hasMeta ? 46 : 28
+        });
+      });
+      return map;
+    }
+
+    function parseNodeMeta(metaText) {
+      if (!metaText) {
+        return null;
+      }
+
+      const normalized = String(metaText).replace(/\s+/g, " ").trim();
+      const matched = normalized.match(/^(.*?)[ :：]+([+-]?[\d,.]+)元\s+([+-]?[\d,.]+)%$/);
+
+      if (!matched) {
+        return {
+          label: normalized,
+          amount: "",
+          rate: "",
+          structured: false
+        };
+      }
+
+      return {
+        label: matched[1].trim(),
+        amount: matched[2],
+        rate: matched[3],
+        structured: true
+      };
+    }
+
+    function getNearestLayerIndex(y, layers) {
+      let bestIndex = 0;
+      let bestDistance = Number.POSITIVE_INFINITY;
+
+      layers.forEach((layer, index) => {
+        const distance = Math.abs(layer.y - y);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
+      });
+
+      return bestIndex;
+    }
+
+    function compactNodesByLayer(dataset, nodeMap, gapByLayer = []) {
+      if (!dataset.compactLayers || !dataset.layers?.length) {
+        return;
+      }
+
+      const buckets = dataset.layers.map(() => []);
+
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers);
+        node.layerIndex = layerIndex;
+        buckets[layerIndex].push(node);
+      });
+
+      buckets.forEach((nodes, layerIndex) => {
+        if (!nodes.length) {
+          return;
+        }
+
+        const layerY = dataset.layers[layerIndex].y;
+        nodes.forEach((node) => {
+          node.y = layerY;
+        });
+
+        if (nodes.length === 1) {
+          return;
+        }
+
+        nodes.sort((a, b) => a.x - b.x);
+
+        const layerGap = LAYER_NODE_GAP + (gapByLayer[layerIndex] || 0);
+        const totalWidth = nodes.reduce((sum, node) => sum + node.width, 0) + layerGap * (nodes.length - 1);
+        const preferredCenter = nodes.reduce((sum, node) => sum + node.x, 0) / nodes.length;
+        const minCenter = totalWidth / 2 + LAYER_SIDE_PADDING;
+        const maxCenter = dataset.canvas.width - totalWidth / 2 - LAYER_SIDE_PADDING;
+        const layerCenter = minCenter <= maxCenter
+          ? Math.max(minCenter, Math.min(maxCenter, preferredCenter))
+          : preferredCenter;
+        let left = layerCenter - totalWidth / 2;
+
+        nodes.forEach((node) => {
+          node.x = left + node.width / 2;
+          left += node.width + layerGap;
+        });
+      });
+    }
+
+    function applyFixedReferenceNodeLayout(dataset, nodeMap) {
+      if (!dataset.scheme1ReferenceXs || !dataset.layers?.length) {
+        return false;
+      }
+
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers);
+        node.layerIndex = layerIndex;
+        node.y = dataset.layers[layerIndex].y;
+
+        if (Object.prototype.hasOwnProperty.call(dataset.scheme1ReferenceXs, node.id)) {
+          node.x = dataset.scheme1ReferenceXs[node.id];
+        }
+      });
+
+      return true;
+    }
+
+    function getOrderedLayerNodes(nodeMap, layerIndex) {
+      return Array.from(nodeMap.values())
+        .filter((node) => node.layerIndex === layerIndex)
+        .sort((nodeA, nodeB) => nodeA.x - nodeB.x);
+    }
+
+    function resolveLayerPositionsForAnchor(layerNodes, anchorIndex, desiredX, canvasWidth, gap = LAYER_NODE_GAP) {
+      if (!layerNodes.length || anchorIndex < 0 || anchorIndex >= layerNodes.length) {
+        return null;
+      }
+
+      const offsets = new Array(layerNodes.length).fill(0);
+
+      for (let index = anchorIndex - 1; index >= 0; index -= 1) {
+        offsets[index] = offsets[index + 1]
+          - (layerNodes[index].width + layerNodes[index + 1].width) / 2
+          - gap;
+      }
+
+      for (let index = anchorIndex + 1; index < layerNodes.length; index += 1) {
+        offsets[index] = offsets[index - 1]
+          + (layerNodes[index - 1].width + layerNodes[index].width) / 2
+          + gap;
+      }
+
+      const leftEdgeAtZero = offsets[0] - layerNodes[0].width / 2;
+      const rightEdgeAtZero = offsets[offsets.length - 1] + layerNodes[layerNodes.length - 1].width / 2;
+      const minAnchorX = LAYER_SIDE_PADDING - leftEdgeAtZero;
+      const maxAnchorX = canvasWidth - LAYER_SIDE_PADDING - rightEdgeAtZero;
+      const anchorX = minAnchorX <= maxAnchorX
+        ? Math.max(minAnchorX, Math.min(maxAnchorX, desiredX))
+        : desiredX;
+
+      return offsets.map((offset) => offset + anchorX);
+    }
+
+    function alignNodeToVerticalAnchor(dataset, nodeMap, layerIndex, anchorNodeId, desiredX) {
+      const layerNodes = getOrderedLayerNodes(nodeMap, layerIndex);
+      const anchorIndex = layerNodes.findIndex((node) => node.id === anchorNodeId);
+
+      if (anchorIndex === -1) {
+        return;
+      }
+
+      const nextXs = resolveLayerPositionsForAnchor(
+        layerNodes,
+        anchorIndex,
+        desiredX,
+        dataset.canvas.width
+      );
+
+      if (!nextXs) {
+        return;
+      }
+
+      layerNodes.forEach((node, index) => {
+        node.x = nextXs[index];
+      });
+    }
+
+    function applySchemeOneFanAlignment(dataset, nodeMap, rawEdges) {
+      const fanInGroups = new Map();
+      const fanOutGroups = new Map();
+
+      rawEdges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const layerDistance = Math.abs(source.layerIndex - target.layerIndex);
+
+        if (layerDistance !== 1) {
+          return;
+        }
+
+        const fanInKey = `${target.id}:${source.layerIndex}`;
+        const fanOutKey = `${source.id}:${target.layerIndex}`;
+
+        if (!fanInGroups.has(fanInKey)) {
+          fanInGroups.set(fanInKey, {
+            target,
+            sourceLayerIndex: source.layerIndex,
+            sourceIds: new Set()
+          });
+        }
+        fanInGroups.get(fanInKey).sourceIds.add(source.id);
+
+        if (!fanOutGroups.has(fanOutKey)) {
+          fanOutGroups.set(fanOutKey, {
+            source,
+            targetLayerIndex: target.layerIndex,
+            targetIds: new Set()
+          });
+        }
+        fanOutGroups.get(fanOutKey).targetIds.add(target.id);
+      });
+
+      const rules = [];
+
+      fanInGroups.forEach((group) => {
+        const sourceIds = Array.from(group.sourceIds);
+        if (sourceIds.length < 3 || sourceIds.length % 2 === 0) {
+          return;
+        }
+
+        const orderedSources = sourceIds
+          .map((nodeId) => nodeMap.get(nodeId))
+          .sort((nodeA, nodeB) => nodeA.x - nodeB.x);
+        const medianSource = orderedSources[Math.floor(orderedSources.length / 2)];
+
+        rules.push({
+          layerIndex: group.sourceLayerIndex,
+          anchorNodeId: medianSource.id,
+          desiredX: group.target.x,
+          weight: orderedSources.length
+        });
+      });
+
+      fanOutGroups.forEach((group) => {
+        const targetIds = Array.from(group.targetIds);
+        if (targetIds.length < 3 || targetIds.length % 2 === 0) {
+          return;
+        }
+
+        const orderedTargets = targetIds
+          .map((nodeId) => nodeMap.get(nodeId))
+          .sort((nodeA, nodeB) => nodeA.x - nodeB.x);
+        const medianTarget = orderedTargets[Math.floor(orderedTargets.length / 2)];
+
+        rules.push({
+          layerIndex: group.targetLayerIndex,
+          anchorNodeId: medianTarget.id,
+          desiredX: group.source.x,
+          weight: orderedTargets.length
+        });
+      });
+
+      rules
+        .sort((ruleA, ruleB) => ruleB.weight - ruleA.weight)
+        .forEach((rule) => {
+          alignNodeToVerticalAnchor(
+            dataset,
+            nodeMap,
+            rule.layerIndex,
+            rule.anchorNodeId,
+            rule.desiredX
+          );
+        });
+    }
+
+    function resolveTagPresentation(rawAmount) {
+      const value = String(rawAmount || "").trim();
+      const normalized = value.replace(/\s+/g, "");
+      const matched = normalized.match(/^([+-]?[\d,]+(?:\.\d+)?)(元)?$/);
+
+      if (!matched) {
+        const fallbackText = "****";
+        return {
+          variant: "error",
+          valueText: fallbackText,
+          unitText: "",
+          valueWidth: Math.ceil(measureTextWidth(fallbackText, '500 10px "PingFang SC"')),
+          unitWidth: 0,
+          width: Math.max(31, Math.ceil(measureTextWidth(fallbackText, '500 10px "PingFang SC"')) + 10),
+          height: 20
+        };
+      }
+
+      const valueText = matched[1];
+      const unitText = "元";
+      const valueWidth = Math.ceil(measureTextWidth(valueText, '500 10px "PingFang SC"'));
+      const unitWidth = Math.ceil(measureTextWidth(unitText, '400 10px "PingFang SC"'));
+
+      return {
+        variant: "normal",
+        valueText,
+        unitText,
+        valueWidth,
+        unitWidth,
+        width: Math.max(70, valueWidth + unitWidth + 12),
+        height: 20
+      };
+    }
+
+    function resolveLabelTagPresentation(labelText) {
+      const valueText = String(labelText || "").trim();
+      const valueWidth = Math.ceil(measureTextWidth(valueText, '500 10px "PingFang SC"'));
+
+      return {
+        variant: "normal",
+        valueText,
+        unitText: "",
+        valueWidth,
+        unitWidth: 0,
+        width: Math.max(70, valueWidth + 12),
+        height: 20
+      };
+    }
+
+    function parseAmountNumber(rawAmount) {
+      const normalized = String(rawAmount || "").replace(/\s+/g, "").replace(/元/g, "").replace(/,/g, "");
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function formatAmountNumber(value) {
+      const safeValue = Number(value) || 0;
+      const sign = safeValue > 0 ? "+" : safeValue < 0 ? "-" : "";
+      return `${sign}${Math.abs(safeValue).toFixed(2)}元`;
+    }
+
+    function pointOnRectTowards(node, toX, toY) {
+      const dx = toX - node.x;
+      const dy = toY - node.y;
+      const halfW = node.width / 2;
+      const halfH = node.height / 2;
+
+      if (!dx && !dy) {
+        return { x: node.x, y: node.y };
+      }
+
+      const scaleX = dx === 0 ? Number.POSITIVE_INFINITY : halfW / Math.abs(dx);
+      const scaleY = dy === 0 ? Number.POSITIVE_INFINITY : halfH / Math.abs(dy);
+      const scale = Math.min(scaleX, scaleY);
+
+      return {
+        x: node.x + dx * scale,
+        y: node.y + dy * scale
+      };
+    }
+
+    function normalizeAngle(angle) {
+      const full = Math.PI * 2;
+      return ((angle % full) + full) % full;
+    }
+
+    function buildRadialEdgePath(sourcePoint, orbitPoint, corePoint, angle) {
+      const ux = Math.cos(angle);
+      const uy = Math.sin(angle);
+      const tx = -uy;
+      const ty = ux;
+      const sweep = Math.sin(angle) >= 0 ? 1 : -1;
+
+      const cp1 = {
+        x: sourcePoint.x - ux * 92 + tx * 18 * sweep,
+        y: sourcePoint.y - uy * 92 + ty * 18 * sweep
+      };
+      const cp2 = {
+        x: orbitPoint.x + tx * 34 * sweep,
+        y: orbitPoint.y + ty * 34 * sweep
+      };
+      const radialMid = {
+        x: orbitPoint.x * 0.62 + corePoint.x * 0.38 + tx * 8 * sweep,
+        y: orbitPoint.y * 0.62 + corePoint.y * 0.38 + ty * 8 * sweep
+      };
+
+      return [
+        `M ${sourcePoint.x} ${sourcePoint.y}`,
+        `C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${orbitPoint.x} ${orbitPoint.y}`,
+        `Q ${radialMid.x} ${radialMid.y}, ${corePoint.x} ${corePoint.y}`
+      ].join(" ");
+    }
+
+    function buildRadialGraph(dataset) {
+      const nodeMap = normalizeNodes(dataset.nodes);
+      const edges = dataset.edges.map((edge) => ({ ...edge }));
+      const core = nodeMap.get(dataset.coreId);
+
+      nodeMap.forEach((node) => {
+        node.outgoing = [];
+        node.incoming = [];
+      });
+
+      nodeMap.forEach((node) => {
+        if (node.id !== core.id) {
+          node.x = core.x + node.radius * Math.cos(node.angle);
+          node.y = core.y + node.radius * Math.sin(node.angle);
+        }
+      });
+
+      edges.forEach((edge) => {
+        nodeMap.get(edge.source).outgoing.push(edge);
+        nodeMap.get(edge.target).incoming.push(edge);
+      });
+
+      const sortedOrbitEdges = edges
+        .map((edge) => {
+          const source = nodeMap.get(edge.source);
+          return {
+            edge,
+            baseAngle: normalizeAngle(Math.atan2(source.y - core.y, source.x - core.x))
+          };
+        })
+        .sort((a, b) => a.baseAngle - b.baseAngle);
+
+      const minAngleGap = TAG_ORBIT_MIN_GAP / TAG_ORBIT_RADIUS;
+      let lastAngle = null;
+
+      sortedOrbitEdges.forEach(({ edge, baseAngle }) => {
+        let tagAngle = baseAngle;
+
+        if (lastAngle !== null && tagAngle - lastAngle < minAngleGap) {
+          tagAngle = lastAngle + minAngleGap;
+        }
+
+        edge.tagAngle = tagAngle;
+        lastAngle = tagAngle;
+      });
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const angle = edge.tagAngle;
+        const orbitPoint = {
+          x: core.x + TAG_ORBIT_RADIUS * Math.cos(angle),
+          y: core.y + TAG_ORBIT_RADIUS * Math.sin(angle)
+        };
+        const sourcePoint = pointOnRectTowards(source, orbitPoint.x, orbitPoint.y);
+        const corePoint = pointOnRectTowards(core, orbitPoint.x, orbitPoint.y);
+
+        edge.sourceNode = source;
+        edge.targetNode = target;
+        edge.sourcePortX = sourcePoint.x;
+        edge.sourcePortY = sourcePoint.y;
+        edge.targetPortX = corePoint.x;
+        edge.targetPortY = corePoint.y;
+        edge.path = buildRadialEdgePath(sourcePoint, orbitPoint, corePoint, angle);
+        edge.points = [sourcePoint, orbitPoint, corePoint];
+        edge.tagAnchor = "orbit-ring";
+        edge.tagCenter = orbitPoint;
+        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagVariant = edge.tagPresentation.variant;
+        edge.tagWidth = edge.tagPresentation.width;
+        edge.tagHeight = edge.tagPresentation.height;
+      });
+
+      return {
+        dataset,
+        nodeMap,
+        edges,
+        orbitRing: {
+          x: core.x,
+          y: core.y,
+          radius: TAG_ORBIT_RADIUS
+        },
+        bounds: {
+          minX: 80,
+          minY: 70,
+          maxX: dataset.canvas.width - 80,
+          maxY: dataset.canvas.height - 70
+        }
+      };
+    }
+
+    function buildLayoutFromNodeMap(dataset, nodeMap, edgeSeed, gapByLayer) {
+      const hasReferenceLayout = applyFixedReferenceNodeLayout(dataset, nodeMap);
+
+      if (!hasReferenceLayout) {
+        compactNodesByLayer(dataset, nodeMap, gapByLayer);
+      }
+
+      if (dataset.scheme1FanAlignment !== false) {
+        applySchemeOneFanAlignment(dataset, nodeMap, edgeSeed);
+      }
+
+      return buildRegularGraphLayout(
+        dataset,
+        nodeMap,
+        edgeSeed.map((edge) => ({ ...edge }))
+      );
+    }
+
+    function getSchemeOneLayerExpansion(overlaps, layerIndex, layerNodeCounts) {
+      if ((layerNodeCounts[layerIndex] || 0) <= 1) {
+        return 0;
+      }
+
+      let requiredExpansion = 0;
+
+      overlaps.forEach(([a, b]) => {
+        const overlap = getBoxOverlapMetrics(a, b);
+        const requiredGap = Math.ceil(overlap.width + TAG_BOX_GAP + 12);
+
+        if (requiredGap <= 0) {
+          return;
+        }
+
+        const sameSourceLayer = a.sourceLayerIndex === layerIndex
+          && b.sourceLayerIndex === layerIndex
+          && a.sourceId !== b.sourceId;
+        const sameTargetLayer = a.targetLayerIndex === layerIndex
+          && b.targetLayerIndex === layerIndex
+          && a.targetId !== b.targetId;
+
+        if (sameSourceLayer || sameTargetLayer) {
+          requiredExpansion = Math.max(requiredExpansion, requiredGap);
+        }
+      });
+
+      return requiredExpansion;
+    }
+
+    function buildSchemeOneGraph(dataset) {
+      const nodeMap = normalizeNodes(dataset.nodes);
+      const edgeSeed = dataset.edges.map((edge) => ({ ...edge }));
+      const layerGapByLayer = (dataset.layers || []).map(() => 0);
+      const layerNodeCounts = (dataset.layers || []).map(() => 0);
+
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers || []);
+        node.layerIndex = layerIndex;
+        layerNodeCounts[layerIndex] += 1;
+      });
+
+      if (dataset.scheme1ReferenceXs) {
+        const layoutResult = buildLayoutFromNodeMap(dataset, nodeMap, edgeSeed, layerGapByLayer);
+
+        return {
+          dataset,
+          nodeMap,
+          edges: layoutResult.edges,
+          bounds: layoutResult.bounds
+        };
+      }
+
+      let layoutResult = buildLayoutFromNodeMap(dataset, nodeMap, edgeSeed, layerGapByLayer);
+
+      for (let layerIndex = 1; layerIndex < (dataset.layers || []).length; layerIndex += 1) {
+        if ((layerNodeCounts[layerIndex] || 0) <= 1) {
+          continue;
+        }
+
+        for (let pass = 0; pass < MAX_SCHEME_ONE_TAG_LAYOUT_PASSES; pass += 1) {
+          layoutResult = buildLayoutFromNodeMap(dataset, nodeMap, edgeSeed, layerGapByLayer);
+          const overlaps = collectTagOverlapPairs(layoutResult.tagBoxes);
+          const expansion = getSchemeOneLayerExpansion(overlaps, layerIndex, layerNodeCounts);
+
+          if (!expansion) {
+            break;
+          }
+
+          layerGapByLayer[layerIndex] += Math.max(LAYER_GAP_EXPAND_STEP, expansion);
+        }
+      }
+
+      layoutResult = buildLayoutFromNodeMap(dataset, nodeMap, edgeSeed, layerGapByLayer);
+
+      return {
+        dataset,
+        nodeMap,
+        edges: layoutResult.edges,
+        bounds: layoutResult.bounds
+      };
+    }
+
+    function buildGraph(modeKey) {
+      const dataset = datasets[modeKey];
+
+      if (dataset.layout === "radial-core") {
+        return buildRadialGraph(dataset);
+      }
+
+      if (state.scheme === "scheme1" || state.scheme === "scheme3") {
+        return buildSchemeOneGraph(dataset);
+      }
+
+      const nodeMap = normalizeNodes(dataset.nodes);
+      const edgeSeed = dataset.edges.map((edge) => ({ ...edge }));
+      const layerGapByLayer = (dataset.layers || []).map(() => 0);
+      const layerNodeCounts = (dataset.layers || []).map(() => 0);
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers || []);
+        layerNodeCounts[layerIndex] += 1;
+      });
+
+      let layoutResult = null;
+      const maxPasses = dataset.compactLayers ? MAX_TAG_LAYOUT_PASSES : 1;
+
+      for (let pass = 0; pass < maxPasses; pass += 1) {
+        compactNodesByLayer(dataset, nodeMap, layerGapByLayer);
+        const edges = edgeSeed.map((edge) => ({ ...edge }));
+        layoutResult = buildRegularGraphLayout(dataset, nodeMap, edges);
+
+        const overlaps = collectTagOverlapPairs(layoutResult.tagBoxes);
+        if (!overlaps.length) {
+          break;
+        }
+
+        const expandableLayers = getExpandableLayers(overlaps, layerNodeCounts);
+        if (!expandableLayers.length) {
+          break;
+        }
+
+        expandableLayers.forEach((layerIndex) => {
+          layerGapByLayer[layerIndex] += LAYER_GAP_EXPAND_STEP;
+        });
+      }
+
+      return {
+        dataset,
+        nodeMap,
+        edges: layoutResult.edges,
+        bounds: layoutResult.bounds
+      };
+    }
+
+    function clearElement(element) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
+    function destroyTooltips() {
+      state.tooltipInstances.forEach((instance) => instance.destroy());
+      state.tooltipInstances = [];
+    }
+
+    function getTagPreferredRatio() {
+      return 0.5;
+    }
+
+    function boxesOverlap(a, b, gap = TAG_BOX_GAP) {
+      return !(
+        a.right + gap <= b.left ||
+        b.right + gap <= a.left ||
+        a.bottom + gap <= b.top ||
+        b.bottom + gap <= a.top
+      );
+    }
+
+    function pickTagPlacement(edge, route, placedBoxes) {
+      const totalLength = route.getTotalLength();
+      const preferredRatio = getTagPreferredRatio(edge);
+      const tryOffsets = [0, 0.04, -0.04, 0.08, -0.08, 0.12, -0.12, 0.16, -0.16];
+
+      for (const offset of tryOffsets) {
+        const ratio = Math.max(0.22, Math.min(0.78, preferredRatio + offset));
+        const point = route.getPointAtLength(totalLength * ratio);
+        const box = {
+          left: point.x - edge.tagWidth / 2,
+          right: point.x + edge.tagWidth / 2,
+          top: point.y - edge.tagHeight / 2,
+          bottom: point.y + edge.tagHeight / 2,
+          centerX: point.x,
+          centerY: point.y,
+          ratio
+        };
+
+        if (!placedBoxes.some((placed) => boxesOverlap(box, placed))) {
+          return box;
+        }
+      }
+
+      const fallbackPoint = route.getPointAtLength(totalLength * preferredRatio);
+      return {
+        left: fallbackPoint.x - edge.tagWidth / 2,
+        right: fallbackPoint.x + edge.tagWidth / 2,
+        top: fallbackPoint.y - edge.tagHeight / 2,
+        bottom: fallbackPoint.y + edge.tagHeight / 2,
+        centerX: fallbackPoint.x,
+        centerY: fallbackPoint.y,
+        ratio: preferredRatio
+      };
+    }
+
+    function computeEdgeTagBoxes(edges) {
+      const placedBoxes = [];
+
+      edges.forEach((edge) => {
+        if (edge.fixedTagCenter && edge.tagCenter) {
+          placedBoxes.push({
+            left: edge.tagCenter.x - edge.tagWidth / 2,
+            right: edge.tagCenter.x + edge.tagWidth / 2,
+            top: edge.tagCenter.y - edge.tagHeight / 2,
+            bottom: edge.tagCenter.y + edge.tagHeight / 2,
+            centerX: edge.tagCenter.x,
+            centerY: edge.tagCenter.y,
+            ratio: 0.5,
+            edgeId: edge.id,
+            sourceId: edge.source,
+            targetId: edge.target,
+            sourceLayerIndex: edge.sourceNode.layerIndex,
+            targetLayerIndex: edge.targetNode.layerIndex
+          });
+          return;
+        }
+
+        const route = createSvg("path", { d: edge.path });
+        const chosen = pickTagPlacement(edge, route, placedBoxes);
+
+        edge.tagCenter = {
+          x: chosen.centerX,
+          y: chosen.centerY
+        };
+        placedBoxes.push({
+          ...chosen,
+          edgeId: edge.id,
+          sourceId: edge.source,
+          targetId: edge.target,
+          sourceLayerIndex: edge.sourceNode.layerIndex,
+          targetLayerIndex: edge.targetNode.layerIndex
+        });
+      });
+
+      return placedBoxes;
+    }
+
+    function collectTagOverlapPairs(boxes) {
+      const overlaps = [];
+
+      for (let i = 0; i < boxes.length; i += 1) {
+        for (let j = i + 1; j < boxes.length; j += 1) {
+          if (boxesOverlap(boxes[i], boxes[j], 0)) {
+            overlaps.push([boxes[i], boxes[j]]);
+          }
+        }
+      }
+
+      return overlaps;
+    }
+
+    function getBoxOverlapMetrics(a, b) {
+      return {
+        width: Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)),
+        height: Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
+      };
+    }
+
+    function getExpandableLayers(overlaps, layerNodeCounts) {
+      const layers = new Set();
+
+      overlaps.forEach(([a, b]) => {
+        let added = false;
+
+        if (a.sourceLayerIndex === b.sourceLayerIndex && a.sourceId !== b.sourceId) {
+          if ((layerNodeCounts[a.sourceLayerIndex] || 0) > 1) {
+            layers.add(a.sourceLayerIndex);
+            added = true;
+          }
+        }
+
+        if (a.targetLayerIndex === b.targetLayerIndex && a.targetId !== b.targetId) {
+          if ((layerNodeCounts[a.targetLayerIndex] || 0) > 1) {
+            layers.add(a.targetLayerIndex);
+            added = true;
+          }
+        }
+
+        if (!added) {
+          [a.sourceLayerIndex, a.targetLayerIndex, b.sourceLayerIndex, b.targetLayerIndex].forEach((layerIndex) => {
+            if ((layerNodeCounts[layerIndex] || 0) > 1) {
+              layers.add(layerIndex);
+            }
+          });
+        }
+      });
+
+      return Array.from(layers);
+    }
+
+    function getOverlapExpansionByLayer(overlaps, layerNodeCounts) {
+      const expansionByLayer = new Map();
+
+      overlaps.forEach(([a, b]) => {
+        const overlap = getBoxOverlapMetrics(a, b);
+        const requiredGap = Math.ceil(overlap.width + TAG_BOX_GAP + 12);
+
+        if (requiredGap <= 0) {
+          return;
+        }
+
+        let assigned = false;
+
+        if (a.sourceLayerIndex === b.sourceLayerIndex && a.sourceId !== b.sourceId) {
+          if ((layerNodeCounts[a.sourceLayerIndex] || 0) > 1) {
+            expansionByLayer.set(
+              a.sourceLayerIndex,
+              Math.max(expansionByLayer.get(a.sourceLayerIndex) || 0, requiredGap)
+            );
+            assigned = true;
+          }
+        }
+
+        if (a.targetLayerIndex === b.targetLayerIndex && a.targetId !== b.targetId) {
+          if ((layerNodeCounts[a.targetLayerIndex] || 0) > 1) {
+            expansionByLayer.set(
+              a.targetLayerIndex,
+              Math.max(expansionByLayer.get(a.targetLayerIndex) || 0, requiredGap)
+            );
+            assigned = true;
+          }
+        }
+
+        if (!assigned) {
+          const candidateLayers = [
+            a.sourceLayerIndex,
+            a.targetLayerIndex,
+            b.sourceLayerIndex,
+            b.targetLayerIndex
+          ].filter((layerIndex, index, array) =>
+            array.indexOf(layerIndex) === index && (layerNodeCounts[layerIndex] || 0) > 1
+          );
+
+          if (!candidateLayers.length) {
+            return;
+          }
+
+          const distributedGap = Math.ceil(requiredGap / candidateLayers.length);
+          candidateLayers.forEach((layerIndex) => {
+            expansionByLayer.set(
+              layerIndex,
+              Math.max(expansionByLayer.get(layerIndex) || 0, distributedGap)
+            );
+          });
+        }
+      });
+
+      return expansionByLayer;
+    }
+
+    function buildTagBoxesFromFixedCenters(edges) {
+      return edges.map((edge) => ({
+        left: edge.tagCenter.x - edge.tagWidth / 2,
+        right: edge.tagCenter.x + edge.tagWidth / 2,
+        top: edge.tagCenter.y - edge.tagHeight / 2,
+        bottom: edge.tagCenter.y + edge.tagHeight / 2,
+        centerX: edge.tagCenter.x,
+        centerY: edge.tagCenter.y,
+        ratio: 0.5,
+        edgeId: edge.id,
+        sourceId: edge.source,
+        targetId: edge.target,
+        sourceLayerIndex: edge.sourceNode.layerIndex,
+        targetLayerIndex: edge.targetNode.layerIndex
+      }));
+    }
+
+    function buildTagCandidateBox(edge, point) {
+      return {
+        left: point.x - edge.tagWidth / 2,
+        right: point.x + edge.tagWidth / 2,
+        top: point.y - edge.tagHeight / 2,
+        bottom: point.y + edge.tagHeight / 2,
+        centerX: point.x,
+        centerY: point.y
+      };
+    }
+
+    function scoreTagCandidateBox(box, placedBoxes) {
+      return placedBoxes.reduce((score, placed) => {
+        const overlap = getBoxOverlapMetrics(box, placed);
+        return score + overlap.width * overlap.height;
+      }, 0);
+    }
+
+    function pushUniqueTagCandidate(candidates, point) {
+      const key = `${point.x.toFixed(2)}:${point.y.toFixed(2)}`;
+      if (candidates.some((candidate) => candidate.key === key)) {
+        return;
+      }
+
+      candidates.push({
+        key,
+        x: point.x,
+        y: point.y
+      });
+    }
+
+    function buildSchemeOneTagCandidates(edge, sharedSourceCount, sharedTargetCount) {
+      const candidates = [];
+      const spanLeft = Math.min(edge.sourcePortX, edge.targetPortX);
+      const spanRight = Math.max(edge.sourcePortX, edge.targetPortX);
+      const horizontalPadding = edge.tagWidth / 2 + 8;
+      const horizontalMinX = spanLeft + horizontalPadding;
+      const horizontalMaxX = spanRight - horizontalPadding;
+      const hasHorizontalRoom = horizontalMinX <= horizontalMaxX;
+      const sourceTowardsTarget = edge.targetPortX >= edge.sourcePortX;
+      const sourceSideX = hasHorizontalRoom
+        ? (sourceTowardsTarget ? horizontalMinX : horizontalMaxX)
+        : (edge.sourcePortX + edge.targetPortX) / 2;
+      const targetSideX = hasHorizontalRoom
+        ? (sourceTowardsTarget ? horizontalMaxX : horizontalMinX)
+        : (edge.sourcePortX + edge.targetPortX) / 2;
+      const centerX = hasHorizontalRoom
+        ? Math.max(horizontalMinX, Math.min(horizontalMaxX, (edge.sourcePortX + edge.targetPortX) / 2))
+        : (edge.sourcePortX + edge.targetPortX) / 2;
+      const sourceVerticalY = edge.sourcePortY + (edge.busY - edge.sourcePortY) * 0.56;
+      const targetVerticalY = edge.targetPortY + (edge.busY - edge.targetPortY) * 0.56;
+
+      if (sharedTargetCount > 1) {
+        pushUniqueTagCandidate(candidates, { x: sourceSideX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: edge.sourcePortX, y: sourceVerticalY });
+        pushUniqueTagCandidate(candidates, { x: centerX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: targetSideX, y: edge.busY });
+      } else if (sharedSourceCount > 1) {
+        pushUniqueTagCandidate(candidates, { x: targetSideX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: edge.targetPortX, y: targetVerticalY });
+        pushUniqueTagCandidate(candidates, { x: centerX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: sourceSideX, y: edge.busY });
+      } else {
+        pushUniqueTagCandidate(candidates, { x: centerX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: sourceSideX, y: edge.busY });
+        pushUniqueTagCandidate(candidates, { x: targetSideX, y: edge.busY });
+      }
+
+      pushUniqueTagCandidate(candidates, { x: edge.sourcePortX, y: sourceVerticalY });
+      pushUniqueTagCandidate(candidates, { x: edge.targetPortX, y: targetVerticalY });
+
+      if (hasHorizontalRoom) {
+        pushUniqueTagCandidate(candidates, {
+          x: horizontalMinX + (horizontalMaxX - horizontalMinX) * 0.25,
+          y: edge.busY
+        });
+        pushUniqueTagCandidate(candidates, {
+          x: horizontalMinX + (horizontalMaxX - horizontalMinX) * 0.75,
+          y: edge.busY
+        });
+      }
+
+      return candidates;
+    }
+
+    function buildSchemeThreeTagCandidates(edge) {
+      if (Math.abs(edge.sourcePortX - edge.targetPortX) < 1) {
+        return [{
+          key: `${edge.targetPortX.toFixed(2)}:${((edge.sourcePortY + edge.targetPortY) / 2).toFixed(2)}`,
+          x: edge.targetPortX,
+          y: (edge.sourcePortY + edge.targetPortY) / 2
+        }];
+      }
+
+      return [{
+        key: `${edge.targetPortX.toFixed(2)}:${((edge.targetPortY + edge.busY) / 2).toFixed(2)}`,
+        x: edge.targetPortX,
+        y: (edge.targetPortY + edge.busY) / 2
+      }];
+    }
+
+    function setEdgeTagData(edge, tagData) {
+      edge.tagPresentation = tagData.presentation;
+      edge.tagVariant = tagData.presentation.variant;
+      edge.tagWidth = tagData.presentation.width;
+      edge.tagHeight = tagData.presentation.height;
+      edge.tagCenter = tagData.center;
+      edge.fixedTagCenter = true;
+      edge.tagInteractiveEdgeIds = tagData.edgeIds;
+      edge.tagTooltip = tagData.tooltip || "";
+      edge.renderTag = true;
+    }
+
+    function assignSchemeThreeTagsOnBus(busEdges, nodeMap) {
+      const groupsByTarget = new Map();
+      const placedBoxes = [];
+
+      busEdges.forEach((edge) => {
+        if (!groupsByTarget.has(edge.target)) {
+          groupsByTarget.set(edge.target, []);
+        }
+        groupsByTarget.get(edge.target).push(edge);
+        edge.renderTag = false;
+      });
+
+      const tagGroups = Array.from(groupsByTarget.values())
+        .map((group) => ({
+          edges: group,
+          primary: group[0],
+          priority: group.length,
+          targetX: group[0].targetPortX
+        }))
+        .sort((groupA, groupB) => {
+          if (groupA.priority !== groupB.priority) {
+            return groupB.priority - groupA.priority;
+          }
+          return groupA.targetX - groupB.targetX;
+        });
+
+      tagGroups.forEach(({ edges, primary }) => {
+        const targetNode = nodeMap.get(primary.target);
+        const totalAmount = edges.reduce((sum, edge) => sum + parseAmountNumber(edge.amount), 0);
+        const isAggregate = edges.length > 1;
+        const presentation = isAggregate
+          ? resolveLabelTagPresentation(`合计：${formatAmountNumber(totalAmount)}`)
+          : resolveTagPresentation(primary.amount);
+        const candidates = buildSchemeThreeTagCandidates(primary);
+
+        let chosenBox = null;
+
+        candidates.forEach((candidate) => {
+          if (chosenBox) {
+            return;
+          }
+
+          const box = buildTagCandidateBox({
+            ...primary,
+            tagWidth: presentation.width,
+            tagHeight: presentation.height
+          }, candidate);
+
+          if (!placedBoxes.some((placed) => boxesOverlap(box, placed))) {
+            chosenBox = box;
+          }
+        });
+
+        if (!chosenBox) {
+          let bestScore = Number.POSITIVE_INFINITY;
+          candidates.forEach((candidate) => {
+            const box = buildTagCandidateBox({
+              ...primary,
+              tagWidth: presentation.width,
+              tagHeight: presentation.height
+            }, candidate);
+            const score = scoreTagCandidateBox(box, placedBoxes);
+            if (score < bestScore) {
+              bestScore = score;
+              chosenBox = box;
+            }
+          });
+        }
+
+        if (!chosenBox) {
+          chosenBox = buildTagCandidateBox({
+            ...primary,
+            tagWidth: presentation.width,
+            tagHeight: presentation.height
+          }, {
+            x: primary.targetPortX,
+            y: primary.targetPortY + (primary.busY - primary.targetPortY) * 0.7
+          });
+        }
+
+        const tooltip = isAggregate
+          ? [
+            `总金额：${formatAmountNumber(totalAmount)}`,
+            ...edges.map((edge) => {
+              const sourceNode = nodeMap.get(edge.source);
+              return `${sourceNode.title} -> ${targetNode.title}：${edge.amount}`;
+            })
+          ].join("\n")
+          : "";
+
+        setEdgeTagData(primary, {
+          presentation,
+          center: {
+            x: chosenBox.centerX,
+            y: chosenBox.centerY
+          },
+          edgeIds: edges.map((edge) => edge.id),
+          tooltip
+        });
+
+        placedBoxes.push(chosenBox);
+      });
+    }
+
+    function assignSegmentTagsOnBus(busEdges) {
+      const sourceCounts = new Map();
+      const targetCounts = new Map();
+      const placedBoxes = [];
+
+      busEdges.forEach((edge) => {
+        sourceCounts.set(edge.source, (sourceCounts.get(edge.source) || 0) + 1);
+        targetCounts.set(edge.target, (targetCounts.get(edge.target) || 0) + 1);
+      });
+
+      const edgeCandidates = busEdges
+        .map((edge) => {
+          const candidates = buildSchemeOneTagCandidates(
+            edge,
+            sourceCounts.get(edge.source) || 1,
+            targetCounts.get(edge.target) || 1
+          );
+
+          return {
+            edge,
+            candidates,
+            span: Math.abs(edge.targetPortX - edge.sourcePortX),
+            priority: Math.max(sourceCounts.get(edge.source) || 1, targetCounts.get(edge.target) || 1)
+          };
+        })
+        .sort((itemA, itemB) => {
+          if (itemA.priority !== itemB.priority) {
+            return itemB.priority - itemA.priority;
+          }
+          if (itemA.candidates.length !== itemB.candidates.length) {
+            return itemA.candidates.length - itemB.candidates.length;
+          }
+          return itemA.span - itemB.span;
+        });
+
+      edgeCandidates.forEach(({ edge, candidates }) => {
+        let chosenBox = null;
+
+        for (const candidate of candidates) {
+          const box = buildTagCandidateBox(edge, candidate);
+          if (!placedBoxes.some((placed) => boxesOverlap(box, placed))) {
+            chosenBox = box;
+            break;
+          }
+        }
+
+        if (!chosenBox) {
+          let bestScore = Number.POSITIVE_INFINITY;
+
+          candidates.forEach((candidate) => {
+            const box = buildTagCandidateBox(edge, candidate);
+            const score = scoreTagCandidateBox(box, placedBoxes);
+            if (score < bestScore) {
+              bestScore = score;
+              chosenBox = box;
+            }
+          });
+        }
+
+        if (!chosenBox) {
+          chosenBox = buildTagCandidateBox(edge, {
+            x: (edge.sourcePortX + edge.targetPortX) / 2,
+            y: edge.busY
+          });
+        }
+
+        edge.tagCenter = {
+          x: chosenBox.centerX,
+          y: chosenBox.centerY
+        };
+        edge.tagSegment = null;
+        edge.fixedTagCenter = true;
+        placedBoxes.push(chosenBox);
+      });
+    }
+
+    function buildSharedBusEdgePoints(edge) {
+      return [
+        { x: edge.sourcePortX, y: edge.sourcePortY },
+        { x: edge.sourcePortX, y: edge.busY },
+        { x: edge.targetPortX, y: edge.busY },
+        { x: edge.targetPortX, y: edge.targetPortY }
+      ];
+    }
+
+    function buildRegularGraphLayoutSchemeOne(dataset, nodeMap, edges) {
+      nodeMap.forEach((node) => {
+        node.outgoingTop = [];
+        node.outgoingBottom = [];
+        node.incomingTop = [];
+        node.incomingBottom = [];
+      });
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const isUpwardFlow = target.y < source.y;
+
+        edge.sourceNode = source;
+        edge.targetNode = target;
+        edge.isUpwardFlow = isUpwardFlow;
+        edge.sourcePortSide = isUpwardFlow ? "top" : "bottom";
+        edge.targetPortSide = isUpwardFlow ? "bottom" : "top";
+
+        if (edge.sourcePortSide === "top") {
+          source.outgoingTop.push(edge);
+        } else {
+          source.outgoingBottom.push(edge);
+        }
+
+        if (edge.targetPortSide === "top") {
+          target.incomingTop.push(edge);
+        } else {
+          target.incomingBottom.push(edge);
+        }
+      });
+
+      const busGroups = new Map();
+
+      edges.forEach((edge) => {
+        const source = edge.sourceNode;
+        const target = edge.targetNode;
+        const minLayerIndex = Math.min(source.layerIndex, target.layerIndex);
+        const maxLayerIndex = Math.max(source.layerIndex, target.layerIndex);
+        const busY = (dataset.layers[minLayerIndex].y + dataset.layers[maxLayerIndex].y) / 2;
+        const busKey = `${minLayerIndex}-${maxLayerIndex}`;
+        const sourcePortCount = edge.sourcePortSide === "top"
+          ? source.outgoingTop.length || 1
+          : source.outgoingBottom.length || 1;
+        const targetPortCount = edge.targetPortSide === "top"
+          ? target.incomingTop.length || 1
+          : target.incomingBottom.length || 1;
+
+        edge.sourcePortIndex = 0;
+        edge.targetPortIndex = 0;
+        edge.sourcePortCount = sourcePortCount;
+        edge.targetPortCount = targetPortCount;
+        edge.sourcePortX = source.x;
+        edge.targetPortX = target.x;
+        edge.sourcePortY = edge.sourcePortSide === "top"
+          ? source.y - source.height / 2
+          : source.y + source.height / 2;
+        edge.targetPortY = edge.targetPortSide === "top"
+          ? target.y - target.height / 2
+          : target.y + target.height / 2;
+        edge.busY = busY;
+        edge.busKey = busKey;
+        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagVariant = edge.tagPresentation.variant;
+        edge.tagWidth = edge.tagPresentation.width;
+        edge.tagHeight = edge.tagPresentation.height;
+
+        if (!busGroups.has(busKey)) {
+          busGroups.set(busKey, []);
+        }
+        busGroups.get(busKey).push(edge);
+      });
+
+      busGroups.forEach((group) => {
+        assignSegmentTagsOnBus(group);
+
+        group.forEach((edge) => {
+          edge.points = buildSharedBusEdgePoints(edge);
+          edge.path = buildRoundedOrthogonalPath(edge.points);
+        });
+      });
+
+      const tagBoxes = buildTagBoxesFromFixedCenters(edges);
+
+      const bounds = {
+        minX: Infinity,
+        minY: Infinity,
+        maxX: -Infinity,
+        maxY: -Infinity
+      };
+
+      nodeMap.forEach((node) => {
+        bounds.minX = Math.min(bounds.minX, node.x - node.width / 2 - NODE_PADDING_X);
+        bounds.minY = Math.min(bounds.minY, node.y - node.height / 2 - NODE_PADDING_X);
+        bounds.maxX = Math.max(bounds.maxX, node.x + node.width / 2 + NODE_PADDING_X);
+        bounds.maxY = Math.max(bounds.maxY, node.y + node.height / 2 + NODE_PADDING_X);
+      });
+
+      edges.forEach((edge) => {
+        edge.points.forEach((point) => {
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+        });
+      });
+
+      tagBoxes.forEach((box) => {
+        bounds.minX = Math.min(bounds.minX, box.left - 8);
+        bounds.minY = Math.min(bounds.minY, box.top - 8);
+        bounds.maxX = Math.max(bounds.maxX, box.right + 8);
+        bounds.maxY = Math.max(bounds.maxY, box.bottom + 8);
+      });
+
+      return {
+        edges,
+        bounds,
+        tagBoxes
+      };
+    }
+
+    function buildRegularGraphLayoutSchemeThree(dataset, nodeMap, edges) {
+      nodeMap.forEach((node) => {
+        node.outgoingTop = [];
+        node.outgoingBottom = [];
+        node.incomingTop = [];
+        node.incomingBottom = [];
+      });
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const isUpwardFlow = target.y < source.y;
+
+        edge.sourceNode = source;
+        edge.targetNode = target;
+        edge.isUpwardFlow = isUpwardFlow;
+        edge.sourcePortSide = isUpwardFlow ? "top" : "bottom";
+        edge.targetPortSide = isUpwardFlow ? "bottom" : "top";
+        edge.renderTag = false;
+
+        if (edge.sourcePortSide === "top") {
+          source.outgoingTop.push(edge);
+        } else {
+          source.outgoingBottom.push(edge);
+        }
+
+        if (edge.targetPortSide === "top") {
+          target.incomingTop.push(edge);
+        } else {
+          target.incomingBottom.push(edge);
+        }
+      });
+
+      const busGroups = new Map();
+
+      edges.forEach((edge) => {
+        const source = edge.sourceNode;
+        const target = edge.targetNode;
+        const minLayerIndex = Math.min(source.layerIndex, target.layerIndex);
+        const maxLayerIndex = Math.max(source.layerIndex, target.layerIndex);
+        const busY = (dataset.layers[minLayerIndex].y + dataset.layers[maxLayerIndex].y) / 2;
+        const busKey = `${minLayerIndex}-${maxLayerIndex}`;
+        const sourcePortCount = edge.sourcePortSide === "top"
+          ? source.outgoingTop.length || 1
+          : source.outgoingBottom.length || 1;
+        const targetPortCount = edge.targetPortSide === "top"
+          ? target.incomingTop.length || 1
+          : target.incomingBottom.length || 1;
+
+        edge.sourcePortIndex = 0;
+        edge.targetPortIndex = 0;
+        edge.sourcePortCount = sourcePortCount;
+        edge.targetPortCount = targetPortCount;
+        edge.sourcePortX = source.x;
+        edge.targetPortX = target.x;
+        edge.sourcePortY = edge.sourcePortSide === "top"
+          ? source.y - source.height / 2
+          : source.y + source.height / 2;
+        edge.targetPortY = edge.targetPortSide === "top"
+          ? target.y - target.height / 2
+          : target.y + target.height / 2;
+        edge.busY = busY;
+        edge.busKey = busKey;
+        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagVariant = edge.tagPresentation.variant;
+        edge.tagWidth = edge.tagPresentation.width;
+        edge.tagHeight = edge.tagPresentation.height;
+
+        if (!busGroups.has(busKey)) {
+          busGroups.set(busKey, []);
+        }
+        busGroups.get(busKey).push(edge);
+      });
+
+      busGroups.forEach((group) => {
+        assignSchemeThreeTagsOnBus(group, nodeMap);
+
+        group.forEach((edge) => {
+          edge.points = buildSharedBusEdgePoints(edge);
+          edge.path = buildRoundedOrthogonalPath(edge.points);
+        });
+      });
+
+      const tagBoxes = buildTagBoxesFromFixedCenters(edges.filter((edge) => edge.renderTag));
+
+      const bounds = {
+        minX: Infinity,
+        minY: Infinity,
+        maxX: -Infinity,
+        maxY: -Infinity
+      };
+
+      nodeMap.forEach((node) => {
+        bounds.minX = Math.min(bounds.minX, node.x - node.width / 2 - NODE_PADDING_X);
+        bounds.minY = Math.min(bounds.minY, node.y - node.height / 2 - NODE_PADDING_X);
+        bounds.maxX = Math.max(bounds.maxX, node.x + node.width / 2 + NODE_PADDING_X);
+        bounds.maxY = Math.max(bounds.maxY, node.y + node.height / 2 + NODE_PADDING_X);
+      });
+
+      edges.forEach((edge) => {
+        edge.points.forEach((point) => {
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+        });
+      });
+
+      tagBoxes.forEach((box) => {
+        bounds.minX = Math.min(bounds.minX, box.left - 8);
+        bounds.minY = Math.min(bounds.minY, box.top - 8);
+        bounds.maxX = Math.max(bounds.maxX, box.right + 8);
+        bounds.maxY = Math.max(bounds.maxY, box.bottom + 8);
+      });
+
+      return {
+        edges,
+        bounds,
+        tagBoxes
+      };
+    }
+
+    function buildRegularGraphLayoutLegacy(dataset, nodeMap, edges) {
+      const outgoingMap = new Map();
+      const incomingMap = new Map();
+
+      nodeMap.forEach((node) => {
+        outgoingMap.set(node.id, []);
+        incomingMap.set(node.id, []);
+      });
+
+      edges.forEach((edge) => {
+        outgoingMap.get(edge.source).push(edge);
+        incomingMap.get(edge.target).push(edge);
+      });
+
+      outgoingMap.forEach((list, nodeId) => {
+        list.sort((a, b) => {
+          const nodeA = nodeMap.get(a.target);
+          const nodeB = nodeMap.get(b.target);
+          if (nodeA.y !== nodeB.y) {
+            return nodeA.y - nodeB.y;
+          }
+          return nodeA.x - nodeB.x;
+        });
+        nodeMap.get(nodeId).outgoing = list;
+      });
+
+      incomingMap.forEach((list, nodeId) => {
+        list.sort((a, b) => {
+          const nodeA = nodeMap.get(a.source);
+          const nodeB = nodeMap.get(b.source);
+          if (nodeA.y !== nodeB.y) {
+            return nodeA.y - nodeB.y;
+          }
+          return nodeA.x - nodeB.x;
+        });
+        nodeMap.get(nodeId).incoming = list;
+      });
+
+      const laneGroups = new Map();
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const sourceIndex = source.outgoing.findIndex((item) => item.id === edge.id);
+        const targetIndex = target.incoming.findIndex((item) => item.id === edge.id);
+        const sourcePortCount = source.outgoing.length || 1;
+        const targetPortCount = target.incoming.length || 1;
+        const isUpwardFlow = target.y < source.y;
+        const sourcePortSide = isUpwardFlow ? "top" : "bottom";
+        const targetPortSide = isUpwardFlow ? "bottom" : "top";
+
+        edge.sourcePortIndex = Math.max(sourceIndex, 0);
+        edge.targetPortIndex = Math.max(targetIndex, 0);
+        edge.sourcePortCount = sourcePortCount;
+        edge.targetPortCount = targetPortCount;
+        edge.isUpwardFlow = isUpwardFlow;
+        edge.sourcePortSide = sourcePortSide;
+        edge.targetPortSide = targetPortSide;
+        edge.sourcePortX = source.x;
+        edge.targetPortX = target.x;
+        edge.sourcePortY = sourcePortSide === "top"
+          ? source.y - source.height / 2
+          : source.y + source.height / 2;
+        edge.targetPortY = targetPortSide === "top"
+          ? target.y - target.height / 2
+          : target.y + target.height / 2;
+
+        const sourceExitY = sourcePortSide === "top"
+          ? edge.sourcePortY - EXCLUSIVE_SEGMENT
+          : edge.sourcePortY + EXCLUSIVE_SEGMENT;
+        const targetEntryY = targetPortSide === "top"
+          ? edge.targetPortY - EXCLUSIVE_SEGMENT
+          : edge.targetPortY + EXCLUSIVE_SEGMENT;
+
+        edge.sourceExitY = sourceExitY;
+        edge.targetEntryY = targetEntryY;
+
+        const corridorKey = [
+          Math.round(sourceExitY),
+          Math.round(targetEntryY),
+          Math.round(Math.min(sourceExitY, targetEntryY)),
+          Math.round(Math.max(sourceExitY, targetEntryY))
+        ].join(":");
+
+        if (!laneGroups.has(corridorKey)) {
+          laneGroups.set(corridorKey, []);
+        }
+        laneGroups.get(corridorKey).push(edge);
+      });
+
+      laneGroups.forEach((group) => {
+        group.sort((a, b) => {
+          if (a.sourcePortX !== b.sourcePortX) {
+            return a.sourcePortX - b.sourcePortX;
+          }
+          return a.targetPortX - b.targetPortX;
+        });
+
+        const laneCount = group.length;
+
+        group.forEach((edge, index) => {
+          const sourceExitY = edge.sourceExitY;
+          const targetEntryY = edge.targetEntryY;
+          const middle = (sourceExitY + targetEntryY) / 2;
+          const spread = (index - (laneCount - 1) / 2) * LANE_GAP;
+          const laneTop = Math.min(sourceExitY, targetEntryY) + 10;
+          const laneBottom = Math.max(sourceExitY, targetEntryY) - 10;
+
+          let laneY = middle + spread;
+          if (laneBottom >= laneTop) {
+            laneY = Math.max(laneTop, Math.min(laneBottom, laneY));
+          } else {
+            laneY = middle;
+          }
+
+          edge.laneY = laneY;
+        });
+      });
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const sourceExitY = edge.sourceExitY;
+        const targetEntryY = edge.targetEntryY;
+
+        edge.points = [
+          { x: edge.sourcePortX, y: edge.sourcePortY },
+          { x: edge.sourcePortX, y: sourceExitY },
+          { x: edge.sourcePortX, y: edge.laneY },
+          { x: edge.targetPortX, y: edge.laneY },
+          { x: edge.targetPortX, y: targetEntryY },
+          { x: edge.targetPortX, y: edge.targetPortY }
+        ];
+        edge.path = smoothCurvePath(edge.points);
+        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagVariant = edge.tagPresentation.variant;
+        edge.tagWidth = edge.tagPresentation.width;
+        edge.tagHeight = edge.tagPresentation.height;
+        edge.sourceNode = source;
+        edge.targetNode = target;
+      });
+
+      const tagBoxes = computeEdgeTagBoxes(edges);
+
+      const bounds = {
+        minX: Infinity,
+        minY: Infinity,
+        maxX: -Infinity,
+        maxY: -Infinity
+      };
+
+      nodeMap.forEach((node) => {
+        bounds.minX = Math.min(bounds.minX, node.x - node.width / 2 - NODE_PADDING_X);
+        bounds.minY = Math.min(bounds.minY, node.y - node.height / 2 - NODE_PADDING_X);
+        bounds.maxX = Math.max(bounds.maxX, node.x + node.width / 2 + NODE_PADDING_X);
+        bounds.maxY = Math.max(bounds.maxY, node.y + node.height / 2 + NODE_PADDING_X);
+      });
+
+      return {
+        edges,
+        bounds,
+        tagBoxes
+      };
+    }
+
+    function buildRegularGraphLayout(dataset, nodeMap, edges) {
+      if (state.scheme === "scheme1") {
+        return buildRegularGraphLayoutSchemeOne(dataset, nodeMap, edges);
+      }
+
+      if (state.scheme === "scheme3") {
+        return buildRegularGraphLayoutSchemeThree(dataset, nodeMap, edges);
+      }
+
+      return buildRegularGraphLayoutLegacy(dataset, nodeMap, edges);
+    }
+
+    function positionTagGroup(tagGroup, edge, centerX, centerY, width, height) {
+      const underlay = tagGroup.querySelector('[data-tag-part="underlay"]');
+      const body = tagGroup.querySelector('[data-tag-part="body"]');
+      const value = tagGroup.querySelector('[data-tag-part="value"]');
+      const unit = tagGroup.querySelector('[data-tag-part="unit"]');
+      const hit = tagGroup.querySelector('[data-tag-part="hit"]');
+      const left = centerX - width / 2;
+      const top = centerY - height / 2;
+
+      if (underlay) {
+        underlay.setAttribute("x", left - 2);
+        underlay.setAttribute("y", top - 2);
+      }
+
+      if (body) {
+        body.setAttribute("x", left);
+        body.setAttribute("y", top);
+      }
+
+      if (hit) {
+        hit.setAttribute("x", left - 4);
+        hit.setAttribute("y", top - 4);
+      }
+
+      if (value) {
+        if (edge.tagPresentation.unitText) {
+          const totalWidth = edge.tagPresentation.valueWidth + edge.tagPresentation.unitWidth + 1;
+          value.setAttribute("x", centerX - totalWidth / 2 + edge.tagPresentation.valueWidth / 2);
+        } else {
+          value.setAttribute("x", centerX);
+        }
+        value.setAttribute("y", centerY + 0.5);
+      }
+
+      if (unit) {
+        const totalWidth = edge.tagPresentation.valueWidth + edge.tagPresentation.unitWidth + 1;
+        unit.setAttribute("x", centerX + totalWidth / 2 - edge.tagPresentation.unitWidth / 2);
+        unit.setAttribute("y", centerY + 0.5);
+      }
+    }
+
+    function layoutTagsOnEdges(graphRoot, edges) {
+      const tagGroups = new Map(
+        Array.from(graphRoot.querySelectorAll(".tag-group")).map((group) => [
+          group.getAttribute("data-edge-id"),
+          group
+        ])
+      );
+      const routePaths = new Map(
+        Array.from(graphRoot.querySelectorAll(".edge-group")).map((group) => [
+          group.getAttribute("data-edge-id"),
+          group.querySelector(".edge-route")
+        ])
+      );
+      const placedBoxes = [];
+
+      edges.forEach((edge) => {
+        const tagGroup = tagGroups.get(edge.id);
+        const route = routePaths.get(edge.id);
+
+        if (!tagGroup || !route) {
+          return;
+        }
+
+        if (edge.fixedTagCenter && edge.tagCenter) {
+          positionTagGroup(tagGroup, edge, edge.tagCenter.x, edge.tagCenter.y, edge.tagWidth, edge.tagHeight);
+          placedBoxes.push({
+            left: edge.tagCenter.x - edge.tagWidth / 2,
+            right: edge.tagCenter.x + edge.tagWidth / 2,
+            top: edge.tagCenter.y - edge.tagHeight / 2,
+            bottom: edge.tagCenter.y + edge.tagHeight / 2
+          });
+          return;
+        }
+
+        const chosen = pickTagPlacement(edge, route, placedBoxes);
+
+        edge.tagCenter = {
+          x: chosen.centerX,
+          y: chosen.centerY
+        };
+        positionTagGroup(tagGroup, edge, chosen.centerX, chosen.centerY, edge.tagWidth, edge.tagHeight);
+        placedBoxes.push(chosen);
+      });
+    }
+
+    function initTagTooltips(graphRoot) {
+      // #region debug-point A:tippy-availability
+      reportDebugEvent("A", "initTagTooltips", "enter initTagTooltips", {
+        hasTippy: typeof window.tippy === "function"
+      });
+      // #endregion
+      if (typeof window.tippy !== "function") {
+        console.warn("Tippy.js is not available, tag tooltips cannot be initialized.");
+        return;
+      }
+
+      destroyTooltips();
+
+      const tooltipTargets = Array.from(graphRoot.querySelectorAll("[data-tooltip-html]"));
+      // #region debug-point B:tooltip-targets
+      reportDebugEvent("B", "initTagTooltips", "resolved tooltip targets", {
+        targetCount: tooltipTargets.length,
+        scheme: state.scheme,
+        mode: state.mode
+      });
+      // #endregion
+      state.tooltipInstances = tooltipTargets.map((target) => window.tippy(target, {
+        content: target.getAttribute("data-tooltip-html"),
+        allowHTML: true,
+        trigger: "mouseenter focus",
+        arrow: true,
+        theme: "topology",
+        placement: "top",
+        delay: [0, 0],
+        duration: [120, 80],
+        interactive: false,
+        maxWidth: "none",
+        appendTo: () => document.body,
+        onShow(instance) {
+          // #region debug-point D:tippy-show
+          reportDebugEvent("D", "tippy:onShow", "tooltip show triggered", {
+            referenceTag: instance.reference?.getAttribute?.("data-debug-tag") || "",
+            rect: instance.reference?.getBoundingClientRect?.()
+              ? {
+                  x: Math.round(instance.reference.getBoundingClientRect().x),
+                  y: Math.round(instance.reference.getBoundingClientRect().y),
+                  width: Math.round(instance.reference.getBoundingClientRect().width),
+                  height: Math.round(instance.reference.getBoundingClientRect().height)
+                }
+              : null
+          });
+          // #endregion
+        }
+      }));
+    }
+
+    function renderLayerLabels(graphRoot, layers, width) {
+      return;
+    }
+
+    function renderOrbitRing(graphRoot, orbitRing) {
+      if (!orbitRing) {
+        return;
+      }
+
+      graphRoot.appendChild(createSvg("circle", {
+        cx: orbitRing.x,
+        cy: orbitRing.y,
+        r: orbitRing.radius,
+        class: "orbit-ring"
+      }));
+    }
+
+    function renderEdge(edgeLayer, tagLayer, edge) {
+      const group = createSvg("g", {
+        class: "edge-group",
+        "data-edge-id": edge.id
+      });
+
+      const route = createSvg("path", {
+        d: edge.path,
+        class: "edge-route"
+      });
+      const hit = createSvg("path", {
+        d: edge.path,
+        class: "edge-hit"
+      });
+
+      group.appendChild(route);
+      group.appendChild(hit);
+
+      const activate = () => setActiveEdge(edge.id);
+      const deactivate = () => clearActiveState();
+
+      group.addEventListener("mouseenter", activate);
+      group.addEventListener("mouseleave", deactivate);
+
+      edgeLayer.appendChild(group);
+
+      if (edge.renderTag === false) {
+        return;
+      }
+
+      const tagGroup = createSvg("g", {
+        class: `tag-group ${edge.tagVariant === "error" ? "is-error" : ""}`,
+        "data-edge-id": edge.id,
+        "data-edge-ids": (edge.tagInteractiveEdgeIds || [edge.id]).join(",")
+      });
+
+      const tagX = edge.tagCenter.x - edge.tagWidth / 2;
+      const tagY = edge.tagCenter.y - edge.tagHeight / 2;
+      const tagUnderlay = createSvg("rect", {
+        x: tagX - 2,
+        y: tagY - 2,
+        width: edge.tagWidth + 4,
+        height: edge.tagHeight + 4,
+        rx: 5,
+        ry: 5,
+        "data-tag-part": "underlay",
+        class: "tag-underlay"
+      });
+      const tagRect = createSvg("rect", {
+        x: tagX,
+        y: tagY,
+        width: edge.tagWidth,
+        height: edge.tagHeight,
+        rx: 3,
+        ry: 3,
+        "data-tag-part": "body",
+        class: "tag-bg"
+      });
+      const tagValue = createSvg("text", {
+        x: edge.tagCenter.x,
+        y: edge.tagCenter.y + 0.5,
+        "data-tag-part": "value",
+        class: "tag-value"
+      });
+      tagValue.textContent = edge.tagPresentation.valueText;
+      const tagHit = createSvg("rect", {
+        x: tagX - 4,
+        y: tagY - 4,
+        width: edge.tagWidth + 8,
+        height: edge.tagHeight + 8,
+        rx: 6,
+        ry: 6,
+        class: "tag-hit",
+        "data-tag-part": "hit"
+      });
+      if (edge.tagTooltip) {
+        tagHit.setAttribute("data-tooltip-html", buildTooltipHtml(edge.tagTooltip));
+      }
+      if (state.scheme === "scheme3") {
+        tagHit.setAttribute("data-debug-tag", edge.id);
+      }
+
+      tagGroup.appendChild(tagUnderlay);
+      tagGroup.appendChild(tagRect);
+      tagGroup.appendChild(tagValue);
+
+      if (edge.tagPresentation.unitText) {
+        const tagUnit = createSvg("text", {
+          x: edge.tagCenter.x,
+          y: edge.tagCenter.y + 0.5,
+          "data-tag-part": "unit",
+          class: "tag-unit"
+        });
+        tagUnit.textContent = edge.tagPresentation.unitText;
+        tagGroup.appendChild(tagUnit);
+      }
+      tagGroup.appendChild(tagHit);
+
+      // #region debug-point B:scheme3-tag-render
+      if (state.scheme === "scheme3" && edge.tagTooltip) {
+        reportDebugEvent("B", "renderEdge", "rendered scheme3 tooltip tag", {
+          edgeId: edge.id,
+          targetEdgeIds: edge.tagInteractiveEdgeIds || [edge.id],
+          x: Math.round(edge.tagCenter.x),
+          y: Math.round(edge.tagCenter.y),
+          width: Math.round(edge.tagWidth),
+          height: Math.round(edge.tagHeight)
+        });
+      }
+      // #endregion
+
+      const tagActivate = () => {
+        // #region debug-point C:tag-hover
+        reportDebugEvent("C", "renderEdge:tagActivate", "tag hover entered", {
+          edgeId: edge.id,
+          hasTooltip: Boolean(edge.tagTooltip),
+          hasTippyInstance: Boolean(tagHit._tippy),
+          debugTag: tagHit.getAttribute("data-debug-tag") || "",
+          rect: {
+            x: Math.round(tagHit.getBoundingClientRect().x),
+            y: Math.round(tagHit.getBoundingClientRect().y),
+            width: Math.round(tagHit.getBoundingClientRect().width),
+            height: Math.round(tagHit.getBoundingClientRect().height)
+          }
+        });
+        // #endregion
+        const edgeIds = edge.tagInteractiveEdgeIds || [edge.id];
+        const nodeIds = new Set();
+        edgeIds.forEach((edgeId) => {
+          const matchedEdge = state.graph.edges.find((item) => item.id === edgeId);
+          if (!matchedEdge) {
+            return;
+          }
+          nodeIds.add(matchedEdge.source);
+          nodeIds.add(matchedEdge.target);
+        });
+        state.active = { edgeIds: new Set(edgeIds), nodeIds };
+        applyActiveState();
+      };
+
+      const tagDeactivate = () => {
+        deactivate();
+      };
+
+      tagHit.addEventListener("mouseenter", tagActivate);
+      tagHit.addEventListener("mouseleave", tagDeactivate);
+      tagLayer.appendChild(tagGroup);
+    }
+
+    function renderNode(graphRoot, node) {
+      const roleClass = node.role === "start"
+        ? "is-start"
+        : node.role === "initiator"
+          ? "is-initiator"
+          : "";
+      const group = createSvg("g", {
+        class: `node-group ${roleClass}`.trim(),
+        "data-node-id": node.id
+      });
+      const tooltip = createSvg("title");
+      tooltip.textContent = node.title;
+      group.appendChild(tooltip);
+
+      const shadow = createSvg("rect", {
+        x: node.x - node.width / 2 - 4,
+        y: node.y - node.height / 2 - 4,
+        width: node.width + 8,
+        height: node.height + 8,
+        rx: 10,
+        ry: 10,
+        class: "node-shadow"
+      });
+
+      const rect = createSvg("rect", {
+        x: node.x - node.width / 2,
+        y: node.y - node.height / 2,
+        width: node.width,
+        height: node.height,
+        rx: 4,
+        ry: 4,
+        class: "node-card"
+      });
+
+      group.appendChild(shadow);
+      group.appendChild(rect);
+
+      const title = createSvg("text", {
+        x: node.x,
+        y: node.meta ? node.y - 10 : node.y,
+        class: "node-title"
+      });
+      title.textContent = truncateTextToWidth(
+        node.title,
+        node.width - NODE_TITLE_HORIZONTAL_PADDING * 2,
+        '500 12px Inter'
+      );
+      group.appendChild(title);
+
+      if (node.meta) {
+        const parsedMeta = parseNodeMeta(node.meta);
+
+        if (!parsedMeta?.structured) {
+          const meta = createSvg("text", {
+            x: node.x,
+            y: node.y + 10,
+            class: "node-meta-label"
+          });
+          meta.textContent = node.meta;
+          group.appendChild(meta);
+        } else {
+          const labelWidth = measureTextWidth(parsedMeta.label, '400 10px "PingFang SC"');
+          const amountWidth = measureTextWidth(parsedMeta.amount, '500 10px Roboto');
+          const unitWidth = measureTextWidth("元", '400 10px "PingFang SC"');
+          const rateWidth = measureTextWidth(parsedMeta.rate, '500 10px Roboto');
+          const percentWidth = measureTextWidth("%", '400 10px "PingFang SC"');
+          const dividerGap = 6;
+          const inlineGap = 1;
+          const prefixGap = 4;
+          const suffixGap = 4;
+          const totalWidth = labelWidth
+            + prefixGap
+            + amountWidth
+            + unitWidth
+            + dividerGap
+            + rateWidth
+            + percentWidth
+            + suffixGap;
+          const startX = node.x - totalWidth / 2;
+          const rowY = node.y + 10;
+          const labelX = startX + labelWidth / 2;
+          const amountX = startX + labelWidth + prefixGap + amountWidth / 2;
+          const amountUnitX = startX + labelWidth + prefixGap + amountWidth + inlineGap + unitWidth / 2;
+          const dividerX = startX + labelWidth + prefixGap + amountWidth + unitWidth + dividerGap / 2;
+          const rateX = dividerX + dividerGap / 2 + rateWidth / 2;
+          const percentX = dividerX + dividerGap / 2 + rateWidth + inlineGap + percentWidth / 2;
+
+          const label = createSvg("text", {
+            x: labelX,
+            y: rowY,
+            class: "node-meta-label"
+          });
+          label.textContent = parsedMeta.label;
+          group.appendChild(label);
+
+          const amount = createSvg("text", {
+            x: amountX,
+            y: rowY,
+            class: "node-meta-value"
+          });
+          amount.textContent = parsedMeta.amount;
+          group.appendChild(amount);
+
+          const amountUnit = createSvg("text", {
+            x: amountUnitX,
+            y: rowY,
+            class: "node-meta-unit"
+          });
+          amountUnit.textContent = "元";
+          group.appendChild(amountUnit);
+
+          group.appendChild(createSvg("line", {
+            x1: amountX - amountWidth / 2 + 1,
+            y1: rowY + 6,
+            x2: amountUnitX + unitWidth / 2 - 1,
+            y2: rowY + 6,
+            class: "node-meta-strike"
+          }));
+
+          group.appendChild(createSvg("line", {
+            x1: dividerX,
+            y1: rowY - 5,
+            x2: dividerX,
+            y2: rowY + 5,
+            class: "node-meta-divider"
+          }));
+
+          const rate = createSvg("text", {
+            x: rateX,
+            y: rowY,
+            class: "node-meta-value"
+          });
+          rate.textContent = parsedMeta.rate;
+          group.appendChild(rate);
+
+          const percent = createSvg("text", {
+            x: percentX,
+            y: rowY,
+            class: "node-meta-unit"
+          });
+          percent.textContent = "%";
+          group.appendChild(percent);
+
+          group.appendChild(createSvg("line", {
+            x1: rateX - rateWidth / 2 + 1,
+            y1: rowY + 6,
+            x2: percentX + percentWidth / 2 - 1,
+            y2: rowY + 6,
+            class: "node-meta-strike"
+          }));
+        }
+      }
+
+      group.addEventListener("mouseenter", () => setActiveNode(node.id));
+      group.addEventListener("mouseleave", () => clearActiveState());
+
+      graphRoot.appendChild(group);
+    }
+
+    function fitView() {
+      if (!state.graph) {
+        return;
+      }
+
+      syncSvgSize();
+      const rect = stage.getBoundingClientRect();
+      const bounds = state.graph.bounds;
+      const padding = 24;
+      const width = bounds.maxX - bounds.minX;
+      const height = bounds.maxY - bounds.minY;
+      const scale = Math.min(
+        (rect.width - padding * 2) / width,
+        (rect.height - padding * 2) / height
+      );
+
+      state.camera.scale = Math.max(0.45, Math.min(scale, 1.12));
+      state.camera.x = (rect.width - width * state.camera.scale) / 2 - bounds.minX * state.camera.scale;
+      state.camera.y = (rect.height - height * state.camera.scale) / 2 - bounds.minY * state.camera.scale;
+      applyCamera();
+    }
+
+    function applyCamera() {
+      viewportLayer.setAttribute(
+        "transform",
+        `translate(${state.camera.x} ${state.camera.y}) scale(${state.camera.scale})`
+      );
+    }
+
+    function syncSvgSize() {
+      svg.setAttribute("width", Math.round(stage.clientWidth));
+      svg.setAttribute("height", Math.round(stage.clientHeight));
+    }
+
+    function zoomAt(factor, clientX, clientY) {
+      const rect = svg.getBoundingClientRect();
+      const anchorX = clientX - rect.left;
+      const anchorY = clientY - rect.top;
+      const prevScale = state.camera.scale;
+      const nextScale = Math.max(0.35, Math.min(prevScale * factor, 2.4));
+      const graphX = (anchorX - state.camera.x) / prevScale;
+      const graphY = (anchorY - state.camera.y) / prevScale;
+
+      state.camera.scale = nextScale;
+      state.camera.x = anchorX - graphX * nextScale;
+      state.camera.y = anchorY - graphY * nextScale;
+      applyCamera();
+    }
+
+    function setActiveEdge(edgeId) {
+      const edge = state.graph.edges.find((item) => item.id === edgeId);
+      if (!edge) {
+        return;
+      }
+
+      state.active = {
+        edgeIds: new Set([edgeId]),
+        nodeIds: new Set([edge.source, edge.target])
+      };
+      applyActiveState();
+    }
+
+    function setActiveNode(nodeId) {
+      const nodeIds = new Set([nodeId]);
+      const edgeIds = new Set();
+
+      state.graph.edges.forEach((edge) => {
+        if (edge.source === nodeId || edge.target === nodeId) {
+          edgeIds.add(edge.id);
+          nodeIds.add(edge.source);
+          nodeIds.add(edge.target);
+        }
+      });
+
+      state.active = { edgeIds, nodeIds };
+      applyActiveState();
+    }
+
+    function clearActiveState() {
+      if (!state.active) {
+        return;
+      }
+      state.active = null;
+      applyActiveState();
+    }
+
+    function applyActiveState() {
+      const edgeGroups = viewportLayer.querySelectorAll(".edge-group");
+      const tagGroups = viewportLayer.querySelectorAll(".tag-group");
+      const nodeGroups = viewportLayer.querySelectorAll(".node-group");
+      const backdropGroup = viewportLayer.querySelector('[data-layer="backdrop-group"]');
+      const edgeLayer = viewportLayer.querySelector('[data-layer="edge-base"]');
+      const tagLayer = viewportLayer.querySelector('[data-layer="tag-base"]');
+      const nodeLayer = viewportLayer.querySelector('[data-layer="node-base"]');
+      const activeEdgeLayer = viewportLayer.querySelector('[data-layer="edge-active"]');
+      const activeTagLayer = viewportLayer.querySelector('[data-layer="tag-active"]');
+      const activeNodeLayer = viewportLayer.querySelector('[data-layer="node-active"]');
+
+      if (!state.active) {
+        if (backdropGroup) {
+          backdropGroup.style.opacity = "1";
+        }
+        edgeGroups.forEach((group) => {
+          group.classList.remove("is-active");
+          if (edgeLayer) {
+            edgeLayer.appendChild(group);
+          }
+        });
+        tagGroups.forEach((group) => {
+          group.classList.remove("is-active");
+          if (tagLayer) {
+            tagLayer.appendChild(group);
+          }
+        });
+        nodeGroups.forEach((group) => {
+          group.classList.remove("is-active");
+          if (nodeLayer) {
+            nodeLayer.appendChild(group);
+          }
+        });
+        return;
+      }
+
+      if (backdropGroup) {
+        backdropGroup.style.opacity = String(getComputedStyle(document.documentElement).getPropertyValue("--dim-opacity").trim() || 0.3);
+      }
+
+      edgeGroups.forEach((group) => {
+        const edgeId = group.getAttribute("data-edge-id");
+        const isActive = state.active.edgeIds.has(edgeId);
+        group.classList.toggle("is-active", isActive);
+        if (isActive && activeEdgeLayer) {
+          activeEdgeLayer.appendChild(group);
+        } else if (edgeLayer) {
+          edgeLayer.appendChild(group);
+        }
+      });
+
+      tagGroups.forEach((group) => {
+        const edgeIds = (group.getAttribute("data-edge-ids") || group.getAttribute("data-edge-id") || "")
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+        const isActive = edgeIds.some((edgeId) => state.active.edgeIds.has(edgeId));
+        group.classList.toggle("is-active", isActive);
+      });
+      // #region debug-point C:active-state
+      if (state.scheme === "scheme3" && state.active) {
+        reportDebugEvent("C", "applyActiveState", "applied active state", {
+          activeEdgeCount: state.active.edgeIds.size,
+          activeNodeCount: state.active.nodeIds.size
+        });
+      }
+      // #endregion
+
+      nodeGroups.forEach((group) => {
+        const nodeId = group.getAttribute("data-node-id");
+        const isActive = state.active.nodeIds.has(nodeId);
+        group.classList.toggle("is-active", isActive);
+        if (isActive && activeNodeLayer) {
+          activeNodeLayer.appendChild(group);
+        } else if (nodeLayer) {
+          nodeLayer.appendChild(group);
+        }
+      });
+    }
+
+    function render() {
+      schemeSelect.value = state.scheme;
+      state.graph = buildGraph(state.mode);
+      syncSvgSize();
+      destroyTooltips();
+      clearElement(viewportLayer);
+
+      const graphRoot = createSvg("g");
+      viewportLayer.appendChild(graphRoot);
+
+      const labelLayer = createSvg("g");
+      const backdropGroup = createSvg("g", { "data-layer": "backdrop-group", class: "layer-backdrop" });
+      const foregroundGroup = createSvg("g", { "data-layer": "foreground-group" });
+      const edgeLayer = createSvg("g", { "data-layer": "edge-base" });
+      const tagLayer = createSvg("g", { "data-layer": "tag-base" });
+      const nodeLayer = createSvg("g", { "data-layer": "node-base" });
+      const activeEdgeLayer = createSvg("g", { "data-layer": "edge-active" });
+      const activeTagLayer = createSvg("g", { "data-layer": "tag-active" });
+      const activeNodeLayer = createSvg("g", { "data-layer": "node-active" });
+
+      graphRoot.appendChild(labelLayer);
+      graphRoot.appendChild(backdropGroup);
+      graphRoot.appendChild(foregroundGroup);
+      backdropGroup.appendChild(edgeLayer);
+      backdropGroup.appendChild(nodeLayer);
+      foregroundGroup.appendChild(activeEdgeLayer);
+      foregroundGroup.appendChild(tagLayer);
+      foregroundGroup.appendChild(activeTagLayer);
+      foregroundGroup.appendChild(activeNodeLayer);
+
+      renderLayerLabels(labelLayer, state.graph.dataset.layers, state.graph.dataset.canvas.width);
+      renderOrbitRing(labelLayer, state.graph.orbitRing);
+      state.graph.edges.forEach((edge) => renderEdge(edgeLayer, tagLayer, edge));
+      state.graph.nodeMap.forEach((node) => renderNode(nodeLayer, node));
+      layoutTagsOnEdges(graphRoot, state.graph.edges);
+      initTagTooltips(graphRoot);
+
+      fitView();
+      clearActiveState();
+    }
+
+    modeButtons.tree.addEventListener("click", () => {
+      state.mode = "tree";
+      modeButtons.tree.classList.add("is-active");
+      modeButtons.mesh.classList.remove("is-active");
+      render();
+    });
+
+    modeButtons.mesh.addEventListener("click", () => {
+      state.mode = "mesh";
+      modeButtons.mesh.classList.add("is-active");
+      modeButtons.tree.classList.remove("is-active");
+      render();
+    });
+
+    schemeSelect.addEventListener("change", (event) => {
+      state.scheme = event.target.value;
+      render();
+    });
+
+    document.getElementById("zoom-in").addEventListener("click", () => {
+      const rect = svg.getBoundingClientRect();
+      zoomAt(1.15, rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    document.getElementById("zoom-out").addEventListener("click", () => {
+      const rect = svg.getBoundingClientRect();
+      zoomAt(0.87, rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    document.getElementById("zoom-fit").addEventListener("click", fitView);
+
+    svg.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const factor = event.deltaY < 0 ? 1.1 : 0.9;
+      zoomAt(factor, event.clientX, event.clientY);
+    }, { passive: false });
+
+    svg.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("[data-edge-id]") || event.target.closest("[data-node-id]")) {
+        return;
+      }
+
+      state.dragging = true;
+      state.dragOrigin = {
+        x: event.clientX,
+        y: event.clientY,
+        cameraX: state.camera.x,
+        cameraY: state.camera.y
+      };
+      svg.classList.add("is-dragging");
+    });
+
+    window.addEventListener("pointermove", (event) => {
+      if (!state.dragging || !state.dragOrigin) {
+        return;
+      }
+
+      state.camera.x = state.dragOrigin.cameraX + (event.clientX - state.dragOrigin.x);
+      state.camera.y = state.dragOrigin.cameraY + (event.clientY - state.dragOrigin.y);
+      applyCamera();
+    });
+
+    window.addEventListener("pointerup", () => {
+      state.dragging = false;
+      state.dragOrigin = null;
+      svg.classList.remove("is-dragging");
+    });
+
+    svg.addEventListener("mouseleave", () => {
+      if (!state.dragging) {
+        clearActiveState();
+      }
+    });
+
+    window.addEventListener("resize", fitView);
+
+    render();
+  </script>
+</body>
+</html>
