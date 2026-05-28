@@ -3254,6 +3254,7 @@
         });
         tagGroups.forEach((group) => {
           group.classList.remove("is-active");
+          group.style.opacity = "1";
           if (tagLayer) {
             tagLayer.appendChild(group);
           }
@@ -3289,6 +3290,7 @@
           .filter(Boolean);
         const isActive = edgeIds.some((edgeId) => state.active.edgeIds.has(edgeId));
         group.classList.toggle("is-active", isActive);
+        group.style.opacity = isActive ? "1" : "0.3";
       });
       // #region debug-point C:active-state
       if (state.scheme === "scheme3" && state.active) {
