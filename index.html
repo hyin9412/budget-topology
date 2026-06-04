@@ -214,6 +214,42 @@
       font-weight: 500;
     }
 
+    .node-option-panel[hidden] {
+      display: none;
+    }
+
+    .node-option-panel {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 32px;
+      border-radius: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 0 1px #dde2e9;
+      padding: 5px 10px;
+    }
+
+    .node-option-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .node-option-item input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: #1664ff;
+      cursor: pointer;
+    }
+
     .legend {
       display: flex;
       align-items: center;
@@ -491,14 +527,14 @@
       background: #ffffff;
       color: #1f2937;
       border: 1px solid #dbe3ee;
-      border-radius: 8px;
+      border-radius: 4px;
       box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
       font-size: 12px;
       line-height: 1.5;
     }
 
     .tippy-box[data-theme~='topology'] .tippy-content {
-      padding: 8px 10px;
+      padding: 8px 12px;
       white-space: normal;
     }
 
@@ -520,17 +556,44 @@
       font-weight: 700;
     }
 
+    .node-tooltip {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .node-tooltip-title {
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+    }
+
+    .node-tooltip-hint {
+      color: #737a87;
+      font-size: 12px;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+    }
+
     .node-shadow {
       fill: rgba(24, 144, 255, 0.08);
       opacity: 0;
       transition: opacity 0.14s ease;
+      pointer-events: none;
+    }
+
+    .node-group {
+      cursor: pointer;
     }
 
     .node-card {
       fill: var(--node-fill);
       stroke: #dde2e9;
       stroke-width: 1;
-      transition: stroke 0.14s ease, stroke-width 0.14s ease, fill 0.14s ease, transform 0.14s ease;
+      transition: stroke 0.14s ease, stroke-width 0.14s ease, fill 0.14s ease, transform 0.14s ease, filter 0.14s ease;
     }
 
     .node-group.is-start .node-card {
@@ -547,12 +610,44 @@
       font-weight: 500;
     }
 
+    svg[data-scheme="scheme2"][data-node-default-shadow="true"] .node-card {
+      filter: drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.05));
+    }
+
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group {
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-card {
+      transition:
+        stroke 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        stroke-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        fill 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active {
+      transform: translateY(-2px);
+    }
+
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active .node-card {
+      filter:
+        drop-shadow(0px 15px 35px rgba(0, 0, 0, 0.05))
+        drop-shadow(0px 5px 15px rgba(0, 0, 0, 0.05));
+    }
+
     .node-title {
       fill: #0c0d0e;
       font-size: 12px;
       font-weight: 500;
       text-anchor: middle;
       dominant-baseline: middle;
+    }
+
+    .node-detail-icon {
+      pointer-events: none;
     }
 
     .node-meta-label {
@@ -652,6 +747,25 @@
           </div>
         </div>
 
+        <div id="node-option-panel" class="node-option-panel" hidden>
+          <label class="node-option-item">
+            <input type="checkbox" id="node-option-detail-icon" data-node-option="detailIcon" checked />
+            <span>节点加详情icon</span>
+          </label>
+          <label class="node-option-item">
+            <input type="checkbox" id="node-option-tooltip" data-node-option="tooltip" />
+            <span>节点hover出tooltip</span>
+          </label>
+          <label class="node-option-item">
+            <input type="checkbox" id="node-option-default-shadow" data-node-option="defaultShadow" checked />
+            <span>节点默认加轻微投影</span>
+          </label>
+          <label class="node-option-item">
+            <input type="checkbox" id="node-option-hover-effect" data-node-option="hoverEffect" checked />
+            <span>节点hover后上浮+扩大投影</span>
+          </label>
+        </div>
+
         <div class="mode-switch">
           <button id="mode-tree" class="mode-btn is-active" type="button">普通数据</button>
           <button id="mode-mesh" class="mode-btn" type="button">复杂数据</button>
@@ -735,6 +849,9 @@
     const NODE_PADDING_X = 18;
     const NODE_WIDTH = 265;
     const NODE_TITLE_HORIZONTAL_PADDING = 18;
+    const NODE_TITLE_ICON_SIZE = 12;
+    const NODE_TITLE_ICON_RIGHT_GAP = 8;
+    const NODE_TITLE_ICON_TEXT_GAP = 8;
     const PORT_INSET = 26;
 
     const datasets = {
@@ -868,6 +985,8 @@
       tree: document.getElementById("mode-tree"),
       mesh: document.getElementById("mode-mesh")
     };
+    const nodeOptionPanel = document.getElementById("node-option-panel");
+    const nodeOptionInputs = Array.from(nodeOptionPanel.querySelectorAll("[data-node-option]"));
 
     const measureCanvas = document.createElement("canvas");
     const measureContext = measureCanvas.getContext("2d");
@@ -875,7 +994,15 @@
     const state = {
       mode: "tree",
       scheme: "scheme1",
+      nodeOptions: {
+        detailIcon: true,
+        tooltip: false,
+        defaultShadow: true,
+        hoverEffect: true
+      },
       active: null,
+      hoverActive: null,
+      selectedActive: null,
       camera: { x: 0, y: 0, scale: 1 },
       dragging: false,
       dragOrigin: null,
@@ -968,6 +1095,10 @@
       return `<div class="tooltip-lines">${lines
         .map((line) => `<div class="tooltip-line">${formatTooltipLine(line)}</div>`)
         .join("")}</div>`;
+    }
+
+    function buildNodeTooltipHtml(nodeTitle) {
+      return `<div class="node-tooltip"><div class="node-tooltip-title">${escapeHtml(nodeTitle)}</div><div class="node-tooltip-hint">点击配置/查看明细</div></div>`;
     }
 
     function createSvg(tag, attrs = {}) {
@@ -1738,6 +1869,14 @@
     function destroyTooltips() {
       state.tooltipInstances.forEach((instance) => instance.destroy());
       state.tooltipInstances = [];
+    }
+
+    function hideOtherTooltips(currentInstance) {
+      state.tooltipInstances.forEach((instance) => {
+        if (instance !== currentInstance) {
+          instance.hide();
+        }
+      });
     }
 
     function getTagPreferredRatio() {
@@ -2789,34 +2928,43 @@
         mode: state.mode
       });
       // #endregion
-      state.tooltipInstances = tooltipTargets.map((target) => window.tippy(target, {
-        content: target.getAttribute("data-tooltip-html"),
-        allowHTML: true,
-        trigger: "mouseenter focus",
-        arrow: true,
-        theme: "topology",
-        placement: "top",
-        delay: [0, 0],
-        duration: [120, 80],
-        interactive: false,
-        maxWidth: "none",
-        appendTo: () => document.body,
-        onShow(instance) {
-          // #region debug-point D:tippy-show
-          reportDebugEvent("D", "tippy:onShow", "tooltip show triggered", {
-            referenceTag: instance.reference?.getAttribute?.("data-debug-tag") || "",
-            rect: instance.reference?.getBoundingClientRect?.()
-              ? {
-                  x: Math.round(instance.reference.getBoundingClientRect().x),
-                  y: Math.round(instance.reference.getBoundingClientRect().y),
-                  width: Math.round(instance.reference.getBoundingClientRect().width),
-                  height: Math.round(instance.reference.getBoundingClientRect().height)
-                }
-              : null
-          });
-          // #endregion
+      state.tooltipInstances = tooltipTargets.map((target) => {
+        const instance = window.tippy(target, {
+          content: target.getAttribute("data-tooltip-html"),
+          allowHTML: true,
+          trigger: "mouseenter focus",
+          arrow: true,
+          theme: "topology",
+          placement: "top",
+          delay: [0, 0],
+          duration: [120, 80],
+          interactive: false,
+          maxWidth: "none",
+          appendTo: () => document.body,
+          onShow(instanceRef) {
+            hideOtherTooltips(instanceRef);
+            // #region debug-point D:tippy-show
+            reportDebugEvent("D", "tippy:onShow", "tooltip show triggered", {
+              referenceTag: instanceRef.reference?.getAttribute?.("data-debug-tag") || "",
+              rect: instanceRef.reference?.getBoundingClientRect?.()
+                ? {
+                    x: Math.round(instanceRef.reference.getBoundingClientRect().x),
+                    y: Math.round(instanceRef.reference.getBoundingClientRect().y),
+                    width: Math.round(instanceRef.reference.getBoundingClientRect().width),
+                    height: Math.round(instanceRef.reference.getBoundingClientRect().height)
+                  }
+                : null
+            });
+            // #endregion
+          }
+        });
+
+        if (target.classList.contains("node-group")) {
+          target.addEventListener("mouseleave", () => instance.hide());
         }
-      }));
+
+        return instance;
+      });
     }
 
     function renderLayerLabels(graphRoot, layers, width) {
@@ -2854,8 +3002,8 @@
       group.appendChild(route);
       group.appendChild(hit);
 
-      const activate = () => setActiveEdge(edge.id);
-      const deactivate = () => clearActiveState();
+      const activate = () => setHoverEdge(edge.id);
+      const deactivate = () => clearHoverState();
 
       group.addEventListener("mouseenter", activate);
       group.addEventListener("mouseleave", deactivate);
@@ -2972,8 +3120,13 @@
           nodeIds.add(matchedEdge.source);
           nodeIds.add(matchedEdge.target);
         });
-        state.active = { edgeIds: new Set(edgeIds), nodeIds };
-        applyActiveState();
+        state.hoverActive = {
+          kind: "tag",
+          key: edge.id,
+          edgeIds: new Set(edgeIds),
+          nodeIds
+        };
+        syncActiveState();
       };
 
       const tagDeactivate = () => {
@@ -2995,9 +3148,13 @@
         class: `node-group ${roleClass}`.trim(),
         "data-node-id": node.id
       });
-      const tooltip = createSvg("title");
-      tooltip.textContent = node.title;
-      group.appendChild(tooltip);
+      if (state.scheme === "scheme2" && state.nodeOptions.tooltip) {
+        group.setAttribute("data-tooltip-html", buildNodeTooltipHtml(node.title));
+      } else {
+        const tooltip = createSvg("title");
+        tooltip.textContent = node.title;
+        group.appendChild(tooltip);
+      }
 
       const shadow = createSvg("rect", {
         x: node.x - node.width / 2 - 4,
@@ -3022,17 +3179,35 @@
       group.appendChild(shadow);
       group.appendChild(rect);
 
+      const showDetailIcon = state.scheme === "scheme2" && state.nodeOptions.detailIcon;
+      const titleY = node.meta ? node.y - 10 : node.y;
       const title = createSvg("text", {
-        x: node.x,
-        y: node.meta ? node.y - 10 : node.y,
+        x: showDetailIcon ? node.x - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP) / 2 : node.x,
+        y: titleY,
         class: "node-title"
       });
       title.textContent = truncateTextToWidth(
         node.title,
-        node.width - NODE_TITLE_HORIZONTAL_PADDING * 2,
+        showDetailIcon
+          ? node.width
+            - NODE_TITLE_HORIZONTAL_PADDING
+            - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP + NODE_TITLE_ICON_TEXT_GAP)
+          : node.width - NODE_TITLE_HORIZONTAL_PADDING * 2,
         '500 12px Inter'
       );
       group.appendChild(title);
+
+      if (showDetailIcon) {
+        const detailIcon = createSvg("image", {
+          x: node.x + node.width / 2 - NODE_TITLE_ICON_RIGHT_GAP - NODE_TITLE_ICON_SIZE,
+          y: titleY - NODE_TITLE_ICON_SIZE / 2,
+          width: NODE_TITLE_ICON_SIZE,
+          height: NODE_TITLE_ICON_SIZE,
+          href: "./icon/详情.svg",
+          class: "node-detail-icon"
+        });
+        group.appendChild(detailIcon);
+      }
 
       if (node.meta) {
         const parsedMeta = parseNodeMeta(node.meta);
@@ -3138,8 +3313,9 @@
         }
       }
 
-      group.addEventListener("mouseenter", () => setActiveNode(node.id));
-      group.addEventListener("mouseleave", () => clearActiveState());
+      group.addEventListener("mouseenter", () => setHoverNode(node.id));
+      group.addEventListener("mouseleave", () => clearHoverState());
+      group.addEventListener("click", () => setSelectedNode(node.id));
 
       graphRoot.appendChild(group);
     }
@@ -3196,14 +3372,15 @@
     function setActiveEdge(edgeId) {
       const edge = state.graph.edges.find((item) => item.id === edgeId);
       if (!edge) {
-        return;
+        return null;
       }
 
-      state.active = {
+      return {
+        kind: "edge",
+        key: edgeId,
         edgeIds: new Set([edgeId]),
         nodeIds: new Set([edge.source, edge.target])
       };
-      applyActiveState();
     }
 
     function setActiveNode(nodeId) {
@@ -3218,16 +3395,67 @@
         }
       });
 
-      state.active = { edgeIds, nodeIds };
+      return {
+        kind: "node",
+        key: nodeId,
+        edgeIds,
+        nodeIds
+      };
+    }
+
+    function syncActiveState() {
+      state.active = state.hoverActive || state.selectedActive;
       applyActiveState();
     }
 
-    function clearActiveState() {
-      if (!state.active) {
+    function setHoverEdge(edgeId) {
+      state.hoverActive = setActiveEdge(edgeId);
+      syncActiveState();
+    }
+
+    function setHoverNode(nodeId) {
+      state.hoverActive = setActiveNode(nodeId);
+      syncActiveState();
+    }
+
+    function clearHoverState() {
+      if (!state.hoverActive) {
         return;
       }
-      state.active = null;
-      applyActiveState();
+      state.hoverActive = null;
+      syncActiveState();
+    }
+
+    function setSelectedNode(nodeId) {
+      if (state.scheme !== "scheme2") {
+        return;
+      }
+
+      const nextActive = setActiveNode(nodeId);
+      const isSameSelection = state.selectedActive
+        && state.selectedActive.kind === nextActive.kind
+        && state.selectedActive.key === nextActive.key;
+
+      state.selectedActive = isSameSelection ? null : nextActive;
+      syncActiveState();
+    }
+
+    function clearSelectedState() {
+      if (!state.selectedActive) {
+        return;
+      }
+
+      state.selectedActive = null;
+      syncActiveState();
+    }
+
+    function syncNodeOptionPanel() {
+      const showNodeOptionPanel = state.scheme === "scheme2";
+      nodeOptionPanel.hidden = !showNodeOptionPanel;
+
+      nodeOptionInputs.forEach((input) => {
+        input.checked = Boolean(state.nodeOptions[input.dataset.nodeOption]);
+      });
     }
 
     function applyActiveState() {
@@ -3315,10 +3543,17 @@
 
     function render() {
       schemeSelect.value = state.scheme;
+      svg.dataset.scheme = state.scheme;
+      svg.dataset.nodeDefaultShadow = String(state.nodeOptions.defaultShadow);
+      svg.dataset.nodeHoverEffect = String(state.nodeOptions.hoverEffect);
+      syncNodeOptionPanel();
       state.graph = buildGraph(state.mode);
       syncSvgSize();
       destroyTooltips();
       clearElement(viewportLayer);
+      state.active = null;
+      state.hoverActive = null;
+      state.selectedActive = null;
 
       const graphRoot = createSvg("g");
       viewportLayer.appendChild(graphRoot);
@@ -3351,7 +3586,7 @@
       initTagTooltips(graphRoot);
 
       fitView();
-      clearActiveState();
+      syncActiveState();
     }
 
     modeButtons.tree.addEventListener("click", () => {
@@ -3371,6 +3606,21 @@
     schemeSelect.addEventListener("change", (event) => {
       state.scheme = event.target.value;
       render();
+    });
+
+    nodeOptionInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        state.nodeOptions[input.dataset.nodeOption] = input.checked;
+        render();
+      });
+    });
+
+    nodeOptionPanel.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    nodeOptionPanel.addEventListener("click", (event) => {
+      event.stopPropagation();
     });
 
     document.getElementById("zoom-in").addEventListener("click", () => {
@@ -3396,6 +3646,7 @@
         return;
       }
 
+      clearSelectedState();
       state.dragging = true;
       state.dragOrigin = {
         x: event.clientX,
@@ -3424,7 +3675,7 @@
 
     svg.addEventListener("mouseleave", () => {
       if (!state.dragging) {
-        clearActiveState();
+        clearHoverState();
       }
     });
 
