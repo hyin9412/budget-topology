@@ -740,7 +740,7 @@
           <div class="scheme-select-wrap">
             <select id="scheme-select" class="scheme-select" aria-label="选择方案">
               <option value="scheme1">方案一：线上方案+高亮</option>
-              <option value="scheme2">方案二：弧线连接+高亮</option>
+              <option value="scheme2" selected>方案二：弧线连接+高亮</option>
               <option value="scheme3">方案三：合计展示重叠金额+高亮</option>
             </select>
             <span class="scheme-select-arrow">⌄</span>
@@ -993,7 +993,7 @@
 
     const state = {
       mode: "tree",
-      scheme: "scheme1",
+      scheme: "scheme2",
       nodeOptions: {
         detailIcon: true,
         tooltip: false,
