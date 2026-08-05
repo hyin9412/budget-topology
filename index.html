@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Topology Routing Demo</title>
   <link rel="stylesheet" href="./vendor/tippy.css" />
+  <script type="module" src="/src/tod-styles.ts"></script>
+  <script type="module" src="/src/tod-drawer-summary.tsx"></script>
   <style>
     :root {
       color-scheme: light;
-      --bg: #eef2f7;
+      --bg: #ffffff;
       --panel: #ffffff;
       --panel-border: #e5e8ef;
       --header-bg: #0b0e13;
@@ -35,6 +37,7 @@
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
       min-height: 100vh;
@@ -46,11 +49,12 @@
     .page {
       display: flex;
       justify-content: center;
+      background: #ffffff;
       padding: 24px;
     }
 
     .page-shell {
-      width: min(1176px, calc(100vw - 48px));
+      width: min(1260px, calc(100vw - 48px));
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -62,6 +66,7 @@
       justify-content: flex-start;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 20px;
     }
 
     .scheme-switch {
@@ -132,11 +137,22 @@
 
     .card {
       width: 100%;
+      display: flex;
+      align-items: stretch;
+      height: 600px;
       border: 1px solid var(--panel-border);
       border-radius: 8px;
       background: var(--panel);
       overflow: hidden;
       box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+    }
+
+    .topology-pane {
+      display: flex;
+      flex: 1 1 0;
+      min-width: 0;
+      flex-direction: column;
+      align-self: stretch;
     }
 
     .header {
@@ -146,7 +162,7 @@
       gap: 16px;
       border-bottom: 1px solid #eaedf1;
       padding: 7px 15px 8px;
-      min-height: 38px;
+      min-height: 40px;
       background: #ffffff;
     }
 
@@ -212,6 +228,108 @@
       background: #ffffff;
       color: #1664ff;
       font-weight: 500;
+    }
+
+    .topology-section-bar {
+      display: flex;
+      align-items: center;
+      column-gap: 16px;
+      width: 100%;
+      height: 32px;
+      padding: 5px 0;
+    }
+
+    .topology-section-heading {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      column-gap: 8px;
+      height: 19px;
+    }
+
+    .topology-section-marker {
+      flex-shrink: 0;
+      width: 3px;
+      height: 16px;
+    }
+
+    .topology-section-title {
+      flex-shrink: 0;
+      color: var(--Fill-color-fill-4, #020814);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+    }
+
+    .topology-view-tabs {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      min-width: 0;
+      height: 19px;
+    }
+
+    .topology-view-fallback {
+      display: inline-flex;
+      align-items: center;
+      column-gap: 12px;
+      height: 19px;
+    }
+
+    .topology-view-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: #42464e;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+      cursor: pointer;
+    }
+
+    .topology-view-tab.is-active {
+      color: #1664ff;
+    }
+
+    .topology-view-tab-icon {
+      width: 14px;
+      height: 14px;
+      color: currentColor;
+    }
+
+    .topology-view-subordinates-icon {
+      display: inline-block;
+      flex-shrink: 0;
+      background: currentColor;
+      -webkit-mask: url("/icon/subordinates.svg") center / contain no-repeat;
+      mask: url("/icon/subordinates.svg") center / contain no-repeat;
+    }
+
+    .topology-view-separator {
+      width: 1px;
+      height: 14px;
+      background: #d8dce6;
+    }
+
+    .topology-view-tab-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+    }
+
+    .topology-view-tab-title.is-topology {
+      margin: 0;
+      border-left: 0;
+      padding-left: 0;
     }
 
     .node-option-panel[hidden] {
@@ -359,10 +477,1009 @@
       background: #ffffff;
     }
 
+    .aggregate-drawer {
+      display: flex;
+      flex: 1 1 0;
+      min-width: 360px;
+      align-self: stretch;
+      border-left: 1px solid #eaedf1;
+      background: #ffffff;
+    }
+
+    .aggregate-drawer.is-open {
+      display: flex;
+    }
+
+    .aggregate-drawer.is-collapsed {
+      display: none;
+    }
+
+    .aggregate-drawer-panel {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      height: auto;
+      background: #ffffff;
+      flex-direction: column;
+    }
+
+    .aggregate-drawer-header {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      height: 40px;
+      border-bottom: 1px solid #eaedf1;
+      padding: 8px 16px;
+      min-height: 40px;
+    }
+
+    .aggregate-drawer-heading {
+      display: flex;
+      min-width: 0;
+      flex: 1;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .aggregate-drawer-title {
+      display: inline-flex;
+      min-width: 0;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 6px;
+      color: #020814;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+    }
+
+    .aggregate-drawer-title-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .aggregate-drawer-title-tag {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      height: 20px;
+      border: 1px solid rgba(57, 115, 229, 0.2);
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 0 6px;
+      color: #3973e5;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+    }
+
+    .aggregate-drawer-title-tag.is-demand {
+      border-color: rgba(102, 110, 124, 0.2);
+      color: #666e7c;
+    }
+
+    .aggregate-drawer-title-tag.is-supply {
+      border-color: rgba(84, 91, 241, 0.2);
+      color: #545bf1;
+    }
+
+    .aggregate-drawer-title-tag.is-initiator {
+      border-color: rgba(57, 115, 229, 0.2);
+      color: #3973e5;
+    }
+
+    .aggregate-drawer-subtitle {
+      min-width: 0;
+      color: #42464e;
+      font-size: 13px;
+      line-height: 22px;
+      letter-spacing: 0.04px;
+      white-space: nowrap;
+    }
+
+    .aggregate-drawer-close {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #737a87;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.14s ease, color 0.14s ease;
+    }
+
+    .aggregate-drawer-close:hover {
+      background: #f1f3f5;
+      color: #42464e;
+    }
+
+    .aggregate-drawer-close-icon {
+      display: block;
+      width: 24px;
+      height: 24px;
+    }
+
+    .aggregate-drawer-body {
+      flex: 1;
+      overflow: auto;
+      padding: 15px 16px 16px;
+    }
+
+    .aggregate-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+      gap: 0;
+      margin-bottom: 16px;
+      min-height: 85px;
+      overflow: hidden;
+      border: 1px solid var(--Line-color-border-2, #eaedf1);
+      border-radius: 8px;
+      background: var(--Background-color-bg-2, #fcfdfe);
+    }
+
+    .aggregate-summary-grid.has-diff {
+      grid-template-columns: minmax(0, 172fr) minmax(0, 172fr) minmax(0, 254fr);
+    }
+
+    .aggregate-summary-card {
+      border: 0;
+      background: transparent;
+      padding: 12px 16px;
+    }
+
+    .tod-summary-card {
+      min-width: 0;
+    }
+
+    .tod-summary-card .arco-statistic {
+      display: block;
+      width: 100%;
+    }
+
+    .tod-summary-card .arco-statistic-title {
+      margin-bottom: 8px;
+      color: var(--Text-color-text-3, #737a87);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+    }
+
+    .tod-summary-card .arco-statistic-content {
+      display: flex;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .tod-summary-card .arco-statistic-content .arco-statistic-value,
+    .tod-summary-card .arco-statistic-content .arco-statistic-value-int,
+    .tod-summary-card .arco-statistic-content .arco-statistic-value-decimal {
+      color: var(--Text-color-text-1, #0c0d0e);
+      font-family: Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 28px;
+      letter-spacing: 0;
+    }
+
+    .tod-summary-card .arco-statistic-content .arco-statistic-value-suffix {
+      margin-left: 2px;
+      padding: 7px 0 1px;
+      color: var(--Text-color-text-3, #737a87);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+    }
+
+    .aggregate-summary-label {
+      color: var(--Text-color-text-3, #737a87);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+    }
+
+    .aggregate-summary-value {
+      display: flex;
+      align-items: flex-start;
+      gap: 2px;
+      color: var(--Text-color-text-1, #0c0d0e);
+      font-family: Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 28px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .aggregate-summary-metric-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 8px;
+      min-width: 0;
+    }
+
+    .aggregate-summary-unit {
+      padding: 7px 0 6px;
+      color: var(--Text-color-text-3, #737a87);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+    }
+
+    .aggregate-summary-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--Line-color-border-2, #eaedf1);
+    }
+
+    .aggregate-summary-subtext {
+      padding: 7px 0 6px;
+      color: var(--Text-color-text-3, #737a87);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.04px;
+      white-space: nowrap;
+    }
+
+    .aggregate-section-title {
+      margin: 18px 0 8px;
+      color: #1f2329;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+
+    .aggregate-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .aggregate-list-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #eaedf1;
+      border-radius: 6px;
+      padding: 9px 10px;
+    }
+
+    .aggregate-list-name {
+      overflow: hidden;
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .aggregate-list-amount {
+      color: #1664ff;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .aggregate-table-wrap {
+      overflow: auto;
+      border: 1px solid #eaedf1;
+      border-radius: 4px;
+    }
+
+    .aggregate-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      background: #ffffff;
+    }
+
+    .aggregate-table th,
+    .aggregate-table td {
+      border-bottom: 1px solid #eaedf1;
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .aggregate-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      color: #737a87;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .aggregate-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .aggregate-table-node {
+      max-width: 180px;
+      overflow: hidden;
+      color: #42464e;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .aggregate-table-amount {
+      border: 0;
+      background: transparent;
+      color: #42464e;
+      font: inherit;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 0;
+      text-decoration-line: underline;
+      text-decoration-style: solid;
+      text-decoration-color: #737a87;
+      text-underline-offset: 2px;
+      white-space: nowrap;
+    }
+
+    .aggregate-table-amount-unit {
+      color: #737a87;
+    }
+
+    .aggregate-table-muted {
+      color: #737a87;
+    }
+
+    .tod-drawer-table-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 2px;
+    }
+
+    .tod-drawer-table-wrap.is-tod-rendered {
+      overflow-x: visible;
+      overflow-y: visible;
+      padding-bottom: 0;
+    }
+
+    .tod-drawer-table-wrap.is-aggregate .aggregate-table {
+      min-width: 720px;
+    }
+
+    .tod-drawer-table-wrap.is-node .aggregate-table {
+      min-width: 920px;
+    }
+
+    .tod-drawer-table .arco-table-container {
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .tod-drawer-table .arco-table-header {
+      border-radius: 4px 4px 0 0;
+    }
+
+    .tod-drawer-table table thead tr:first-child th:first-child {
+      border-top-left-radius: 4px;
+    }
+
+    .tod-drawer-table table thead tr:first-child th:last-child {
+      border-top-right-radius: 4px;
+    }
+
+    .tod-drawer-table table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 4px;
+    }
+
+    .tod-drawer-table table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 4px;
+    }
+
+    .tod-drawer-table .arco-table-th {
+      background: #f8fafc;
+      color: #737a87;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .tod-drawer-table .arco-table-td {
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .aggregate-table-node-type-tag,
+    .tod-drawer-table-node-type-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      border: 1px solid rgba(102, 110, 124, 0.2);
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 0 6px;
+      color: #666e7c;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+      white-space: nowrap;
+    }
+
+    .aggregate-table-node-type-tag.is-initiator,
+    .tod-drawer-table-node-type-tag.is-initiator {
+      border-color: rgba(57, 115, 229, 0.2);
+      color: #3973e5;
+    }
+
+    .aggregate-table-node-type-tag.is-supply,
+    .tod-drawer-table-node-type-tag.is-supply {
+      border-color: rgba(84, 91, 241, 0.2);
+      color: #545bf1;
+    }
+
+    .tod-drawer-table-name {
+      display: inline-block;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .tod-drawer-table-amount {
+      display: inline-block;
+      color: #42464e;
+      font-weight: 400;
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration-line: underline;
+      text-decoration-style: solid;
+      text-decoration-color: #737a87;
+      text-underline-offset: 2px;
+    }
+
+    .tod-drawer-table-amount-unit {
+      color: #737a87;
+    }
+
+    .aggregate-table-plain-amount,
+    .tod-drawer-table-plain-value {
+      color: #42464e;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .aggregate-table-plain-amount-unit,
+    .tod-drawer-table-plain-value-unit {
+      color: #737a87;
+    }
+
+    .tod-drawer-table-empty {
+      color: #737a87;
+    }
+
+    .tod-drawer-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 4px;
+      min-width: 160px;
+    }
+
+    .tod-drawer-table-tag {
+      max-width: 148px;
+    }
+
+    .tod-drawer-table-tag .arco-tag-content {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .budget-table-panel {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .budget-table-panel.is-tod-rendered {
+      display: none;
+    }
+
+    .card.is-table-view .header,
+    .card.is-table-view .stage,
+    .card.is-table-view .aggregate-drawer {
+      display: none;
+    }
+
+    .card.is-table-view {
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    .card.is-table-view .budget-table-panel {
+      display: block;
+    }
+
+    .card.is-table-view .budget-table-panel.is-tod-rendered {
+      display: block;
+    }
+
+    .budget-table-view {
+      display: flex;
+      min-width: 980px;
+      flex-direction: column;
+      gap: 14px;
+      border: 0;
+      background: transparent;
+    }
+
+    .budget-table-selector-card {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      gap: 8px;
+      border: 0;
+      background: transparent;
+    }
+
+    .budget-table-selector-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 0;
+      color: #1f2329;
+      font-size: 13px;
+      line-height: 22px;
+      white-space: nowrap;
+    }
+
+    .budget-table-main-select {
+      width: 280px;
+      height: 32px;
+      border: 1px solid #d8dfe9;
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 0 28px 0 10px;
+      color: #1f2329;
+      font-size: 13px;
+    }
+
+    .budget-table-main-tag-trigger {
+      width: 280px;
+    }
+
+    .budget-table-main-tag-trigger .arco-input-tag {
+      cursor: pointer;
+    }
+
+    .budget-table-main-tag-trigger .arco-input-tag-input {
+      cursor: pointer;
+    }
+
+    .budget-table-main-tag-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      color: #737a87;
+    }
+
+    .budget-table-main-tag-arrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+
+    .budget-table-detail-card {
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .budget-table-detail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 66px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eaedf1;
+      background: #f4f7fb;
+    }
+
+    .budget-table-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .budget-table-title {
+      color: #1f2329;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+
+    .budget-table-role-tag {
+      flex-shrink: 0;
+      height: 20px;
+      border-radius: 4px;
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+    }
+
+    .budget-table-role-tag.is-initiator {
+      border-color: rgba(57, 115, 229, 0.2);
+      color: #3973e5;
+    }
+
+    .budget-table-role-tag.is-demand {
+      border-color: rgba(102, 110, 124, 0.2);
+      color: #666e7c;
+    }
+
+    .budget-table-role-tag.is-supply {
+      border-color: rgba(84, 91, 241, 0.2);
+      color: #545bf1;
+    }
+
+    .budget-table-role-tag .arco-tag-content {
+      line-height: 18px;
+    }
+
+    .budget-table-description {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 5px;
+      color: #737a87;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .budget-table-desc-divider {
+      width: 1px;
+      height: 12px;
+      background: #d8dce6;
+    }
+
+    .budget-table-tabs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 56px;
+      border-bottom: 1px solid #eaedf1;
+      background: #ffffff;
+      padding: 12px 16px;
+    }
+
+    .budget-table-tabs {
+      min-width: 0;
+    }
+
+    .budget-table-tabs .arco-tabs-header {
+      margin-bottom: 0;
+    }
+
+    .budget-table-tabs .arco-tabs-header-nav::before,
+    .budget-table-tabs .arco-tabs-content {
+      display: none;
+    }
+
+    .budget-table-tabs .arco-tabs-header-title {
+      position: relative;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      padding: 0 12px;
+      background: transparent;
+      color: #737a87;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      cursor: pointer;
+    }
+
+    .budget-table-tabs .arco-tabs-header-title:first-child {
+      padding-left: 0;
+    }
+
+    .budget-table-tabs .arco-tabs-header-title:not(:last-child)::after {
+      content: "|";
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #d8dce6;
+      font-weight: 400;
+      pointer-events: none;
+    }
+
+    .budget-table-tabs .arco-tabs-header-title-active {
+      color: #1664ff;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .budget-table-tip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #737a87;
+      font-size: 12px;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .budget-table-info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #9ca3af;
+      border-radius: 50%;
+      color: #737a87;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 14px;
+    }
+
+    .budget-table-grid-card {
+      margin: 0 16px 16px;
+      overflow: hidden;
+      border: 1px solid #dde2e9;
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .budget-table-grid-header {
+      display: flex;
+      align-items: center;
+      min-height: 38px;
+      border-bottom: 1px solid #dde2e9;
+      background: #f4f7fb;
+      padding: 8px 16px;
+    }
+
+    .budget-table-grid-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #1f2329;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    .budget-table-grid-icon {
+      color: #737a87;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .budget-table-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 16px 12px;
+      background: #ffffff;
+    }
+
+    .budget-table-filter-row {
+      display: grid;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .budget-table-filter-row.is-main {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .budget-table-filter-row.is-sub {
+      display: flex;
+      grid-template-columns: none;
+    }
+
+    .budget-table-filter-row.is-sub .budget-table-filter-control {
+      flex: 0 0 calc((100% - 30px) / 4);
+    }
+
+    .budget-table-filter-control {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      height: 34px;
+      overflow: hidden;
+      border: 1px solid #d8dfe9;
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .budget-table-filter-label {
+      display: inline-flex;
+      flex: 0 0 142px;
+      align-items: center;
+      height: 100%;
+      border-right: 1px solid #eaedf1;
+      padding: 0 12px;
+      color: #1f2329;
+      font-size: 13px;
+      line-height: 22px;
+      white-space: nowrap;
+    }
+
+    .budget-table-filter-select {
+      flex: 1 1 0;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .budget-table-filter-select .arco-select-view {
+      width: 100%;
+      height: 32px;
+      border: 0;
+      border-radius: 0;
+      background: #ffffff;
+    }
+
+    .budget-table-filter-select .arco-select-view-value,
+    .budget-table-filter-select .arco-select-view-placeholder {
+      color: #737a87;
+      font-size: 13px;
+      line-height: 22px;
+    }
+
+    .budget-table-filter-icon-button {
+      width: 32px;
+      min-width: 32px;
+      height: 34px;
+      padding: 0;
+      color: #737a87;
+      line-height: 1;
+    }
+
+    .budget-table-filter-icon {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+
+    .budget-table-filter-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .budget-table-filter-actions .arco-btn {
+      height: 34px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 1180px) {
+      .budget-table-filter-row.is-main {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .budget-table-detail-table {
+      margin: 0 16px 16px;
+    }
+
+    .budget-table-detail-table .arco-table-container {
+      border-radius: 4px;
+    }
+
+    .budget-table-detail-table .arco-table-th {
+      background: #f8fafc;
+      color: #1f2329;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .budget-table-detail-table .arco-table-td {
+      color: #1f2329;
+      font-size: 12px;
+      line-height: 20px;
+      vertical-align: top;
+    }
+
+    .budget-table-header-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .budget-table-month-amount {
+      display: inline-block;
+      min-width: 72px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .budget-table-billing-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 240px;
+    }
+
+    .budget-table-attribute-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .budget-table-billing-tag,
+    .budget-table-more-tag {
+      max-width: 210px;
+    }
+
+    .budget-table-billing-tag .arco-tag-content,
+    .budget-table-more-tag .arco-tag-content {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .budget-table-empty {
+      border: 1px dashed #dde2e9;
+      border-radius: 6px;
+      background: #ffffff;
+      padding: 48px;
+      color: #737a87;
+      text-align: center;
+      font-size: 13px;
+    }
+
     .stage {
       position: relative;
       width: 100%;
-      height: 400px;
+      flex: 1;
+      min-height: 0;
       background: #fcfdfe;
     }
 
@@ -465,6 +1582,12 @@
     .edge-group.is-active .edge-route {
       stroke: var(--line-hover);
       marker-end: url(#arrow-hover);
+    }
+
+    .edge-group.is-migration-core .edge-route,
+    .edge-group.is-migration-core.is-active .edge-route {
+      stroke: #1664ff;
+      marker-end: url(#arrow-migration);
     }
 
     .edge-hit {
@@ -610,17 +1733,23 @@
       font-weight: 500;
     }
 
-    svg[data-scheme="scheme2"][data-node-default-shadow="true"] .node-card {
+    svg[data-scheme="scheme2"][data-node-default-shadow="true"] .node-card,
+    svg[data-scheme="scheme4"][data-node-default-shadow="true"] .node-card,
+    svg[data-scheme="scheme5"][data-node-default-shadow="true"] .node-card {
       filter: drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.05));
     }
 
-    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group {
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group,
+    svg[data-scheme="scheme4"][data-node-hover-effect="true"] .node-group,
+    svg[data-scheme="scheme5"][data-node-hover-effect="true"] .node-group {
       transform-box: fill-box;
       transform-origin: center;
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-card {
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-card,
+    svg[data-scheme="scheme4"][data-node-hover-effect="true"] .node-card,
+    svg[data-scheme="scheme5"][data-node-hover-effect="true"] .node-card {
       transition:
         stroke 0.25s cubic-bezier(0.4, 0, 0.2, 1),
         stroke-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -628,11 +1757,15 @@
         filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active {
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active,
+    svg[data-scheme="scheme4"][data-node-hover-effect="true"] .node-group.is-active,
+    svg[data-scheme="scheme5"][data-node-hover-effect="true"] .node-group.is-active {
       transform: translateY(-2px);
     }
 
-    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active .node-card {
+    svg[data-scheme="scheme2"][data-node-hover-effect="true"] .node-group.is-active .node-card,
+    svg[data-scheme="scheme4"][data-node-hover-effect="true"] .node-group.is-active .node-card,
+    svg[data-scheme="scheme5"][data-node-hover-effect="true"] .node-group.is-active .node-card {
       filter:
         drop-shadow(0px 15px 35px rgba(0, 0, 0, 0.05))
         drop-shadow(0px 5px 15px rgba(0, 0, 0, 0.05));
@@ -648,6 +1781,15 @@
 
     .node-detail-icon {
       pointer-events: none;
+    }
+
+    .node-detail-icon-path {
+      fill: #737a87;
+      transition: fill 0.14s ease;
+    }
+
+    .node-group.is-active .node-detail-icon-path {
+      fill: #1664ff;
     }
 
     .node-meta-label {
@@ -683,6 +1825,198 @@
       stroke: #eaedf1;
     }
 
+    .node-meta-tooltip-hit {
+      fill: transparent;
+      pointer-events: all;
+    }
+
+    .node-group.is-aggregate .node-card {
+      fill: #f8fbff;
+      stroke: #91b9ff;
+      stroke-width: 1.2;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-card {
+      fill: #ffffff;
+      stroke: #dde2e9;
+      stroke-width: 1;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-card {
+      stroke: #1664ff;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand .node-title,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply .node-title,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-title {
+      fill: #0c0d0e;
+      font-weight: 500;
+      text-anchor: start;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand .node-meta-label,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply .node-meta-label,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-meta-label {
+      fill: #737a87;
+      font-size: 12px;
+      text-anchor: start;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand .node-meta-value,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply .node-meta-value,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-meta-value {
+      fill: #42464e;
+      font-size: 12px;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand .node-meta-strike,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply .node-meta-strike,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator .node-meta-strike {
+      stroke-dasharray: 2 2;
+      stroke-linecap: round;
+      shape-rendering: auto;
+    }
+
+    .node-role-tag-rect {
+      fill: #ffffff;
+      stroke-width: 1;
+    }
+
+    .node-role-tag-text {
+      font-size: 10px;
+      font-weight: 500;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .node-role-tag.is-demand .node-role-tag-rect {
+      stroke: rgba(102, 110, 124, 0.2);
+    }
+
+    .node-role-tag.is-demand .node-role-tag-text {
+      fill: #666e7c;
+    }
+
+    .node-role-tag.is-initiator .node-role-tag-rect {
+      stroke: rgba(57, 115, 229, 0.2);
+    }
+
+    .node-role-tag.is-initiator .node-role-tag-text {
+      fill: #3973e5;
+    }
+
+    .node-role-tag.is-supply .node-role-tag-rect {
+      stroke: rgba(84, 91, 241, 0.2);
+    }
+
+    .node-role-tag.is-supply .node-role-tag-text {
+      fill: #545bf1;
+    }
+
+    .node-aggregate-title {
+      fill: #1664ff;
+      font-size: 12px;
+      font-weight: 600;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-total {
+      fill: #42464e;
+      font-size: 11px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-item {
+      fill: #42464e;
+      font-size: 10px;
+      text-anchor: start;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-link {
+      fill: #1664ff;
+      font-size: 10px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      text-decoration: underline;
+    }
+
+    svg[data-scheme="scheme5"] .node-group.is-migration-aggregate .node-card {
+      fill: #ffffff;
+      stroke: #dde2e9;
+      stroke-width: 1;
+    }
+
+    .node-aggregate-count-rect {
+      fill: #eceded;
+    }
+
+    .node-aggregate-count-text {
+      fill: #42464e;
+      font-size: 10px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-action {
+      fill: #737a87;
+      font-size: 12px;
+      text-anchor: start;
+      dominant-baseline: middle;
+      transition: fill 0.14s ease;
+    }
+
+    .node-group.is-active .node-aggregate-action {
+      fill: #1664ff;
+    }
+
+    .node-aggregate-summary-label,
+    .node-aggregate-top-title,
+    .node-aggregate-top-name,
+    .node-aggregate-summary-unit,
+    .node-aggregate-top-unit {
+      fill: #737a87;
+      font-size: 12px;
+      text-anchor: start;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-top-title {
+      font-weight: 500;
+    }
+
+    .node-aggregate-summary-value,
+    .node-aggregate-top-value {
+      fill: #42464e;
+      font-size: 12px;
+      font-weight: 500;
+      text-anchor: start;
+      dominant-baseline: middle;
+    }
+
+    .node-aggregate-top-value,
+    .node-aggregate-top-unit {
+      text-anchor: end;
+    }
+
+    .node-aggregate-divider {
+      stroke: #eaedf1;
+      stroke-width: 1;
+      shape-rendering: crispEdges;
+    }
+
+    .node-aggregate-divider.is-dashed {
+      stroke-dasharray: 4 4;
+      shape-rendering: auto;
+    }
+
     .orbit-ring {
       fill: none;
       stroke: rgba(24, 144, 255, 0.16);
@@ -700,12 +2034,29 @@
         width: 100%;
       }
 
+      .card {
+        height: auto;
+        min-height: 600px;
+        flex-direction: column;
+      }
+
+      .topology-pane {
+        min-height: 480px;
+      }
+
+      .aggregate-drawer {
+        min-width: 0;
+        border-left: 0;
+        border-top: 1px solid #eaedf1;
+      }
+
       .page-topbar {
         align-items: stretch;
         flex-direction: column;
       }
 
       .scheme-switch,
+      .past-scheme-switch,
       .mode-switch {
         width: 100%;
       }
@@ -739,9 +2090,21 @@
           <div class="scheme-label">方案</div>
           <div class="scheme-select-wrap">
             <select id="scheme-select" class="scheme-select" aria-label="选择方案">
+              <option value="scheme2">方案二：弧线连接+高亮</option>
+              <option value="scheme5" selected>方案五：层级聚合+高亮</option>
+            </select>
+            <span class="scheme-select-arrow">⌄</span>
+          </div>
+        </div>
+
+        <div class="scheme-switch past-scheme-switch">
+          <div class="scheme-label">过往方案</div>
+          <div class="scheme-select-wrap">
+            <select id="past-scheme-select" class="scheme-select" aria-label="选择过往方案">
+              <option value="">选择过往方案</option>
               <option value="scheme1">方案一：线上方案+高亮</option>
-              <option value="scheme2" selected>方案二：弧线连接+高亮</option>
               <option value="scheme3">方案三：合计展示重叠金额+高亮</option>
+              <option value="scheme4">方案四：横向层级+高亮</option>
             </select>
             <span class="scheme-select-arrow">⌄</span>
           </div>
@@ -769,65 +2132,116 @@
         <div class="mode-switch">
           <button id="mode-tree" class="mode-btn is-active" type="button">普通数据</button>
           <button id="mode-mesh" class="mode-btn" type="button">复杂数据</button>
+          <button id="mode-business-extreme" class="mode-btn" type="button">业务极端数据</button>
+          <button id="mode-migration-case1" class="mode-btn" type="button">平移情况1</button>
+          <button id="mode-migration-case2" class="mode-btn" type="button">平移情况2</button>
+          <button id="mode-migration-case3" class="mode-btn" type="button">平移情况3</button>
+        </div>
+      </div>
+
+      <div class="topology-section-bar" aria-label="调整明细视图切换">
+        <div class="topology-section-heading">
+          <svg class="topology-section-marker" width="3" height="16" viewBox="0 0 3 16" fill="none" aria-hidden="true">
+            <path d="M0 0C1.65685 0 3 1.34315 3 3V13C3 14.6569 1.65685 16 0 16V0Z" fill="#165DFF"></path>
+          </svg>
+          <span class="topology-section-title">调整明细</span>
+        </div>
+        <div class="topology-view-tabs" data-tod-view-tabs>
+          <div class="topology-view-fallback" role="tablist" aria-label="视图切换">
+            <button class="topology-view-tab" type="button" role="tab" aria-selected="false" data-view-key="table">
+              <svg class="topology-view-tab-icon" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M2 2.25h10v9.5H2v-9.5Z" stroke="currentColor" stroke-width="1.2"></path>
+                <path d="M2 5.25h10M5.5 2.25v9.5" stroke="currentColor" stroke-width="1.2"></path>
+              </svg>
+              <span>表格视图</span>
+            </button>
+            <span class="topology-view-separator" aria-hidden="true"></span>
+            <button class="topology-view-tab is-active" type="button" role="tab" aria-selected="true" data-view-key="topology">
+              <span class="topology-view-tab-icon topology-view-subordinates-icon" aria-hidden="true"></span>
+              <span>拓扑图视图</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <section class="card">
-      <header class="header">
-        <div class="title-wrap">
-          <div class="title">调整链路</div>
-        </div>
-        <div class="toolbar">
-          <div class="legend">
-            <span class="legend-item">
-              <span class="legend-icon">◉</span>
-              <span>点击节点配置/查看明细</span>
-            </span>
-            <span class="legend-item">
-              <span class="legend-node start"></span>
-              <span>发起方节点</span>
-            </span>
-            <span class="legend-item">
-              <span class="legend-node regular"></span>
-              <span>上下游节点</span>
-            </span>
-          </div>
-        </div>
-      </header>
+        <div class="topology-pane">
+          <header class="header">
+            <div class="title-wrap">
+              <div class="title">调整链路</div>
+            </div>
+            <div class="toolbar">
+              <div class="legend">
+                <span class="legend-item">
+                  <span class="legend-icon">◉</span>
+                  <span>点击查看明细</span>
+                </span>
+                <span class="legend-item">
+                  <span class="legend-node start"></span>
+                  <span>发起方节点</span>
+                </span>
+                <span class="legend-item">
+                  <span class="legend-node regular"></span>
+                  <span>上下游节点</span>
+                </span>
+              </div>
+            </div>
+          </header>
 
-      <div class="stage">
-        <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
-          <defs>
-            <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d6dde8"></path>
-            </marker>
-            <marker id="arrow-hover" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2ccd9"></path>
-            </marker>
-            <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#1890ff"></path>
-            </marker>
-          </defs>
-          <g id="viewport-layer"></g>
-        </svg>
+          <div class="stage">
+            <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
+              <defs>
+                <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#d6dde8"></path>
+                </marker>
+                <marker id="arrow-hover" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2ccd9"></path>
+                </marker>
+                <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#1890ff"></path>
+                </marker>
+                <marker id="arrow-migration" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#1664ff"></path>
+                </marker>
+              </defs>
+              <g id="viewport-layer"></g>
+            </svg>
 
-        <div class="hud">
-          <div class="zoom-panel">
-            <button id="zoom-in" class="zoom-btn" type="button" aria-label="Zoom in">
-              <img src="./icon/放大.svg" class="zoom-icon" alt="" />
-            </button>
-            <button id="zoom-out" class="zoom-btn" type="button" aria-label="Zoom out">
-              <img src="./icon/缩小.svg" class="zoom-icon" alt="" />
-            </button>
-            <button id="zoom-fit" class="zoom-btn" type="button" aria-label="Fit view">
-              <img src="./icon/适配.svg" class="zoom-icon" alt="" />
-            </button>
+            <div class="hud">
+              <div class="zoom-panel">
+                <button id="zoom-in" class="zoom-btn" type="button" aria-label="Zoom in">
+                  <img src="./icon/放大.svg" class="zoom-icon" alt="" />
+                </button>
+                <button id="zoom-out" class="zoom-btn" type="button" aria-label="Zoom out">
+                  <img src="./icon/缩小.svg" class="zoom-icon" alt="" />
+                </button>
+                <button id="zoom-fit" class="zoom-btn" type="button" aria-label="Fit view">
+                  <img src="./icon/适配.svg" class="zoom-icon" alt="" />
+                </button>
+              </div>
+            </div>
           </div>
+          <div id="budget-table-view" class="budget-table-panel" data-tod-budget-table-view></div>
         </div>
-      </div>
+
+        <aside id="aggregate-drawer" class="aggregate-drawer is-collapsed" aria-hidden="true">
+          <div class="aggregate-drawer-panel">
+            <div class="aggregate-drawer-header">
+              <div class="aggregate-drawer-heading">
+                <div id="aggregate-drawer-title" class="aggregate-drawer-title"></div>
+                <div id="aggregate-drawer-subtitle" class="aggregate-drawer-subtitle"></div>
+              </div>
+              <button id="aggregate-drawer-close" class="aggregate-drawer-close" type="button" aria-label="收起侧边栏">
+                <img src="./icon/关闭.svg" class="aggregate-drawer-close-icon" alt="" />
+              </button>
+            </div>
+            <div id="aggregate-drawer-body" class="aggregate-drawer-body"></div>
+          </div>
+        </aside>
       </section>
     </div>
   </div>
+
 
   <script src="./vendor/popper.min.js"></script>
   <script src="./vendor/tippy-bundle.umd.min.js"></script>
@@ -844,21 +2258,34 @@
     const LAYER_GAP_EXPAND_STEP = 24;
     const MAX_TAG_LAYOUT_PASSES = 8;
     const MAX_SCHEME_ONE_TAG_LAYOUT_PASSES = 14;
+    const AGGREGATE_LAYER_THRESHOLD = 5;
+    const AGGREGATE_TOP_COUNT = 5;
     const LANE_GAP = 18;
     const CORNER_RADIUS = 14;
     const NODE_PADDING_X = 18;
     const NODE_WIDTH = 265;
+    const MIGRATION_CASE2_GROUP_GAP = 80;
     const NODE_TITLE_HORIZONTAL_PADDING = 18;
     const NODE_TITLE_ICON_SIZE = 12;
     const NODE_TITLE_ICON_RIGHT_GAP = 8;
     const NODE_TITLE_ICON_TEXT_GAP = 8;
     const PORT_INSET = 26;
+    const SCHEME5_NODE_PADDING_X = 8;
+    const SCHEME5_NODE_PADDING_Y = 7;
+    const SCHEME5_NODE_ROW_GAP = 4;
+    const SCHEME5_NODE_TAG_HEIGHT = 18;
+    const SCHEME5_NODE_TEXT_ROW_HEIGHT = 20;
+    const SCHEME5_NODE_DETAIL_ICON_SIZE = 12;
+    const SCHEME5_LAYER_VERTICAL_GAP = 80;
+    const SCHEME5_MIGRATION_AGGREGATE_HEIGHT = 216;
+    const DETAIL_ICON_PATH = "M3.67509 8.53871C3.44164 8.77217 3.44164 9.15067 3.67509 9.38413L4.0978 9.80684C4.33126 10.0403 4.70977 10.0403 4.94322 9.80684L8.32491 6.42516C8.44226 6.3078 8.50062 6.1538 8.49999 5.99999C8.50062 5.84618 8.44226 5.69218 8.32491 5.57482L4.94322 2.19314C4.70977 1.95968 4.33126 1.95968 4.0978 2.19314L3.67509 2.61585C3.44164 2.84931 3.44164 3.22781 3.67509 3.46127L6.21381 5.99999L3.67509 8.53871Z";
 
     const datasets = {
       tree: {
         label: "普通数据",
         canvas: { width: 1520, height: 760 },
         compactLayers: true,
+        aggregateLayerThreshold: 5,
         layers: [
           { y: 110, label: "TOP" },
           { y: 320, label: "CENTER" },
@@ -904,6 +2331,7 @@
         label: "复杂数据",
         canvas: { width: 1520, height: 860 },
         compactLayers: true,
+        aggregateLayerThreshold: 5,
         scheme1FanAlignment: false,
         scheme1ReferenceXs: {
           "m-toutiao": 160,
@@ -974,26 +2402,380 @@
           { id: "m-e8", source: "m-core", target: "m-volcano", amount: "+65.00元" },
           { id: "m-e9", source: "m-core", target: "m-bottom-arch", amount: "-180.00元" }
         ]
-      }
+      },
+      businessExtreme: {
+        label: "业务极端数据",
+        canvas: { width: 9300, height: 920 },
+        compactLayers: false,
+        scheme4SemanticLayout: true,
+        layers: [
+          { y: 160, label: "1 级上游" },
+          { y: 540, label: "中间节点" },
+          { y: 800, label: "下游节点" }
+        ],
+        nodes: [
+          { id: "b-up-1", x: 180, y: 160, title: "抖音短视频(5150)" },
+          { id: "b-up-2", x: 485, y: 160, title: "今日头条(5136)" },
+          { id: "b-up-3", x: 790, y: 160, title: "西瓜视频(1689)" },
+          { id: "b-up-4", x: 1095, y: 160, title: "研发商品中心-电商(2480)" },
+          { id: "b-up-5", x: 1400, y: 160, title: "小说(5300)" },
+          { id: "b-up-6", x: 1705, y: 160, title: "Lark(5137)" },
+          { id: "b-up-7", x: 2010, y: 160, title: "抖音业务(2503)" },
+          { id: "b-up-8", x: 2315, y: 160, title: "研发商品中心-Data-数据中心与供应链(293)" },
+          { id: "b-up-9", x: 2620, y: 160, title: "Project Luna(780)" },
+          { id: "b-up-10", x: 2925, y: 160, title: "研发商品中心-商业化(56)" },
+          { id: "b-up-11", x: 3230, y: 160, title: "研发商品中心-广告技术(5139)" },
+          { id: "b-up-12", x: 3535, y: 160, title: "火山引擎-公共职能官网平台(1842)" },
+          { id: "b-up-13", x: 3840, y: 160, title: "研发商品中心-视频架构(55)" },
+          { id: "b-up-14", x: 4145, y: 160, title: "研发商品中心-搜索业务研发(2513)" },
+          { id: "b-up-15", x: 4450, y: 160, title: "研发商品中心-用户中台(2253)" },
+          { id: "b-up-16", x: 4755, y: 160, title: "研发商品中心-AIDP(5108)" },
+          { id: "b-up-17", x: 5060, y: 160, title: "研发商品中心-Data-中国区风控(305)" },
+          { id: "b-up-18", x: 5365, y: 160, title: "核心服务(2498)" },
+          { id: "b-up-19", x: 5670, y: 160, title: "PICO-Swan(3068)" },
+          { id: "b-up-20", x: 5975, y: 160, title: "研发商品中心-Data-语音(2448)" },
+          { id: "b-up-21", x: 6280, y: 160, title: "研发商品中心-互娱研发-客服平台(1966)" },
+          { id: "b-up-22", x: 6585, y: 160, title: "网络安全(1821)" },
+          { id: "b-up-23", x: 6890, y: 160, title: "厂商与联盟(1826)" },
+          { id: "b-up-24", x: 7195, y: 160, title: "内容套件(1827)" },
+          { id: "b-up-25", x: 7500, y: 160, title: "云通信(431)" },
+          { id: "b-up-26", x: 7805, y: 160, title: "视频云(420)" },
+          { id: "b-up-27", x: 8110, y: 160, title: "增长营销(1832)" },
+          { id: "b-up-28", x: 8415, y: 160, title: "计算(1836)" },
+          { id: "b-up-29", x: 8720, y: 160, title: "集团信息系统部(4790)" },
+          { id: "b-up-30", x: 9025, y: 160, title: "小荷健康(5306)" },
+          {
+            id: "b-core",
+            x: 4603,
+            y: 540,
+            title: "研发商品中心-基础架构(292)",
+            meta: "收支偏差  0.31元   0.00%",
+            role: "initiator"
+          },
+          { id: "b-downstream", x: 4603, y: 800, title: "研发商品中心-基础架构(292)" }
+        ],
+        edges: [
+          { id: "b-e1", source: "b-core", target: "b-up-1", amount: "+124230364.24元" },
+          { id: "b-e2", source: "b-core", target: "b-up-2", amount: "+129.70元" },
+          { id: "b-e3", source: "b-core", target: "b-up-3", amount: "+665761.01元" },
+          { id: "b-e4", source: "b-core", target: "b-up-4", amount: "+20737.84元" },
+          { id: "b-e5", source: "b-core", target: "b-up-5", amount: "+34843676.33元" },
+          { id: "b-e6", source: "b-core", target: "b-up-6", amount: "+358.46元" },
+          { id: "b-e7", source: "b-core", target: "b-up-7", amount: "+70802.28元" },
+          { id: "b-e8", source: "b-core", target: "b-up-8", amount: "+76660.93元" },
+          { id: "b-e9", source: "b-core", target: "b-up-9", amount: "+50488269.95元" },
+          { id: "b-e10", source: "b-core", target: "b-up-10", amount: "+1165080.63元" },
+          { id: "b-e11", source: "b-core", target: "b-up-11", amount: "+8730.88元" },
+          { id: "b-e12", source: "b-core", target: "b-up-12", amount: "+214562.40元" },
+          { id: "b-e13", source: "b-core", target: "b-up-13", amount: "+98012.55元" },
+          { id: "b-e14", source: "b-core", target: "b-up-14", amount: "+391804.19元" },
+          { id: "b-e15", source: "b-core", target: "b-up-15", amount: "+7062.13元" },
+          { id: "b-e16", source: "b-core", target: "b-up-16", amount: "+180936.77元" },
+          { id: "b-e17", source: "b-core", target: "b-up-17", amount: "+45290.06元" },
+          { id: "b-e18", source: "b-core", target: "b-up-18", amount: "+632518.34元" },
+          { id: "b-e19", source: "b-core", target: "b-up-19", amount: "+2901.45元" },
+          { id: "b-e20", source: "b-core", target: "b-up-20", amount: "+73044.88元" },
+          { id: "b-e21", source: "b-core", target: "b-up-21", amount: "+42158.23元" },
+          { id: "b-e22", source: "b-core", target: "b-up-22", amount: "-126.50元" },
+          { id: "b-e23", source: "b-core", target: "b-up-23", amount: "+8834.72元" },
+          { id: "b-e24", source: "b-core", target: "b-up-24", amount: "+56019.31元" },
+          { id: "b-e25", source: "b-core", target: "b-up-25", amount: "+1024.00元" },
+          { id: "b-e26", source: "b-core", target: "b-up-26", amount: "+742918.60元" },
+          { id: "b-e27", source: "b-core", target: "b-up-27", amount: "+19876.44元" },
+          { id: "b-e28", source: "b-core", target: "b-up-28", amount: "+306512.90元" },
+          { id: "b-e29", source: "b-core", target: "b-up-29", amount: "+60533.18元" },
+          { id: "b-e30", source: "b-core", target: "b-up-30", amount: "+7741.36元" },
+          { id: "b-e31", source: "b-core", target: "b-downstream", amount: "+0.31元" }
+        ]
+      },
+      migrationCase1: {
+        label: "平移情况1",
+        canvas: { width: 1400, height: 660 },
+        compactLayers: false,
+        layers: [
+          { y: 90, label: "二级上游" },
+          { y: 220, label: "一级上游" },
+          { y: 360, label: "发起方节点" },
+          { y: 540, label: "一级下游" }
+        ],
+        nodes: [
+          { id: "case1-second-up", x: 700, y: 90, title: "集团信息系统部(4790)" },
+          { id: "case1-up-1", x: 420, y: 220, title: "抖音短视频(5150)", meta: "收支偏差  +4.00元   +4.00%" },
+          { id: "case1-up-2", x: 700, y: 220, title: "今日头条(5136)", meta: "收支偏差  +3.00元   +3.00%" },
+          { id: "case1-up-3", x: 980, y: 220, title: "西瓜视频(1689)", meta: "收支偏差  +3.00元   +3.00%" },
+          {
+            id: "case1-core",
+            x: 700,
+            y: 360,
+            title: "研发商品中心-基础架构(292)",
+            meta: "收支偏差  +10.00元   +10.00%",
+            role: "initiator"
+          },
+          { id: "case1-down-1", x: 420, y: 540, title: "研发商品中心-电商(2480)" },
+          { id: "case1-down-2", x: 700, y: 540, title: "Lark(5137)" },
+          { id: "case1-down-3", x: 980, y: 540, title: "商业化(56)" }
+        ],
+        edges: [
+          { id: "case1-e1", source: "case1-up-2", target: "case1-second-up", amount: "+3.00元" },
+          { id: "case1-e2", source: "case1-core", target: "case1-up-1", amount: "+4.00元" },
+          { id: "case1-e3", source: "case1-core", target: "case1-up-2", amount: "+3.00元" },
+          { id: "case1-e4", source: "case1-core", target: "case1-up-3", amount: "+3.00元" },
+          { id: "case1-e5", source: "case1-core", target: "case1-down-1", amount: "-2.50元" },
+          { id: "case1-e6", source: "case1-core", target: "case1-down-2", amount: "-3.50元" },
+          { id: "case1-e7", source: "case1-core", target: "case1-down-3", amount: "-4.00元" }
+        ]
+      },
+      migrationCase2: (() => {
+        const firstLevelNames = [
+          "抖音短视频(5150)",
+          "今日头条(5136)",
+          "西瓜视频(1689)",
+          "研发商品中心-电商(2480)",
+          "小说(5300)",
+          "Lark(5137)",
+          "抖音业务(2503)",
+          "商业化(56)",
+          "视频云(420)",
+          "小荷健康(5306)"
+        ];
+        const downstreamNames = [
+          "Data-数据中心与供应链(293)",
+          "广告技术(5139)",
+          "视频架构(55)",
+          "搜索业务研发(2513)",
+          "用户中台(2253)"
+        ];
+        const firstLevelAmounts = [2, 1.6, 1.4, 1.2, 1, 0.9, 0.8, 0.6, 0.3, 0.2];
+        const downstreamAmounts = [3, 2.5, 2, 1.5, 1];
+        const costBudgetAmount = firstLevelAmounts.reduce((sum, amount) => sum + amount, 0);
+        const incomeBudgetAmount = downstreamAmounts.reduce((sum, amount) => sum + amount, 0);
+        const balanceDiffAmount = incomeBudgetAmount - costBudgetAmount;
+        const nodes = [];
+        const edges = [];
+        const canvasWidth = 1400;
+        const treeCenterDistance = NODE_WIDTH + MIGRATION_CASE2_GROUP_GAP;
+        const leftTreeX = canvasWidth / 2 - treeCenterDistance / 2;
+        const rightTreeX = canvasWidth / 2 + treeCenterDistance / 2;
+
+        [
+          { side: "left", x: leftTreeX, amountSign: -1, title: "研发商品中心-基础架构(292)", role: "initiator" },
+          { side: "right", x: rightTreeX, amountSign: 1, title: "研发商品中心-Data-数据中心与供应链(293)", role: "initiator" }
+        ].forEach((tree) => {
+          nodes.push({
+            id: `${tree.side}-core`,
+            x: tree.x,
+            y: 330,
+            title: tree.title,
+            meta: `收支偏差  ${formatAmountNumber(tree.amountSign * balanceDiffAmount)}   ${formatPercentNumber(tree.amountSign * balanceDiffAmount)}`,
+            role: tree.role
+          });
+
+          firstLevelNames.forEach((title, index) => {
+            nodes.push({
+              id: `${tree.side}-up-${index + 1}`,
+              x: tree.x - 220 + index * 48,
+              y: 120,
+              title,
+              aggregateGroup: `${tree.side}-up`
+            });
+            edges.push({
+              id: `${tree.side}-up-e${index + 1}`,
+              source: `${tree.side}-core`,
+              target: `${tree.side}-up-${index + 1}`,
+              amount: `${tree.amountSign > 0 ? "+" : "-"}${firstLevelAmounts[index].toFixed(2)}元`
+            });
+          });
+
+          downstreamNames.forEach((title, index) => {
+            nodes.push({
+              id: `${tree.side}-down-${index + 1}`,
+              x: tree.x - 140 + index * 70,
+              y: 560,
+              title,
+              aggregateGroup: `${tree.side}-down`
+            });
+            edges.push({
+              id: `${tree.side}-down-e${index + 1}`,
+              source: `${tree.side}-core`,
+              target: `${tree.side}-down-${index + 1}`,
+              amount: `${tree.amountSign > 0 ? "+" : "-"}${downstreamAmounts[index].toFixed(2)}元`
+            });
+          });
+        });
+
+        edges.push({
+          id: "migration-core-e",
+          source: "left-core",
+          target: "right-core",
+          amount: "+10.00元",
+          flow: "horizontal-right"
+        });
+
+        return {
+          label: "平移情况2",
+          canvas: { width: canvasWidth, height: 720 },
+          compactLayers: false,
+          aggregateAllGroupsInScheme5: true,
+          layers: [
+            { y: 120, label: "一级上游" },
+            { y: 330, label: "发起方节点" },
+            { y: 560, label: "一级下游" }
+          ],
+          nodes,
+          edges
+        };
+      })(),
+      migrationCase3: (() => {
+        const firstLevelNames = [
+          "抖音短视频(5150)",
+          "今日头条(5136)",
+          "西瓜视频(1689)",
+          "研发商品中心-电商(2480)",
+          "小说(5300)",
+          "Lark(5137)"
+        ];
+        const secondLevelNames = [
+          "集团信息系统部(4790)",
+          "火山引擎-公共职能官网平台(1842)",
+          "Project Luna(780)"
+        ];
+        const supplyNames = [
+          "Data-数据中心与供应链(293)",
+          "广告技术(5139)",
+          "视频架构(55)",
+          "搜索业务研发(2513)"
+        ];
+        const firstLevelAmounts = [2.4, 2, 1.8, 1.4, 1.2, 0.8];
+        const secondLevelAmounts = [2.4, 2, 1.8];
+        const supplyAmounts = [2.8, 2.4, 1.6, 1.2];
+        const costBudgetAmount = firstLevelAmounts.reduce((sum, amount) => sum + amount, 0);
+        const incomeBudgetAmount = supplyAmounts.reduce((sum, amount) => sum + amount, 0);
+        const balanceDiffAmount = incomeBudgetAmount - costBudgetAmount;
+        const nodes = [];
+        const edges = [];
+        const canvasWidth = 1400;
+        const treeCenterDistance = NODE_WIDTH + MIGRATION_CASE2_GROUP_GAP;
+        const leftTreeX = canvasWidth / 2 - treeCenterDistance / 2;
+        const rightTreeX = canvasWidth / 2 + treeCenterDistance / 2;
+
+        [
+          { side: "left", x: leftTreeX, amountSign: -1, title: "研发商品中心-基础架构(292)", role: "initiator" },
+          { side: "right", x: rightTreeX, amountSign: 1, title: "研发商品中心-Data-数据中心与供应链(293)", role: "initiator" }
+        ].forEach((tree) => {
+          nodes.push({
+            id: `${tree.side}-core`,
+            x: tree.x,
+            y: 430,
+            title: tree.title,
+            meta: `收支偏差  ${formatAmountNumber(tree.amountSign * balanceDiffAmount)}   ${formatPercentNumber(tree.amountSign * balanceDiffAmount)}`,
+            role: tree.role
+          });
+
+          secondLevelNames.forEach((title, index) => {
+            nodes.push({
+              id: `${tree.side}-second-up-${index + 1}`,
+              x: tree.x - 90 + index * 90,
+              y: 80,
+              title,
+              aggregateGroup: `${tree.side}-second-up`
+            });
+          });
+
+          firstLevelNames.forEach((title, index) => {
+            const secondLevelIndex = index % secondLevelNames.length;
+            nodes.push({
+              id: `${tree.side}-up-${index + 1}`,
+              x: tree.x - 150 + index * 60,
+              y: 240,
+              title,
+              aggregateGroup: `${tree.side}-up`
+            });
+            edges.push({
+              id: `${tree.side}-up-e${index + 1}`,
+              source: `${tree.side}-core`,
+              target: `${tree.side}-up-${index + 1}`,
+              amount: `${tree.amountSign > 0 ? "+" : "-"}${firstLevelAmounts[index].toFixed(2)}元`
+            });
+            edges.push({
+              id: `${tree.side}-second-up-e${index + 1}`,
+              source: `${tree.side}-up-${index + 1}`,
+              target: `${tree.side}-second-up-${secondLevelIndex + 1}`,
+              amount: `${tree.amountSign > 0 ? "+" : "-"}${secondLevelAmounts[secondLevelIndex].toFixed(2)}元`
+            });
+          });
+
+          supplyNames.forEach((title, index) => {
+            nodes.push({
+              id: `${tree.side}-down-${index + 1}`,
+              x: tree.x - 105 + index * 70,
+              y: 680,
+              title,
+              aggregateGroup: `${tree.side}-down`
+            });
+            edges.push({
+              id: `${tree.side}-down-e${index + 1}`,
+              source: `${tree.side}-core`,
+              target: `${tree.side}-down-${index + 1}`,
+              amount: `${tree.amountSign > 0 ? "+" : "-"}${supplyAmounts[index].toFixed(2)}元`
+            });
+          });
+        });
+
+        edges.push({
+          id: "migration-case3-core-e",
+          source: "left-core",
+          target: "right-core",
+          amount: "+8.00元",
+          flow: "horizontal-right"
+        });
+
+        return {
+          label: "平移情况3",
+          canvas: { width: canvasWidth, height: 840 },
+          compactLayers: false,
+          aggregateAllGroupsInScheme5: true,
+          layers: [
+            { y: 80, label: "二级需求方" },
+            { y: 240, label: "一级需求方" },
+            { y: 430, label: "发起方节点" },
+            { y: 680, label: "一级供给方" }
+          ],
+          nodes,
+          edges
+        };
+      })()
     };
 
     const stage = document.querySelector(".stage");
     const svg = document.getElementById("topology-canvas");
     const viewportLayer = document.getElementById("viewport-layer");
     const schemeSelect = document.getElementById("scheme-select");
+    const pastSchemeSelect = document.getElementById("past-scheme-select");
     const modeButtons = {
       tree: document.getElementById("mode-tree"),
-      mesh: document.getElementById("mode-mesh")
+      mesh: document.getElementById("mode-mesh"),
+      businessExtreme: document.getElementById("mode-business-extreme"),
+      migrationCase1: document.getElementById("mode-migration-case1"),
+      migrationCase2: document.getElementById("mode-migration-case2"),
+      migrationCase3: document.getElementById("mode-migration-case3")
     };
     const nodeOptionPanel = document.getElementById("node-option-panel");
     const nodeOptionInputs = Array.from(nodeOptionPanel.querySelectorAll("[data-node-option]"));
+    const aggregateDrawer = document.getElementById("aggregate-drawer");
+    const aggregateDrawerTitle = document.getElementById("aggregate-drawer-title");
+    const aggregateDrawerSubtitle = document.getElementById("aggregate-drawer-subtitle");
+    const aggregateDrawerBody = document.getElementById("aggregate-drawer-body");
+    const aggregateDrawerClose = document.getElementById("aggregate-drawer-close");
+    const card = document.querySelector(".card");
+    const viewTabButtons = Array.from(document.querySelectorAll(".topology-view-tab[data-view-key]"));
+    const budgetTableView = document.getElementById("budget-table-view");
 
     const measureCanvas = document.createElement("canvas");
     const measureContext = measureCanvas.getContext("2d");
 
     const state = {
       mode: "tree",
-      scheme: "scheme2",
+      scheme: "scheme5",
       nodeOptions: {
         detailIcon: true,
         tooltip: false,
@@ -1003,11 +2785,14 @@
       active: null,
       hoverActive: null,
       selectedActive: null,
+      view: "topology",
+      budgetTableFocus: null,
       camera: { x: 0, y: 0, scale: 1 },
       dragging: false,
       dragOrigin: null,
       graph: null,
-      tooltipInstances: []
+      tooltipInstances: [],
+      drawerTooltipInstances: []
     };
 
     // #region debug-point A:report-helper
@@ -1109,6 +2894,19 @@
       return node;
     }
 
+    function renderDetailIcon(group, x, y, size = 12) {
+      const icon = createSvg("g", {
+        class: "node-detail-icon",
+        transform: `translate(${x} ${y}) scale(${size / 12})`
+      });
+      icon.appendChild(createSvg("path", {
+        d: DETAIL_ICON_PATH,
+        class: "node-detail-icon-path"
+      }));
+      group.appendChild(icon);
+      return icon;
+    }
+
     function buildPortX(node, count, index) {
       if (count <= 1) {
         return node.x;
@@ -1117,6 +2915,15 @@
       const usable = Math.max(node.width - PORT_INSET * 2, 24);
       const step = usable / (count - 1);
       return node.x - usable / 2 + step * index;
+    }
+
+    function buildSidePortY(node, count, index) {
+      if (count <= 1) {
+        return node.y;
+      }
+
+      const gap = 9;
+      return node.y + (index - (count - 1) / 2) * gap;
     }
 
     function buildBiasedPortX(node, side) {
@@ -1245,8 +3052,8 @@
         const hasMeta = Boolean(node.meta);
         map.set(node.id, {
           ...node,
-          width: NODE_WIDTH,
-          height: node.role === "initiator" || hasMeta ? 46 : 28
+          width: node.width || NODE_WIDTH,
+          height: node.height || (node.role === "initiator" || hasMeta ? 46 : 28)
         });
       });
       return map;
@@ -1275,6 +3082,89 @@
         rate: matched[3],
         structured: true
       };
+    }
+
+    function parsePlainNumber(rawValue) {
+      const parsed = Number(String(rawValue || "").replace(/\s+/g, "").replace(/[,%元]/g, ""));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function isMigrationDataset(dataset) {
+      return ["平移情况2", "平移情况3"].includes(dataset?.label);
+    }
+
+    function getBudgetAdjustmentBreakdown(node, parsedMeta, dataset = state.graph?.dataset) {
+      const diffAmount = parsePlainNumber(parsedMeta?.amount);
+
+      if (isMigrationDataset(dataset) && node?.role === "initiator") {
+        const sign = node.id === "left-core" ? -1 : 1;
+        const cost = (dataset.edges || [])
+          .filter((edge) => edge.source === node.id && /-up-/.test(edge.target))
+          .reduce((sum, edge) => sum + parseAmountNumber(edge.amount), 0);
+        const income = (dataset.edges || [])
+          .filter((edge) => edge.source === node.id && /-down-/.test(edge.target))
+          .reduce((sum, edge) => sum + parseAmountNumber(edge.amount), 0);
+
+        return {
+          income,
+          cost,
+          diff: income - cost,
+          rate: parsePlainNumber(parsedMeta?.rate),
+          sign
+        };
+      }
+
+      return {
+        income: Math.max(diffAmount, 0),
+        cost: Math.max(-diffAmount, 0),
+        diff: diffAmount,
+        rate: parsePlainNumber(parsedMeta?.rate),
+        sign: diffAmount < 0 ? -1 : 1
+      };
+    }
+
+    function buildMetaAmountFormulaTooltip(node, parsedMeta, dataset = state.graph?.dataset) {
+      const breakdown = getBudgetAdjustmentBreakdown(node, parsedMeta, dataset);
+      const incomeText = formatSignedNumber(breakdown.income);
+      const costText = formatSignedNumber(breakdown.cost);
+      const diffText = formatSignedNumber(breakdown.diff);
+      return escapeHtml(`收支偏差 = 收入预算调整金额-成本预算调整金额 = ${incomeText} - ${costText} = ${diffText}`);
+    }
+
+    function buildMetaRateFormulaTooltip(node, parsedMeta, dataset = state.graph?.dataset) {
+      const breakdown = getBudgetAdjustmentBreakdown(node, parsedMeta, dataset);
+      const incomeText = formatSignedNumber(breakdown.income);
+      const costText = formatSignedNumber(breakdown.cost);
+      const diffText = formatSignedNumber(breakdown.diff);
+      const rateText = formatSignedNumber(parsePlainNumber(parsedMeta?.rate));
+      return escapeHtml(`收支偏差 =（收入调整金额-成本调整金额）/成本调整金额 = (${incomeText} - ${costText}) / ${costText} = ${rateText}%`);
+    }
+
+    function useSchemeFiveAggregateCardStyle(dataset) {
+      return ["平移情况2", "平移情况3", "业务极端数据", "普通数据", "复杂数据"].includes(dataset?.label);
+    }
+
+    function getSchemeFiveAggregateNodeHeight(dataset, detail, useNewAggregateCardStyle) {
+      if (!useNewAggregateCardStyle) {
+        return 168;
+      }
+
+      if (dataset?.label !== "平移情况3") {
+        return SCHEME5_MIGRATION_AGGREGATE_HEIGHT;
+      }
+
+      const rowCount = Math.min(detail?.topItems?.length || 0, AGGREGATE_TOP_COUNT);
+      if (!rowCount) {
+        return 96;
+      }
+
+      return 120 + (rowCount - 1) * 24;
+    }
+
+    function getSchemeFiveAggregateThreshold(dataset) {
+      return Number.isFinite(dataset?.aggregateLayerThreshold)
+        ? dataset.aggregateLayerThreshold
+        : AGGREGATE_LAYER_THRESHOLD;
     }
 
     function getNearestLayerIndex(y, layers) {
@@ -1522,8 +3412,9 @@
         };
       }
 
-      const valueText = matched[1];
-      const unitText = "元";
+      const compactAmount = splitAmountUnit(formatCompactAmountNumber(parseAmountNumber(rawAmount)));
+      const valueText = compactAmount.value;
+      const unitText = compactAmount.unit;
       const valueWidth = Math.ceil(measureTextWidth(valueText, '500 10px "PingFang SC"'));
       const unitWidth = Math.ceil(measureTextWidth(unitText, '400 10px "PingFang SC"'));
 
@@ -1536,6 +3427,10 @@
         width: Math.max(70, valueWidth + unitWidth + 12),
         height: 20
       };
+    }
+
+    function resolveEdgeTagPresentation(edge) {
+      return resolveTagPresentation(edge.amount);
     }
 
     function resolveLabelTagPresentation(labelText) {
@@ -1563,6 +3458,38 @@
       const safeValue = Number(value) || 0;
       const sign = safeValue > 0 ? "+" : safeValue < 0 ? "-" : "";
       return `${sign}${Math.abs(safeValue).toFixed(2)}元`;
+    }
+
+    function addThousandsSeparators(valueText) {
+      const [integerPart, decimalPart = ""] = String(valueText).split(".");
+      const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+    }
+
+    function formatCompactAmountNumber(value) {
+      const safeValue = Number(value) || 0;
+      const sign = safeValue > 0 ? "+" : safeValue < 0 ? "-" : "";
+      const absoluteValue = Math.abs(safeValue);
+      const unit = absoluteValue >= 100000000
+        ? "亿元"
+        : absoluteValue >= 10000
+          ? "万元"
+          : "元";
+      const divisor = unit === "亿元" ? 100000000 : unit === "万元" ? 10000 : 1;
+      const displayValue = addThousandsSeparators((absoluteValue / divisor).toFixed(2));
+      return `${sign}${displayValue}${unit}`;
+    }
+
+    function formatSignedNumber(value) {
+      const safeValue = Number(value) || 0;
+      const sign = safeValue < 0 ? "-" : "";
+      return `${sign}${Math.abs(safeValue).toFixed(2)}`;
+    }
+
+    function formatPercentNumber(value) {
+      const safeValue = Number(value) || 0;
+      const sign = safeValue > 0 ? "+" : safeValue < 0 ? "-" : "";
+      return `${sign}${Math.abs(safeValue).toFixed(2)}%`;
     }
 
     function pointOnRectTowards(node, toX, toY) {
@@ -1684,7 +3611,7 @@
         edge.points = [sourcePoint, orbitPoint, corePoint];
         edge.tagAnchor = "orbit-ring";
         edge.tagCenter = orbitPoint;
-        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagPresentation = resolveEdgeTagPresentation(edge);
         edge.tagVariant = edge.tagPresentation.variant;
         edge.tagWidth = edge.tagPresentation.width;
         edge.tagHeight = edge.tagPresentation.height;
@@ -1816,6 +3743,14 @@
         return buildRadialGraph(dataset);
       }
 
+      if (state.scheme === "scheme4") {
+        return buildSchemeFourGraph(dataset);
+      }
+
+      if (state.scheme === "scheme5") {
+        return buildSchemeFiveGraph(dataset);
+      }
+
       if (state.scheme === "scheme1" || state.scheme === "scheme3") {
         return buildSchemeOneGraph(dataset);
       }
@@ -1895,7 +3830,18 @@
     function pickTagPlacement(edge, route, placedBoxes) {
       const totalLength = route.getTotalLength();
       const preferredRatio = getTagPreferredRatio(edge);
-      const tryOffsets = [0, 0.04, -0.04, 0.08, -0.08, 0.12, -0.12, 0.16, -0.16];
+      const tryOffsets = [
+        0,
+        0.04, -0.04,
+        0.08, -0.08,
+        0.12, -0.12,
+        0.16, -0.16,
+        0.2, -0.2,
+        0.24, -0.24,
+        0.28, -0.28
+      ];
+      let bestBox = null;
+      let bestScore = Number.POSITIVE_INFINITY;
 
       for (const offset of tryOffsets) {
         const ratio = Math.max(0.22, Math.min(0.78, preferredRatio + offset));
@@ -1913,26 +3859,36 @@
         if (!placedBoxes.some((placed) => boxesOverlap(box, placed))) {
           return box;
         }
+
+        const score = scoreTagCandidateBox(box, placedBoxes);
+        if (score < bestScore) {
+          bestScore = score;
+          bestBox = box;
+        }
       }
 
-      const fallbackPoint = route.getPointAtLength(totalLength * preferredRatio);
-      return {
-        left: fallbackPoint.x - edge.tagWidth / 2,
-        right: fallbackPoint.x + edge.tagWidth / 2,
-        top: fallbackPoint.y - edge.tagHeight / 2,
-        bottom: fallbackPoint.y + edge.tagHeight / 2,
-        centerX: fallbackPoint.x,
-        centerY: fallbackPoint.y,
-        ratio: preferredRatio
-      };
+      return bestBox;
     }
 
-    function computeEdgeTagBoxes(edges) {
-      const placedBoxes = [];
+    function buildNodeAvoidanceBoxes(nodeMap) {
+      return Array.from(nodeMap.values()).map((node) => ({
+        left: node.x - node.width / 2,
+        right: node.x + node.width / 2,
+        top: node.y - node.height / 2,
+        bottom: node.y + node.height / 2,
+        centerX: node.x,
+        centerY: node.y,
+        nodeId: node.id
+      }));
+    }
+
+    function computeEdgeTagBoxes(edges, avoidanceBoxes = []) {
+      const placedBoxes = [...avoidanceBoxes];
+      const tagBoxes = [];
 
       edges.forEach((edge) => {
         if (edge.fixedTagCenter && edge.tagCenter) {
-          placedBoxes.push({
+          const tagBox = {
             left: edge.tagCenter.x - edge.tagWidth / 2,
             right: edge.tagCenter.x + edge.tagWidth / 2,
             top: edge.tagCenter.y - edge.tagHeight / 2,
@@ -1945,7 +3901,9 @@
             targetId: edge.target,
             sourceLayerIndex: edge.sourceNode.layerIndex,
             targetLayerIndex: edge.targetNode.layerIndex
-          });
+          };
+          tagBoxes.push(tagBox);
+          placedBoxes.push(tagBox);
           return;
         }
 
@@ -1956,17 +3914,19 @@
           x: chosen.centerX,
           y: chosen.centerY
         };
-        placedBoxes.push({
+        const tagBox = {
           ...chosen,
           edgeId: edge.id,
           sourceId: edge.source,
           targetId: edge.target,
           sourceLayerIndex: edge.sourceNode.layerIndex,
           targetLayerIndex: edge.targetNode.layerIndex
-        });
+        };
+        tagBoxes.push(tagBox);
+        placedBoxes.push(tagBox);
       });
 
-      return placedBoxes;
+      return tagBoxes;
     }
 
     function collectTagOverlapPairs(boxes) {
@@ -2244,7 +4204,7 @@
         const isAggregate = edges.length > 1;
         const presentation = isAggregate
           ? resolveLabelTagPresentation(`合计：${formatAmountNumber(totalAmount)}`)
-          : resolveTagPresentation(primary.amount);
+          : resolveEdgeTagPresentation(primary);
         const candidates = buildSchemeThreeTagCandidates(primary);
 
         let chosenBox = null;
@@ -2463,7 +4423,7 @@
           : target.y + target.height / 2;
         edge.busY = busY;
         edge.busKey = busKey;
-        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagPresentation = resolveEdgeTagPresentation(edge);
         edge.tagVariant = edge.tagPresentation.variant;
         edge.tagWidth = edge.tagPresentation.width;
         edge.tagHeight = edge.tagPresentation.height;
@@ -2585,7 +4545,7 @@
           : target.y + target.height / 2;
         edge.busY = busY;
         edge.busKey = busKey;
-        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagPresentation = resolveEdgeTagPresentation(edge);
         edge.tagVariant = edge.tagPresentation.variant;
         edge.tagWidth = edge.tagPresentation.width;
         edge.tagHeight = edge.tagPresentation.height;
@@ -2687,6 +4647,17 @@
       edges.forEach((edge) => {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
+        if (edge.flow === "horizontal-right") {
+          edge.isHorizontalFlow = true;
+          edge.sourcePortX = source.x + source.width / 2;
+          edge.targetPortX = target.x - target.width / 2;
+          edge.sourcePortY = source.y;
+          edge.targetPortY = target.y;
+          edge.sourceNode = source;
+          edge.targetNode = target;
+          return;
+        }
+
         const sourceIndex = source.outgoing.findIndex((item) => item.id === edge.id);
         const targetIndex = target.incoming.findIndex((item) => item.id === edge.id);
         const sourcePortCount = source.outgoing.length || 1;
@@ -2766,6 +4737,21 @@
       edges.forEach((edge) => {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
+        if (edge.isHorizontalFlow) {
+          edge.points = [
+            { x: edge.sourcePortX, y: edge.sourcePortY },
+            { x: edge.targetPortX, y: edge.targetPortY }
+          ];
+          edge.path = smoothCurvePath(edge.points);
+          edge.tagPresentation = resolveEdgeTagPresentation(edge);
+          edge.tagVariant = edge.tagPresentation.variant;
+          edge.tagWidth = edge.tagPresentation.width;
+          edge.tagHeight = edge.tagPresentation.height;
+          edge.sourceNode = source;
+          edge.targetNode = target;
+          return;
+        }
+
         const sourceExitY = edge.sourceExitY;
         const targetEntryY = edge.targetEntryY;
 
@@ -2778,7 +4764,7 @@
           { x: edge.targetPortX, y: edge.targetPortY }
         ];
         edge.path = smoothCurvePath(edge.points);
-        edge.tagPresentation = resolveTagPresentation(edge.amount);
+        edge.tagPresentation = resolveEdgeTagPresentation(edge);
         edge.tagVariant = edge.tagPresentation.variant;
         edge.tagWidth = edge.tagPresentation.width;
         edge.tagHeight = edge.tagPresentation.height;
@@ -2786,7 +4772,7 @@
         edge.targetNode = target;
       });
 
-      const tagBoxes = computeEdgeTagBoxes(edges);
+      const tagBoxes = computeEdgeTagBoxes(edges, buildNodeAvoidanceBoxes(nodeMap));
 
       const bounds = {
         minX: Infinity,
@@ -2806,6 +4792,941 @@
         edges,
         bounds,
         tagBoxes
+      };
+    }
+
+    function transformNodeMapForSchemeFour(dataset, nodeMap, edges = []) {
+      const nodes = Array.from(nodeMap.values());
+      if (dataset.scheme4SemanticLayout) {
+        const initiator = nodes.find((node) => node.role === "initiator") || nodes[0];
+        const incomingByTarget = new Map();
+        const outgoingBySource = new Map();
+        edges.forEach((edge) => {
+          if (!incomingByTarget.has(edge.target)) {
+            incomingByTarget.set(edge.target, []);
+          }
+          if (!outgoingBySource.has(edge.source)) {
+            outgoingBySource.set(edge.source, []);
+          }
+          incomingByTarget.get(edge.target).push(edge.source);
+          outgoingBySource.get(edge.source).push(edge.target);
+        });
+
+        const levelByNodeId = new Map([[initiator.id, 0]]);
+        const visit = (startId, adjacency, levelDirection) => {
+          const queue = [{ id: startId, depth: 0 }];
+          const visited = new Set([startId]);
+          while (queue.length) {
+            const current = queue.shift();
+            (adjacency.get(current.id) || []).forEach((nextId) => {
+              if (visited.has(nextId)) {
+                return;
+              }
+              visited.add(nextId);
+              const depth = current.depth + 1;
+              levelByNodeId.set(nextId, levelDirection * depth);
+              queue.push({ id: nextId, depth });
+            });
+          }
+        };
+
+        visit(initiator.id, outgoingBySource, -1);
+        visit(initiator.id, incomingByTarget, 1);
+
+        const buckets = new Map();
+        nodes.forEach((node) => {
+          const level = levelByNodeId.get(node.id) ?? 1;
+          if (!buckets.has(level)) {
+            buckets.set(level, []);
+          }
+          buckets.get(level).push(node);
+        });
+
+        const levels = Array.from(buckets.keys()).sort((a, b) => a - b);
+        const minLevel = levels[0] || 0;
+        const layerGap = 430;
+        const rowGap = 70;
+        const leftPadding = 180;
+        const topPadding = 120;
+        let maxRows = 1;
+
+        levels.forEach((level) => {
+          const bucket = buckets.get(level).sort((a, b) => a.x - b.x || a.y - b.y);
+          maxRows = Math.max(maxRows, bucket.length);
+          bucket.forEach((node, index) => {
+            node.x = leftPadding + (level - minLevel) * layerGap;
+            node.y = topPadding + index * rowGap;
+          });
+        });
+
+        dataset.canvas = {
+          width: Math.max(1200, leftPadding * 2 + (levels.length - 1) * layerGap + NODE_WIDTH),
+          height: Math.max(760, topPadding * 2 + Math.max(0, maxRows - 1) * rowGap + NODE_WIDTH)
+        };
+        return;
+      }
+
+      const minOriginalX = Math.min(...nodes.map((node) => node.x));
+      const maxOriginalX = Math.max(...nodes.map((node) => node.x));
+      const minOriginalY = Math.min(...nodes.map((node) => node.y));
+      const maxOriginalY = Math.max(...nodes.map((node) => node.y));
+      const layerScale = 1.65;
+      const crossScale = 0.24;
+      const leftPadding = 180;
+      const topPadding = 120;
+
+      nodes.forEach((node) => {
+        const originalX = node.x;
+        const originalY = node.y;
+        node.x = leftPadding + (originalY - minOriginalY) * layerScale;
+        node.y = topPadding + (originalX - minOriginalX) * crossScale;
+      });
+
+      dataset.canvas = {
+        width: Math.max(1200, leftPadding * 2 + (maxOriginalY - minOriginalY) * layerScale + NODE_WIDTH),
+        height: Math.max(760, topPadding * 2 + (maxOriginalX - minOriginalX) * crossScale + NODE_WIDTH)
+      };
+    }
+
+    function buildRegularGraphLayoutSchemeFour(dataset, nodeMap, edges) {
+      const outgoingMap = new Map();
+      const incomingMap = new Map();
+
+      nodeMap.forEach((node) => {
+        outgoingMap.set(node.id, []);
+        incomingMap.set(node.id, []);
+      });
+
+      edges.forEach((edge) => {
+        outgoingMap.get(edge.source).push(edge);
+        incomingMap.get(edge.target).push(edge);
+      });
+
+      outgoingMap.forEach((list, nodeId) => {
+        list.sort((a, b) => {
+          const nodeA = nodeMap.get(a.target);
+          const nodeB = nodeMap.get(b.target);
+          if (nodeA.x !== nodeB.x) {
+            return nodeA.x - nodeB.x;
+          }
+          return nodeA.y - nodeB.y;
+        });
+        nodeMap.get(nodeId).outgoing = list;
+      });
+
+      incomingMap.forEach((list, nodeId) => {
+        list.sort((a, b) => {
+          const nodeA = nodeMap.get(a.source);
+          const nodeB = nodeMap.get(b.source);
+          if (nodeA.x !== nodeB.x) {
+            return nodeA.x - nodeB.x;
+          }
+          return nodeA.y - nodeB.y;
+        });
+        nodeMap.get(nodeId).incoming = list;
+      });
+
+      const laneGroups = new Map();
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+        const sourceIndex = source.outgoing.findIndex((item) => item.id === edge.id);
+        const targetIndex = target.incoming.findIndex((item) => item.id === edge.id);
+        const sourcePortCount = source.outgoing.length || 1;
+        const targetPortCount = target.incoming.length || 1;
+        const isLeftwardFlow = target.x < source.x;
+        const sourcePortSide = isLeftwardFlow ? "left" : "right";
+        const targetPortSide = isLeftwardFlow ? "right" : "left";
+
+        edge.sourcePortIndex = Math.max(sourceIndex, 0);
+        edge.targetPortIndex = Math.max(targetIndex, 0);
+        edge.sourcePortCount = sourcePortCount;
+        edge.targetPortCount = targetPortCount;
+        edge.isLeftwardFlow = isLeftwardFlow;
+        edge.sourcePortSide = sourcePortSide;
+        edge.targetPortSide = targetPortSide;
+        edge.sourcePortX = sourcePortSide === "left"
+          ? source.x - source.width / 2
+          : source.x + source.width / 2;
+        edge.targetPortX = targetPortSide === "left"
+          ? target.x - target.width / 2
+          : target.x + target.width / 2;
+        edge.sourcePortY = source.y;
+        edge.targetPortY = target.y;
+
+        const sourceExitX = sourcePortSide === "left"
+          ? edge.sourcePortX - EXCLUSIVE_SEGMENT
+          : edge.sourcePortX + EXCLUSIVE_SEGMENT;
+        const targetEntryX = targetPortSide === "left"
+          ? edge.targetPortX - EXCLUSIVE_SEGMENT
+          : edge.targetPortX + EXCLUSIVE_SEGMENT;
+
+        edge.sourceExitX = sourceExitX;
+        edge.targetEntryX = targetEntryX;
+
+        const corridorKey = [
+          Math.round(sourceExitX),
+          Math.round(targetEntryX),
+          Math.round(Math.min(sourceExitX, targetEntryX)),
+          Math.round(Math.max(sourceExitX, targetEntryX))
+        ].join(":");
+
+        if (!laneGroups.has(corridorKey)) {
+          laneGroups.set(corridorKey, []);
+        }
+        laneGroups.get(corridorKey).push(edge);
+      });
+
+      laneGroups.forEach((group) => {
+        group.sort((a, b) => {
+          if (a.sourcePortY !== b.sourcePortY) {
+            return a.sourcePortY - b.sourcePortY;
+          }
+          return a.targetPortY - b.targetPortY;
+        });
+
+        const laneCount = group.length;
+
+        group.forEach((edge, index) => {
+          const sourceExitX = edge.sourceExitX;
+          const targetEntryX = edge.targetEntryX;
+          const middle = (sourceExitX + targetEntryX) / 2;
+          const spread = (index - (laneCount - 1) / 2) * LANE_GAP;
+          const laneLeft = Math.min(sourceExitX, targetEntryX) + 10;
+          const laneRight = Math.max(sourceExitX, targetEntryX) - 10;
+
+          let laneX = middle + spread;
+          if (laneRight >= laneLeft) {
+            laneX = Math.max(laneLeft, Math.min(laneRight, laneX));
+          } else {
+            laneX = middle;
+          }
+
+          edge.laneX = laneX;
+        });
+      });
+
+      edges.forEach((edge) => {
+        const source = nodeMap.get(edge.source);
+        const target = nodeMap.get(edge.target);
+
+        edge.points = [
+          { x: edge.sourcePortX, y: edge.sourcePortY },
+          { x: edge.sourceExitX, y: edge.sourcePortY },
+          { x: edge.laneX, y: edge.sourcePortY },
+          { x: edge.laneX, y: edge.targetPortY },
+          { x: edge.targetEntryX, y: edge.targetPortY },
+          { x: edge.targetPortX, y: edge.targetPortY }
+        ];
+        edge.path = smoothCurvePath(edge.points);
+        edge.tagPresentation = resolveEdgeTagPresentation(edge);
+        edge.tagVariant = edge.tagPresentation.variant;
+        edge.tagWidth = edge.tagPresentation.width;
+        edge.tagHeight = edge.tagPresentation.height;
+        edge.sourceNode = source;
+        edge.targetNode = target;
+      });
+
+      const tagBoxes = computeEdgeTagBoxes(edges, buildNodeAvoidanceBoxes(nodeMap));
+
+      const bounds = {
+        minX: Infinity,
+        minY: Infinity,
+        maxX: -Infinity,
+        maxY: -Infinity
+      };
+
+      nodeMap.forEach((node) => {
+        bounds.minX = Math.min(bounds.minX, node.x - node.width / 2 - NODE_PADDING_X);
+        bounds.minY = Math.min(bounds.minY, node.y - node.height / 2 - NODE_PADDING_X);
+        bounds.maxX = Math.max(bounds.maxX, node.x + node.width / 2 + NODE_PADDING_X);
+        bounds.maxY = Math.max(bounds.maxY, node.y + node.height / 2 + NODE_PADDING_X);
+      });
+
+      edges.forEach((edge) => {
+        edge.points.forEach((point) => {
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+        });
+      });
+
+      tagBoxes.forEach((box) => {
+        bounds.minX = Math.min(bounds.minX, box.left - 8);
+        bounds.minY = Math.min(bounds.minY, box.top - 8);
+        bounds.maxX = Math.max(bounds.maxX, box.right + 8);
+        bounds.maxY = Math.max(bounds.maxY, box.bottom + 8);
+      });
+
+      return {
+        edges,
+        bounds,
+        tagBoxes
+      };
+    }
+
+    function buildSchemeFourGraph(dataset) {
+      const schemeDataset = {
+        ...dataset,
+        canvas: { ...dataset.canvas },
+        layers: (dataset.layers || []).map((layer) => ({ ...layer }))
+      };
+      const nodeMap = normalizeNodes(dataset.nodes);
+      const edgeSeed = dataset.edges.map((edge) => ({ ...edge }));
+
+      transformNodeMapForSchemeFour(schemeDataset, nodeMap, edgeSeed);
+      const layoutResult = buildRegularGraphLayoutSchemeFour(
+        schemeDataset,
+        nodeMap,
+        edgeSeed.map((edge) => ({ ...edge }))
+      );
+
+      return {
+        dataset: schemeDataset,
+        nodeMap,
+        edges: layoutResult.edges,
+        bounds: layoutResult.bounds
+      };
+    }
+
+    function formatLayerName(label) {
+      return String(label || "同层级").replace(/\s+/g, "").replace("1级", "一级").replace("2级", "二级");
+    }
+
+    function getLayerLevelName(label) {
+      const normalized = formatLayerName(label);
+      return normalized.includes("二级") ? "二级" : "一级";
+    }
+
+    function getSchemeFiveLayerLevelName(dataset, layerIndex, layerLabel, variant) {
+      const normalized = formatLayerName(layerLabel);
+      if (normalized.includes("二级")) {
+        return "二级";
+      }
+      if (normalized.includes("一级")) {
+        return "一级";
+      }
+
+      const initiatorLayerIndex = getSchemeFiveInitiatorLayerIndex(dataset);
+      if (initiatorLayerIndex < 0) {
+        return "一级";
+      }
+
+      if (variant === "demand" && layerIndex < initiatorLayerIndex) {
+        return initiatorLayerIndex - layerIndex >= 2 ? "二级" : "一级";
+      }
+      if (variant === "supply" && layerIndex > initiatorLayerIndex) {
+        return layerIndex - initiatorLayerIndex >= 2 ? "二级" : "一级";
+      }
+
+      return "一级";
+    }
+
+    function getSchemeFiveInitiatorLayerIndex(dataset) {
+      const initiator = (dataset?.nodes || []).find((node) => node.role === "initiator");
+      return initiator ? getNearestLayerIndex(initiator.y, dataset?.layers || []) : -1;
+    }
+
+    function getSchemeFiveLayerVariant(dataset, layerIndex, layerLabel) {
+      const normalized = formatLayerName(layerLabel);
+      if (normalized.includes("上游") || normalized.includes("需求方")) {
+        return "demand";
+      }
+      if (normalized.includes("下游") || normalized.includes("供给方")) {
+        return "supply";
+      }
+
+      const initiatorLayerIndex = getSchemeFiveInitiatorLayerIndex(dataset);
+      if (initiatorLayerIndex >= 0) {
+        if (layerIndex < initiatorLayerIndex) {
+          return "demand";
+        }
+        if (layerIndex > initiatorLayerIndex) {
+          return "supply";
+        }
+      }
+
+      return "";
+    }
+
+    function getSchemeFiveInitiatorTagText(node, dataset) {
+      if (!isMigrationDataset(dataset)) {
+        return "发起方";
+      }
+
+      if (node.id === "left-core") {
+        return "发起方（迁出）";
+      }
+
+      if (node.id === "right-core") {
+        return "发起方（迁入）";
+      }
+
+      return "发起方";
+    }
+
+    function getSchemeFiveNodeVisual(node, dataset) {
+      if (!node || node.aggregate) {
+        return null;
+      }
+
+      if (node.role === "initiator") {
+        return {
+          variant: "initiator",
+          className: "is-scheme5-initiator",
+          tagText: getSchemeFiveInitiatorTagText(node, dataset)
+        };
+      }
+
+      const layers = dataset?.layers || [];
+      const layerIndex = node.layerIndex ?? getNearestLayerIndex(node.y, layers);
+      const layer = layers[layerIndex] || {};
+      const layerVariant = getSchemeFiveLayerVariant(dataset, layerIndex, layer.label);
+      const levelName = getSchemeFiveLayerLevelName(dataset, layerIndex, layer.label, layerVariant);
+
+      if (layerVariant === "demand") {
+        return {
+          variant: "demand",
+          className: "is-scheme5-demand",
+          tagText: `${levelName}需求方`
+        };
+      }
+
+      if (layerVariant === "supply") {
+        return {
+          variant: "supply",
+          className: "is-scheme5-supply",
+          tagText: `${levelName}供给方`
+        };
+      }
+
+      return null;
+    }
+
+    function getSchemeFiveNodeLayerIndex(node, dataset) {
+      if (Number.isFinite(node?.layerIndex)) {
+        return node.layerIndex;
+      }
+
+      return getNearestLayerIndex(node?.y || 0, dataset?.layers || []);
+    }
+
+    function isSchemeFiveEndpointMetaHidden(node, visual, dataset = state.graph?.dataset) {
+      if (!visual || !["demand", "supply"].includes(visual.variant) || !dataset) {
+        return false;
+      }
+
+      const semanticLayerIndexes = (dataset.nodes || [])
+        .filter((item) => {
+          const itemVisual = getSchemeFiveNodeVisual(item, dataset);
+          return itemVisual && ["demand", "supply"].includes(itemVisual.variant);
+        })
+        .map((item) => getSchemeFiveNodeLayerIndex(item, dataset))
+        .filter((layerIndex) => Number.isFinite(layerIndex));
+
+      if (!semanticLayerIndexes.length) {
+        return false;
+      }
+
+      const minLayerIndex = Math.min(...semanticLayerIndexes);
+      const maxLayerIndex = Math.max(...semanticLayerIndexes);
+      const nodeLayerIndex = getSchemeFiveNodeLayerIndex(node, dataset);
+
+      return (visual.variant === "demand" && nodeLayerIndex === minLayerIndex)
+        || (visual.variant === "supply" && nodeLayerIndex === maxLayerIndex);
+    }
+
+    function getSchemeFiveNodeLayout(node, visual, showMeta) {
+      if (!visual) {
+        return null;
+      }
+
+      const top = node.y - node.height / 2;
+      const left = node.x - node.width / 2;
+      let cursorY = top + SCHEME5_NODE_PADDING_Y;
+      const layout = {
+        left,
+        top,
+        contentX: left + SCHEME5_NODE_PADDING_X,
+        contentWidth: node.width - SCHEME5_NODE_PADDING_X * 2,
+        tagX: left + SCHEME5_NODE_PADDING_X,
+        tagY: cursorY,
+        tagHeight: SCHEME5_NODE_TAG_HEIGHT,
+        iconX: left + node.width - SCHEME5_NODE_PADDING_X - SCHEME5_NODE_DETAIL_ICON_SIZE,
+        iconY: cursorY + (SCHEME5_NODE_TAG_HEIGHT - SCHEME5_NODE_DETAIL_ICON_SIZE) / 2,
+        titleY: cursorY + SCHEME5_NODE_TEXT_ROW_HEIGHT / 2,
+        metaY: null
+      };
+
+      if (visual.tagText) {
+        cursorY += SCHEME5_NODE_TAG_HEIGHT + SCHEME5_NODE_ROW_GAP;
+      }
+
+      layout.titleY = cursorY + SCHEME5_NODE_TEXT_ROW_HEIGHT / 2;
+      cursorY += SCHEME5_NODE_TEXT_ROW_HEIGHT;
+
+      if (showMeta) {
+        cursorY += SCHEME5_NODE_ROW_GAP;
+        layout.metaY = cursorY + SCHEME5_NODE_TEXT_ROW_HEIGHT / 2;
+      }
+
+      return layout;
+    }
+
+    function getSchemeFiveNodeHeight(visual, showMeta) {
+      if (!visual) {
+        return null;
+      }
+
+      let height = SCHEME5_NODE_PADDING_Y * 2 + SCHEME5_NODE_TEXT_ROW_HEIGHT;
+      if (visual.tagText) {
+        height += SCHEME5_NODE_TAG_HEIGHT + SCHEME5_NODE_ROW_GAP;
+      }
+      if (showMeta) {
+        height += SCHEME5_NODE_ROW_GAP + SCHEME5_NODE_TEXT_ROW_HEIGHT;
+      }
+      return height;
+    }
+
+    function applySchemeFiveNodeMetrics(dataset) {
+      dataset.nodes.forEach((node) => {
+        const visual = getSchemeFiveNodeVisual(node, dataset);
+        if (!visual) {
+          return;
+        }
+
+        const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, visual, dataset);
+        node.width = NODE_WIDTH;
+        node.height = getSchemeFiveNodeHeight(visual, showMeta);
+      });
+    }
+
+    function alignSchemeFiveLayersByGap(dataset, nodeMap) {
+      if (!dataset.layers?.length) {
+        return;
+      }
+
+      const buckets = dataset.layers.map(() => []);
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers);
+        node.layerIndex = layerIndex;
+        buckets[layerIndex].push(node);
+      });
+
+      let previousCenterY = null;
+      let previousLayerHeight = 0;
+
+      dataset.layers.forEach((layer, layerIndex) => {
+        const nodes = buckets[layerIndex];
+        const layerHeight = nodes.length
+          ? Math.max(...nodes.map((node) => node.height))
+          : 0;
+        const centerY = previousCenterY === null
+          ? layer.y
+          : previousCenterY + previousLayerHeight / 2 + SCHEME5_LAYER_VERTICAL_GAP + layerHeight / 2;
+
+        layer.y = centerY;
+        nodes.forEach((node) => {
+          node.y = centerY;
+        });
+
+        previousCenterY = centerY;
+        previousLayerHeight = layerHeight;
+      });
+    }
+
+    function alignSchemeFiveOddNodeLayersToInitiator(dataset, nodeMap) {
+      if (!dataset.layers?.length) {
+        return;
+      }
+
+      const initiator = Array.from(nodeMap.values()).find((node) => node.role === "initiator");
+      if (!initiator) {
+        return;
+      }
+
+      const buckets = dataset.layers.map(() => []);
+      nodeMap.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers);
+        node.layerIndex = layerIndex;
+        buckets[layerIndex].push(node);
+      });
+
+      buckets.forEach((nodes, layerIndex) => {
+        if (!nodes.length || nodes.length % 2 === 0 || nodes.length > 5) {
+          return;
+        }
+
+        const layer = dataset.layers[layerIndex] || {};
+        const layerVariant = getSchemeFiveLayerVariant(dataset, layerIndex, layer.label || "");
+        if (!["demand", "supply"].includes(layerVariant)) {
+          return;
+        }
+
+        nodes.sort((nodeA, nodeB) => nodeA.x - nodeB.x);
+        const anchorIndex = Math.floor(nodes.length / 2);
+        const nextXs = resolveLayerPositionsForAnchor(
+          nodes,
+          anchorIndex,
+          initiator.x,
+          dataset.canvas.width
+        );
+
+        if (!nextXs) {
+          return;
+        }
+
+        nodes.forEach((node, index) => {
+          node.x = nextXs[index];
+        });
+      });
+    }
+
+    function alignMigrationCase2TreeGap(dataset, nodeMap) {
+      if (!isMigrationDataset(dataset)) {
+        return;
+      }
+
+      const leftCore = nodeMap.get("left-core");
+      const rightCore = nodeMap.get("right-core");
+      if (!leftCore || !rightCore) {
+        return;
+      }
+
+      const centerX = ((dataset.canvas?.width || 0) / 2) || (leftCore.x + rightCore.x) / 2;
+      const centerDistance = NODE_WIDTH + MIGRATION_CASE2_GROUP_GAP;
+      const leftX = centerX - centerDistance / 2;
+      const rightX = centerX + centerDistance / 2;
+
+      nodeMap.forEach((node) => {
+        if (node.id === "left-core" || node.aggregateGroup?.startsWith("left-")) {
+          node.x = leftX;
+        }
+        if (node.id === "right-core" || node.aggregateGroup?.startsWith("right-")) {
+          node.x = rightX;
+        }
+      });
+    }
+
+    function renderNodeRoleTag(group, node, visual, layout) {
+      if (!visual?.tagText) {
+        return;
+      }
+
+      const tagWidth = measureTextWidth(visual.tagText, '500 10px Inter') + 14;
+      const tag = createSvg("g", {
+        class: `node-role-tag is-${visual.variant}`
+      });
+
+      tag.appendChild(createSvg("rect", {
+        x: layout.tagX,
+        y: layout.tagY,
+        width: tagWidth,
+        height: layout.tagHeight,
+        rx: 4,
+        ry: 4,
+        class: "node-role-tag-rect"
+      }));
+
+      const text = createSvg("text", {
+        x: layout.tagX + tagWidth / 2,
+        y: layout.tagY + layout.tagHeight / 2 + 0.5,
+        class: "node-role-tag-text"
+      });
+      text.textContent = visual.tagText;
+      tag.appendChild(text);
+      group.appendChild(tag);
+    }
+
+    function renderSchemeFiveDetailIcon(group, layout) {
+      if (!layout) {
+        return;
+      }
+
+      renderDetailIcon(group, layout.iconX, layout.iconY, SCHEME5_NODE_DETAIL_ICON_SIZE);
+    }
+
+    function getAggregateNodeAmount(nodeId, edges) {
+      return edges.reduce((sum, edge) => {
+        if (edge.source !== nodeId && edge.target !== nodeId) {
+          return sum;
+        }
+        return sum + parseAmountNumber(edge.amount);
+      }, 0);
+    }
+
+    function getNextLevelRelatedTitles(nodeId, layerVariant, aggregateNodeIds, rawEdges, rawNodeById, dataset) {
+      const titles = [];
+      const layers = dataset?.layers || [];
+      const currentNode = rawNodeById.get(nodeId);
+      const currentLayerIndex = currentNode && layers.length
+        ? getNearestLayerIndex(currentNode.y || 0, layers)
+        : -1;
+      const initiatorLayerIndex = getSchemeFiveInitiatorLayerIndex(dataset);
+
+      rawEdges.forEach((edge) => {
+        const relatedId = edge.source === nodeId
+          ? edge.target
+          : edge.target === nodeId
+            ? edge.source
+            : "";
+
+        if (!relatedId || aggregateNodeIds.has(relatedId)) {
+          return;
+        }
+
+        const relatedNode = rawNodeById.get(relatedId);
+        if (!relatedNode || relatedNode.role === "initiator") {
+          return;
+        }
+
+        if (currentLayerIndex >= 0 && layers.length) {
+          const relatedLayerIndex = getNearestLayerIndex(relatedNode.y || 0, layers);
+          const isNextLevel = layerVariant === "supply"
+            ? relatedLayerIndex > currentLayerIndex
+            : relatedLayerIndex < currentLayerIndex;
+          const isSameSide = initiatorLayerIndex < 0
+            ? true
+            : layerVariant === "supply"
+              ? relatedLayerIndex > initiatorLayerIndex
+              : relatedLayerIndex < initiatorLayerIndex;
+
+          if (!isNextLevel || !isSameSide) {
+            return;
+          }
+        }
+
+        titles.push(relatedNode.title);
+      });
+      return Array.from(new Set(titles));
+    }
+
+    function buildAggregateDetail(layerLabel, nodes, rawEdges, options = {}) {
+      const aggregateNodeIds = new Set(nodes.map((node) => node.id));
+      const rawNodeById = new Map();
+      (options.dataset?.nodes || []).forEach((node) => {
+        rawNodeById.set(node.id, node);
+      });
+      const useLayerRoleAmounts = Boolean(options.useLayerRoleAmounts);
+      const isDemandLayer = options.layerVariant === "demand" || /上游|需求方/.test(layerLabel);
+      const isSupplyLayer = options.layerVariant === "supply" || /下游|供给方/.test(layerLabel);
+      const items = nodes.map((node) => {
+        const amount = getAggregateNodeAmount(node.id, rawEdges);
+        const costAmount = useLayerRoleAmounts && isDemandLayer
+          ? amount
+          : useLayerRoleAmounts && isSupplyLayer
+            ? 0
+            : Math.max(amount, 0);
+        const incomeAmount = useLayerRoleAmounts && isSupplyLayer
+          ? amount
+          : useLayerRoleAmounts && isDemandLayer
+            ? 0
+            : Math.max(-amount, 0);
+        const secondLevelNodes = getNextLevelRelatedTitles(
+          node.id,
+          isSupplyLayer ? "supply" : "demand",
+          aggregateNodeIds,
+          rawEdges,
+          rawNodeById,
+          options.dataset
+        );
+        return {
+          id: node.id,
+          title: node.title,
+          amount,
+          amountText: formatAmountNumber(amount),
+          amountDisplayText: formatCompactAmountNumber(amount),
+          costAmount,
+          costAmountText: formatAmountNumber(costAmount),
+          costAmountDisplayText: formatCompactAmountNumber(costAmount),
+          incomeAmount,
+          incomeAmountText: formatAmountNumber(incomeAmount),
+          incomeAmountDisplayText: formatCompactAmountNumber(incomeAmount),
+          secondLevelNodes
+        };
+      }).sort((a, b) => {
+        if (useLayerRoleAmounts) {
+          return Math.abs(b.amount) - Math.abs(a.amount);
+        }
+        return b.costAmount - a.costAmount || Math.abs(b.amount) - Math.abs(a.amount);
+      });
+      const total = items.reduce((sum, item) => sum + item.amount, 0);
+      const costTotal = items.reduce((sum, item) => sum + item.costAmount, 0);
+      const incomeTotal = items.reduce((sum, item) => sum + item.incomeAmount, 0);
+
+      return {
+        layerLabel,
+        layerVariant: options.layerVariant || "",
+        count: items.length,
+        total,
+        totalText: formatAmountNumber(total),
+        totalDisplayText: formatCompactAmountNumber(total),
+        incomeTotal,
+        incomeTotalText: formatAmountNumber(incomeTotal),
+        incomeTotalDisplayText: formatCompactAmountNumber(incomeTotal),
+        costTotal,
+        costTotalText: formatAmountNumber(costTotal),
+        costTotalDisplayText: formatCompactAmountNumber(costTotal),
+        topItems: items.slice(0, AGGREGATE_TOP_COUNT),
+        items,
+        incomeItems: items.filter((item) => item.incomeAmount !== 0)
+      };
+    }
+
+    function buildSchemeFiveGraph(dataset) {
+      const rawNodes = dataset.nodes.map((node) => ({ ...node }));
+      const rawEdges = dataset.edges.map((edge) => ({ ...edge }));
+      const rawNodeById = new Map(rawNodes.map((node) => [node.id, node]));
+      const aggregateThreshold = getSchemeFiveAggregateThreshold(dataset);
+      const buckets = new Map();
+
+      rawNodes.forEach((node) => {
+        if (node.role === "initiator") {
+          return;
+        }
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers || []);
+        const bucketKey = `${layerIndex}:${node.aggregateGroup || "default"}`;
+        if (!buckets.has(bucketKey)) {
+          buckets.set(bucketKey, {
+            layerIndex,
+            aggregateGroup: node.aggregateGroup || "",
+            nodes: []
+          });
+        }
+        buckets.get(bucketKey).nodes.push(node);
+      });
+
+      const aggregateByNodeId = new Map();
+      const aggregateNodes = [];
+      const nextNodes = [];
+
+      rawNodes.forEach((node) => {
+        const layerIndex = getNearestLayerIndex(node.y, dataset.layers || []);
+        const bucketKey = `${layerIndex}:${node.aggregateGroup || "default"}`;
+        const bucket = buckets.get(bucketKey);
+        const shouldAggregate = bucket
+          && node.role !== "initiator"
+          && (dataset.aggregateAllGroupsInScheme5 || bucket.nodes.length > aggregateThreshold);
+        if (shouldAggregate) {
+          return;
+        }
+        nextNodes.push(node);
+      });
+
+      buckets.forEach(({ nodes, layerIndex, aggregateGroup }) => {
+        if (!dataset.aggregateAllGroupsInScheme5 && nodes.length <= aggregateThreshold) {
+          return;
+        }
+
+        const layer = (dataset.layers || [])[layerIndex] || {};
+        const layerLabel = formatLayerName(layer.label);
+        const useMigrationAggregateStyle = isMigrationDataset(dataset);
+        const useNewAggregateCardStyle = useSchemeFiveAggregateCardStyle(dataset);
+        const aggregateVariant = useNewAggregateCardStyle
+          ? getSchemeFiveLayerVariant(dataset, layerIndex, layer.label)
+          : "";
+        const detail = buildAggregateDetail(layerLabel, nodes, rawEdges, {
+          useLayerRoleAmounts: useNewAggregateCardStyle,
+          layerVariant: aggregateVariant,
+          dataset
+        });
+        const aggregatedNodeIds = new Set(nodes.map((node) => node.id));
+        const connectedInitiator = useMigrationAggregateStyle
+          ? rawEdges.map((edge) => {
+            if (aggregatedNodeIds.has(edge.source)) {
+              return rawNodeById.get(edge.target);
+            }
+            if (aggregatedNodeIds.has(edge.target)) {
+              return rawNodeById.get(edge.source);
+            }
+            return null;
+          }).find((node) => node?.role === "initiator")
+          : null;
+        const aggregateNode = {
+          id: `agg-layer-${layerIndex}-${aggregateGroup || "default"}`,
+          x: connectedInitiator
+            ? connectedInitiator.x
+            : nodes.reduce((sum, node) => sum + node.x, 0) / nodes.length,
+          y: layer.y ?? nodes.reduce((sum, node) => sum + node.y, 0) / nodes.length,
+          width: NODE_WIDTH,
+          height: getSchemeFiveAggregateNodeHeight(dataset, detail, useNewAggregateCardStyle),
+          title: `${layerLabel}，共${nodes.length}个`,
+          role: "aggregate",
+          layerIndex,
+          aggregateGroup,
+          aggregateVariant,
+          aggregate: detail
+        };
+
+        nodes.forEach((node) => {
+          aggregateByNodeId.set(node.id, aggregateNode.id);
+        });
+        aggregateNodes.push(aggregateNode);
+      });
+
+      const edgeGroups = new Map();
+      rawEdges.forEach((edge) => {
+        const source = aggregateByNodeId.get(edge.source) || edge.source;
+        const target = aggregateByNodeId.get(edge.target) || edge.target;
+        if (source === target) {
+          return;
+        }
+
+        const key = `${source}->${target}`;
+        if (!edgeGroups.has(key)) {
+          edgeGroups.set(key, {
+            id: `agg-e-${edgeGroups.size + 1}`,
+            source,
+            target,
+            amountValue: 0,
+            flow: edge.flow || "",
+            renderTag: edge.flow === "horizontal-right" ? false : undefined,
+            rawEdgeIds: []
+          });
+        }
+        const group = edgeGroups.get(key);
+        group.amountValue += parseAmountNumber(edge.amount);
+        if (edge.flow) {
+          group.flow = edge.flow;
+        }
+        if (edge.flow === "horizontal-right") {
+          group.renderTag = false;
+        }
+        group.rawEdgeIds.push(edge.id);
+      });
+
+      const schemeDataset = {
+        ...dataset,
+        canvas: { ...dataset.canvas },
+        layers: (dataset.layers || []).map((layer) => ({ ...layer })),
+        nodes: [...nextNodes, ...aggregateNodes],
+        edges: Array.from(edgeGroups.values()).map((edge) => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          amount: formatAmountNumber(edge.amountValue),
+          flow: edge.flow,
+          renderTag: edge.renderTag,
+          rawEdgeIds: edge.rawEdgeIds
+        }))
+      };
+      applySchemeFiveNodeMetrics(schemeDataset);
+      const nodeMap = normalizeNodes(schemeDataset.nodes);
+      alignSchemeFiveLayersByGap(schemeDataset, nodeMap);
+      const edgeSeed = schemeDataset.edges.map((edge) => ({ ...edge }));
+      const layerGapByLayer = (schemeDataset.layers || []).map(() => 0);
+      compactNodesByLayer(schemeDataset, nodeMap, layerGapByLayer);
+      alignSchemeFiveOddNodeLayersToInitiator(schemeDataset, nodeMap);
+      alignMigrationCase2TreeGap(schemeDataset, nodeMap);
+      const layoutResult = buildRegularGraphLayoutLegacy(schemeDataset, nodeMap, edgeSeed);
+
+      return {
+        dataset: schemeDataset,
+        nodeMap,
+        edges: layoutResult.edges,
+        bounds: layoutResult.bounds
       };
     }
 
@@ -2985,8 +5906,11 @@
     }
 
     function renderEdge(edgeLayer, tagLayer, edge) {
+      const isMigrationCoreEdge = edge.flow === "horizontal-right"
+        && edge.sourceNode?.role === "initiator"
+        && edge.targetNode?.role === "initiator";
       const group = createSvg("g", {
-        class: "edge-group",
+        class: `edge-group${isMigrationCoreEdge ? " is-migration-core" : ""}`,
         "data-edge-id": edge.id
       });
 
@@ -3138,17 +6062,267 @@
       tagLayer.appendChild(tagGroup);
     }
 
+    function isNodeOptionScheme() {
+      return state.scheme === "scheme2" || state.scheme === "scheme4" || state.scheme === "scheme5";
+    }
+
+    function splitAmountUnit(amountText) {
+      const text = String(amountText || "0元");
+      const matched = text.match(/^(.*?)(亿元|万元|元)$/);
+      if (matched) {
+        return {
+          value: matched[1],
+          unit: matched[2]
+        };
+      }
+      return {
+        value: text,
+        unit: ""
+      };
+    }
+
+    function renderStartAmount(group, x, y, labelText, amountText) {
+      const amount = splitAmountUnit(amountText);
+      const labelWidth = measureTextWidth(labelText, '400 12px "PingFang SC"');
+      const amountWidth = measureTextWidth(amount.value, '500 12px Roboto');
+      const label = createSvg("text", {
+        x,
+        y,
+        class: "node-aggregate-summary-label"
+      });
+      label.textContent = labelText;
+      group.appendChild(label);
+
+      const value = createSvg("text", {
+        x: x + labelWidth + 2,
+        y,
+        class: "node-aggregate-summary-value"
+      });
+      value.textContent = amount.value;
+      group.appendChild(value);
+
+      if (amount.unit) {
+        const unit = createSvg("text", {
+          x: x + labelWidth + 2 + amountWidth + 2,
+          y,
+          class: "node-aggregate-summary-unit"
+        });
+        unit.textContent = amount.unit;
+        group.appendChild(unit);
+      }
+    }
+
+    function renderEndAmount(group, rightX, y, amountText) {
+      const amount = splitAmountUnit(amountText);
+      const unitWidth = amount.unit ? measureTextWidth(amount.unit, '400 12px "PingFang SC"') : 0;
+
+      if (amount.unit) {
+        const unit = createSvg("text", {
+          x: rightX,
+          y,
+          class: "node-aggregate-top-unit"
+        });
+        unit.textContent = amount.unit;
+        group.appendChild(unit);
+      }
+
+      const value = createSvg("text", {
+        x: rightX - unitWidth - (amount.unit ? 2 : 0),
+        y,
+        class: "node-aggregate-top-value"
+      });
+      value.textContent = amount.value;
+      group.appendChild(value);
+    }
+
+    function measureEndAmountWidth(amountText) {
+      const amount = splitAmountUnit(amountText);
+      const valueWidth = measureTextWidth(amount.value, '500 12px Roboto');
+      const unitWidth = amount.unit ? measureTextWidth(amount.unit, '400 12px "PingFang SC"') : 0;
+      return valueWidth + unitWidth + (amount.unit ? 2 : 0);
+    }
+
+    function renderMigrationAggregateNodeContent(group, node) {
+      const detail = node.aggregate;
+      const variant = node.aggregateVariant || "demand";
+      const left = node.x - node.width / 2;
+      const top = node.y - node.height / 2;
+      const right = node.x + node.width / 2;
+      const contentLeft = left + 7;
+      const contentRight = right - 7;
+      const headerY = top + 17;
+      const levelName = getSchemeFiveLayerLevelName(
+        state.graph?.dataset,
+        node.layerIndex,
+        detail?.layerLabel || node.title,
+        variant
+      );
+      const tagText = `${levelName}${variant === "supply" ? "供给方" : "需求方"}`;
+      const tagWidth = measureTextWidth(tagText, '500 10px Inter') + 14;
+      const countText = String(detail?.count || 0);
+      const countWidth = Math.max(22, measureTextWidth(countText, '500 10px Inter') + 12);
+      const actionText = "查看全部";
+      const actionWidth = measureTextWidth(actionText, '400 12px "PingFang SC"');
+      const actionIconX = contentRight - 12;
+      const actionX = actionIconX - 4 - actionWidth;
+      const actionCenterY = headerY + 0.5;
+      const displayTopCount = Math.min(detail?.topItems?.length || 0, AGGREGATE_TOP_COUNT);
+
+      const tag = createSvg("g", { class: `node-role-tag is-${variant}` });
+      tag.appendChild(createSvg("rect", {
+        x: contentLeft,
+        y: top + 8,
+        width: tagWidth,
+        height: 18,
+        rx: 4,
+        ry: 4,
+        class: "node-role-tag-rect"
+      }));
+      const tagLabel = createSvg("text", {
+        x: contentLeft + tagWidth / 2,
+        y: headerY + 0.5,
+        class: "node-role-tag-text"
+      });
+      tagLabel.textContent = tagText;
+      tag.appendChild(tagLabel);
+      group.appendChild(tag);
+
+      group.appendChild(createSvg("rect", {
+        x: contentLeft + tagWidth + 4,
+        y: top + 10,
+        width: countWidth,
+        height: 14,
+        rx: 7,
+        ry: 7,
+        class: "node-aggregate-count-rect"
+      }));
+      const count = createSvg("text", {
+        x: contentLeft + tagWidth + 4 + countWidth / 2,
+        y: top + 18,
+        class: "node-aggregate-count-text"
+      });
+      count.textContent = countText;
+      group.appendChild(count);
+
+      const action = createSvg("text", {
+        x: actionX,
+        y: actionCenterY,
+        class: "node-aggregate-action"
+      });
+      action.textContent = actionText;
+      group.appendChild(action);
+      renderDetailIcon(group, actionIconX, actionCenterY - 7, 12);
+
+      const summaryY = top + 41;
+      const dividerX = node.x;
+      renderStartAmount(group, contentLeft, summaryY, "总成本", detail?.costTotalDisplayText || "0元");
+      renderStartAmount(group, dividerX + 8, summaryY, "总收入", detail?.incomeTotalDisplayText || "0元");
+      group.appendChild(createSvg("line", {
+        x1: dividerX,
+        y1: summaryY - 6,
+        x2: dividerX,
+        y2: summaryY + 6,
+        class: "node-aggregate-divider"
+      }));
+
+      group.appendChild(createSvg("line", {
+        x1: contentLeft,
+        y1: top + 59,
+        x2: contentRight,
+        y2: top + 59,
+        class: "node-aggregate-divider is-dashed"
+      }));
+
+      const topTitle = createSvg("text", {
+        x: contentLeft,
+        y: top + 78,
+        class: "node-aggregate-top-title"
+      });
+      topTitle.textContent = `Top ${AGGREGATE_TOP_COUNT} ${tagText}`;
+      group.appendChild(topTitle);
+
+      (detail?.topItems || []).slice(0, displayTopCount).forEach((item, index) => {
+        const rowY = top + 102 + index * 24;
+        const amountText = item.amountDisplayText || item.amountText;
+        const amountWidth = measureEndAmountWidth(amountText);
+        const nameMaxWidth = Math.max(0, contentRight - amountWidth - 16 - contentLeft);
+        const name = createSvg("text", {
+          x: contentLeft,
+          y: rowY,
+          class: "node-aggregate-top-name"
+        });
+        name.textContent = truncateTextToWidth(item.title, nameMaxWidth, '400 12px "PingFang SC"');
+        group.appendChild(name);
+        renderEndAmount(group, contentRight, rowY, amountText);
+      });
+    }
+
+    function renderAggregateNodeContent(group, node) {
+      if (node.aggregateVariant) {
+        renderMigrationAggregateNodeContent(group, node);
+        return;
+      }
+
+      const left = node.x - node.width / 2 + 18;
+      const detail = node.aggregate;
+      const title = createSvg("text", {
+        x: node.x,
+        y: node.y - node.height / 2 + 22,
+        class: "node-aggregate-title"
+      });
+      title.textContent = detail ? `${detail.layerLabel}，共${detail.count}个` : node.title;
+      group.appendChild(title);
+
+      const total = createSvg("text", {
+        x: node.x,
+        y: node.y - node.height / 2 + 44,
+        class: "node-aggregate-total"
+      });
+      total.textContent = detail ? `变动总额：${detail.totalDisplayText || detail.totalText}` : "";
+      group.appendChild(total);
+
+      (detail?.topItems || []).forEach((item, index) => {
+        const row = createSvg("text", {
+          x: left,
+          y: node.y - node.height / 2 + 70 + index * 16,
+          class: "node-aggregate-item"
+        });
+        row.textContent = `${index + 1}. ${truncateTextToWidth(item.title, 170, '400 10px Inter')}  ${item.amountDisplayText || item.amountText}`;
+        group.appendChild(row);
+      });
+
+      const link = createSvg("text", {
+        x: node.x,
+        y: node.y + node.height / 2 - 16,
+        class: "node-aggregate-link"
+      });
+      link.textContent = "展开查看全部 >";
+      group.appendChild(link);
+    }
+
     function renderNode(graphRoot, node) {
-      const roleClass = node.role === "start"
-        ? "is-start"
-        : node.role === "initiator"
-          ? "is-initiator"
-          : "";
+      const schemeFiveVisual = state.scheme === "scheme5"
+        ? getSchemeFiveNodeVisual(node, state.graph?.dataset)
+        : null;
+      const roleClasses = [];
+      if (node.role === "start") {
+        roleClasses.push("is-start");
+      } else if (node.role === "initiator") {
+        roleClasses.push("is-initiator");
+      } else if (node.role === "aggregate") {
+        roleClasses.push("is-aggregate");
+      }
+      if (schemeFiveVisual?.className) {
+        roleClasses.push(schemeFiveVisual.className);
+      }
+      if (node.aggregateVariant) {
+        roleClasses.push("is-migration-aggregate", `is-migration-aggregate-${node.aggregateVariant}`);
+      }
       const group = createSvg("g", {
-        class: `node-group ${roleClass}`.trim(),
+        class: `node-group ${roleClasses.join(" ")}`.trim(),
         "data-node-id": node.id
       });
-      if (state.scheme === "scheme2" && state.nodeOptions.tooltip) {
+      if (isNodeOptionScheme() && state.nodeOptions.tooltip) {
         group.setAttribute("data-tooltip-html", buildNodeTooltipHtml(node.title));
       } else {
         const tooltip = createSvg("title");
@@ -3179,73 +6353,106 @@
       group.appendChild(shadow);
       group.appendChild(rect);
 
-      const showDetailIcon = state.scheme === "scheme2" && state.nodeOptions.detailIcon;
-      const titleY = node.meta ? node.y - 10 : node.y;
+      if (node.aggregate) {
+        renderAggregateNodeContent(group, node);
+        group.addEventListener("mouseenter", () => setHoverNode(node.id));
+        group.addEventListener("mouseleave", () => clearHoverState());
+        group.addEventListener("click", () => {
+          setSelectedNode(node.id);
+          openAggregateDrawer(node.aggregate);
+        });
+        graphRoot.appendChild(group);
+        return;
+      }
+
+      const showDetailIcon = isNodeOptionScheme() && state.nodeOptions.detailIcon && !schemeFiveVisual;
+      const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, schemeFiveVisual);
+      const schemeFiveLayout = getSchemeFiveNodeLayout(node, schemeFiveVisual, showMeta);
+      renderNodeRoleTag(group, node, schemeFiveVisual, schemeFiveLayout);
+      renderSchemeFiveDetailIcon(group, schemeFiveLayout);
+
+      const titleY = schemeFiveLayout
+        ? schemeFiveLayout.titleY
+        : showMeta
+          ? node.y - 10
+          : node.y;
+      const titleX = schemeFiveLayout
+        ? schemeFiveLayout.contentX
+        : showDetailIcon
+          ? node.x - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP) / 2
+          : node.x;
+      const titleMaxWidth = schemeFiveLayout
+        ? schemeFiveLayout.contentWidth
+        : showDetailIcon
+          ? node.width
+            - NODE_TITLE_HORIZONTAL_PADDING
+            - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP + NODE_TITLE_ICON_TEXT_GAP)
+          : node.width - NODE_TITLE_HORIZONTAL_PADDING * 2;
       const title = createSvg("text", {
-        x: showDetailIcon ? node.x - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP) / 2 : node.x,
+        x: titleX,
         y: titleY,
         class: "node-title"
       });
       title.textContent = truncateTextToWidth(
         node.title,
-        showDetailIcon
-          ? node.width
-            - NODE_TITLE_HORIZONTAL_PADDING
-            - (NODE_TITLE_ICON_SIZE + NODE_TITLE_ICON_RIGHT_GAP + NODE_TITLE_ICON_TEXT_GAP)
-          : node.width - NODE_TITLE_HORIZONTAL_PADDING * 2,
+        titleMaxWidth,
         '500 12px Inter'
       );
       group.appendChild(title);
 
       if (showDetailIcon) {
-        const detailIcon = createSvg("image", {
-          x: node.x + node.width / 2 - NODE_TITLE_ICON_RIGHT_GAP - NODE_TITLE_ICON_SIZE,
-          y: titleY - NODE_TITLE_ICON_SIZE / 2,
-          width: NODE_TITLE_ICON_SIZE,
-          height: NODE_TITLE_ICON_SIZE,
-          href: "./icon/详情.svg",
-          class: "node-detail-icon"
-        });
-        group.appendChild(detailIcon);
+        renderDetailIcon(
+          group,
+          node.x + node.width / 2 - NODE_TITLE_ICON_RIGHT_GAP - NODE_TITLE_ICON_SIZE,
+          titleY - NODE_TITLE_ICON_SIZE / 2,
+          NODE_TITLE_ICON_SIZE
+        );
       }
 
-      if (node.meta) {
+      if (showMeta) {
         const parsedMeta = parseNodeMeta(node.meta);
 
         if (!parsedMeta?.structured) {
           const meta = createSvg("text", {
-            x: node.x,
-            y: node.y + 10,
+            x: schemeFiveLayout ? schemeFiveLayout.contentX : node.x,
+            y: schemeFiveLayout ? schemeFiveLayout.metaY : node.y + 10,
             class: "node-meta-label"
           });
           meta.textContent = node.meta;
           group.appendChild(meta);
         } else {
-          const labelWidth = measureTextWidth(parsedMeta.label, '400 10px "PingFang SC"');
-          const amountWidth = measureTextWidth(parsedMeta.amount, '500 10px Roboto');
-          const unitWidth = measureTextWidth("元", '400 10px "PingFang SC"');
-          const rateWidth = measureTextWidth(parsedMeta.rate, '500 10px Roboto');
+          const metaLabelFont = schemeFiveLayout ? '400 12px "PingFang SC"' : '400 10px "PingFang SC"';
+          const metaValueFont = schemeFiveLayout ? '500 12px Roboto' : '500 10px Roboto';
+          const amountDisplay = splitAmountUnit(formatCompactAmountNumber(parsePlainNumber(parsedMeta.amount)));
+          const labelWidth = measureTextWidth(parsedMeta.label, metaLabelFont);
+          const amountWidth = measureTextWidth(amountDisplay.value, metaValueFont);
+          const unitWidth = measureTextWidth(amountDisplay.unit, '400 10px "PingFang SC"');
+          const rateWidth = measureTextWidth(parsedMeta.rate, metaValueFont);
           const percentWidth = measureTextWidth("%", '400 10px "PingFang SC"');
-          const dividerGap = 6;
-          const inlineGap = 1;
-          const prefixGap = 4;
-          const suffixGap = 4;
+          const labelGap = 4;
+          const groupGap = 6;
+          const dividerWidth = 0;
           const totalWidth = labelWidth
-            + prefixGap
+            + labelGap
             + amountWidth
             + unitWidth
-            + dividerGap
+            + groupGap
+            + dividerWidth
+            + groupGap
             + rateWidth
-            + percentWidth
-            + suffixGap;
-          const startX = node.x - totalWidth / 2;
-          const rowY = node.y + 10;
-          const labelX = startX + labelWidth / 2;
-          const amountX = startX + labelWidth + prefixGap + amountWidth / 2;
-          const amountUnitX = startX + labelWidth + prefixGap + amountWidth + inlineGap + unitWidth / 2;
-          const dividerX = startX + labelWidth + prefixGap + amountWidth + unitWidth + dividerGap / 2;
-          const rateX = dividerX + dividerGap / 2 + rateWidth / 2;
-          const percentX = dividerX + dividerGap / 2 + rateWidth + inlineGap + percentWidth / 2;
+            + percentWidth;
+          const startX = schemeFiveLayout ? schemeFiveLayout.contentX : node.x - totalWidth / 2;
+          const rowY = schemeFiveLayout ? schemeFiveLayout.metaY : node.y + 10;
+          const labelX = schemeFiveLayout ? startX : startX + labelWidth / 2;
+          const amountStartX = startX + labelWidth + labelGap;
+          const amountX = amountStartX + amountWidth / 2;
+          const amountUnitX = amountStartX + amountWidth + unitWidth / 2;
+          const dividerX = amountStartX + amountWidth + unitWidth + groupGap;
+          const rateStartX = dividerX + dividerWidth + groupGap;
+          const rateX = rateStartX + rateWidth / 2;
+          const percentX = rateStartX + rateWidth + percentWidth / 2;
+          const amountFormulaTooltip = buildMetaAmountFormulaTooltip(node, parsedMeta);
+          const rateFormulaTooltip = buildMetaRateFormulaTooltip(node, parsedMeta);
 
           const label = createSvg("text", {
             x: labelX,
@@ -3260,7 +6467,7 @@
             y: rowY,
             class: "node-meta-value"
           });
-          amount.textContent = parsedMeta.amount;
+          amount.textContent = amountDisplay.value;
           group.appendChild(amount);
 
           const amountUnit = createSvg("text", {
@@ -3268,7 +6475,7 @@
             y: rowY,
             class: "node-meta-unit"
           });
-          amountUnit.textContent = "元";
+          amountUnit.textContent = amountDisplay.unit;
           group.appendChild(amountUnit);
 
           group.appendChild(createSvg("line", {
@@ -3278,6 +6485,18 @@
             y2: rowY + 6,
             class: "node-meta-strike"
           }));
+
+          const amountHit = createSvg("rect", {
+            x: amountStartX - 3,
+            y: rowY - 10,
+            width: amountWidth + unitWidth + 6,
+            height: 20,
+            rx: 3,
+            ry: 3,
+            class: "node-meta-tooltip-hit"
+          });
+          amountHit.setAttribute("data-tooltip-html", amountFormulaTooltip);
+          group.appendChild(amountHit);
 
           group.appendChild(createSvg("line", {
             x1: dividerX,
@@ -3310,12 +6529,27 @@
             y2: rowY + 6,
             class: "node-meta-strike"
           }));
+
+          const rateHit = createSvg("rect", {
+            x: rateStartX - 3,
+            y: rowY - 10,
+            width: rateWidth + percentWidth + 6,
+            height: 20,
+            rx: 3,
+            ry: 3,
+            class: "node-meta-tooltip-hit"
+          });
+          rateHit.setAttribute("data-tooltip-html", rateFormulaTooltip);
+          group.appendChild(rateHit);
         }
       }
 
       group.addEventListener("mouseenter", () => setHoverNode(node.id));
       group.addEventListener("mouseleave", () => clearHoverState());
-      group.addEventListener("click", () => setSelectedNode(node.id));
+      group.addEventListener("click", () => {
+        setSelectedNode(node.id);
+        openNodeDrawer(node);
+      });
 
       graphRoot.appendChild(group);
     }
@@ -3427,7 +6661,7 @@
     }
 
     function setSelectedNode(nodeId) {
-      if (state.scheme !== "scheme2") {
+      if (!isNodeOptionScheme()) {
         return;
       }
 
@@ -3450,12 +6684,792 @@
     }
 
     function syncNodeOptionPanel() {
-      const showNodeOptionPanel = state.scheme === "scheme2";
+      const showNodeOptionPanel = isNodeOptionScheme();
       nodeOptionPanel.hidden = !showNodeOptionPanel;
 
       nodeOptionInputs.forEach((input) => {
         input.checked = Boolean(state.nodeOptions[input.dataset.nodeOption]);
       });
+    }
+
+    function destroyDrawerTooltips() {
+      state.drawerTooltipInstances.forEach((instance) => instance.destroy());
+      state.drawerTooltipInstances = [];
+    }
+
+    function getAggregatePanelTitle(detail) {
+      const levelName = getLayerLevelName(detail?.layerLabel || "一级");
+      const layerVariant = detail?.layerVariant || "";
+
+      if (layerVariant === "supply" || /下游|供给方/.test(detail?.layerLabel || "")) {
+        return `${levelName}供给方明细`;
+      }
+      if (layerVariant === "demand" || /上游|需求方/.test(detail?.layerLabel || "")) {
+        return `${levelName}需求方明细`;
+      }
+      return `${detail?.layerLabel || levelName}明细`;
+    }
+
+    function getNextLayerLevelName(levelName) {
+      const order = ["一级", "二级", "三级", "四级", "五级"];
+      const index = order.indexOf(levelName);
+      return index >= 0 && index < order.length - 1 ? order[index + 1] : `${levelName}下级`;
+    }
+
+    function getDrawerRoleName(layerVariant, layerLabel = "") {
+      if (layerVariant === "supply" || /下游|供给方/.test(layerLabel)) {
+        return "供给方";
+      }
+      return "需求方";
+    }
+
+    function getDrawerLevelName(layerLabel, layerIndex, layerVariant, dataset = state.graph?.dataset) {
+      if (dataset) {
+        return getSchemeFiveLayerLevelName(dataset, layerIndex, layerLabel, layerVariant);
+      }
+      return getLayerLevelName(layerLabel);
+    }
+
+    function getDrawerNodeTypeLabel(node, side, dataset = getRawDatasetForDrawer()) {
+      const layerInfo = getNodeLayerInfo(node, dataset);
+      const layerVariant = side || layerInfo.layerVariant;
+      const levelName = getDrawerLevelName(layerInfo.layerLabel, layerInfo.layerIndex, layerVariant, dataset);
+      return `${levelName}${getDrawerRoleName(layerVariant, layerInfo.layerLabel)}`;
+    }
+
+    function getDrawerTitleTagText(node) {
+      const visual = getSchemeFiveNodeVisual(node, state.graph?.dataset);
+      return visual?.tagText || "";
+    }
+
+    function setDrawerTitle(titleText, tagText = "") {
+      const tagVariant = /供给方/.test(tagText)
+        ? "supply"
+        : /需求方/.test(tagText)
+          ? "demand"
+          : /发起方/.test(tagText)
+            ? "initiator"
+            : "";
+      aggregateDrawerTitle.innerHTML = `
+        <span class="aggregate-drawer-title-text">${escapeHtml(titleText)}</span>
+        ${tagText ? `<span class="aggregate-drawer-title-tag ${tagVariant ? `is-${tagVariant}` : ""}">${escapeHtml(tagText)}</span>` : ""}
+      `;
+    }
+
+    function renderAggregateSummaryValue(amountText) {
+      const amount = splitAmountUnit(amountText);
+      return `
+        <span>${escapeHtml(amount.value)}</span>
+        ${amount.unit ? `<span class="aggregate-summary-unit">${escapeHtml(amount.unit)}</span>` : ""}
+      `;
+    }
+
+    function renderSummaryCards(cards) {
+      const encodedCards = escapeHtml(JSON.stringify(cards));
+      const hasDiff = cards.some((card) => Boolean(card.subtext));
+      return `
+        <div class="aggregate-summary-grid${hasDiff ? " has-diff" : ""}" data-tod-summary-cards="${encodedCards}">
+          ${cards.map((card) => `
+            <div class="aggregate-summary-card${card.subtext ? " is-diff" : ""}">
+              <div class="aggregate-summary-label">${escapeHtml(card.label)}</div>
+              <div class="aggregate-summary-metric-row">
+                <div class="aggregate-summary-value">${renderAggregateSummaryValue(card.value)}</div>
+                ${card.subtext ? `
+                  <span class="aggregate-summary-divider" aria-hidden="true"></span>
+                  <span class="aggregate-summary-subtext">${escapeHtml(card.subtext)}</span>
+                ` : ""}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderTableAmountValue(amountText) {
+      const amount = splitAmountUnit(amountText);
+      return `
+        <span>${escapeHtml(amount.value)}</span>${amount.unit ? `<span class="aggregate-table-amount-unit">${escapeHtml(amount.unit)}</span>` : ""}
+      `;
+    }
+
+    function renderPlainTableValue(amountText) {
+      const amount = splitAmountUnit(amountText);
+      return `
+        <span class="aggregate-table-plain-amount">
+          <span>${escapeHtml(amount.value)}</span>${amount.unit ? `<span class="aggregate-table-plain-amount-unit">${escapeHtml(amount.unit)}</span>` : ""}
+        </span>
+      `;
+    }
+
+    function getRoleTagVariant(text) {
+      if (/供给方/.test(text || "")) {
+        return "supply";
+      }
+      if (/发起方/.test(text || "")) {
+        return "initiator";
+      }
+      return "demand";
+    }
+
+    function renderNodeTypeTag(text) {
+      const variant = getRoleTagVariant(text);
+      return `<span class="aggregate-table-node-type-tag is-${variant}">${escapeHtml(text)}</span>`;
+    }
+
+    function renderFallbackDrawerTable(payload) {
+      if (payload.mode === "aggregate") {
+        const showNextLevelColumn = payload.showNextLevelColumn !== false;
+        const rows = payload.rows.length
+          ? payload.rows.map((row) => `
+            <tr>
+              <td><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
+              <td style="text-align: right;">
+                <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="cost">${renderTableAmountValue(row.costAmount)}</button>
+              </td>
+              <td style="text-align: right;">
+                <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="income">${renderTableAmountValue(row.incomeAmount)}</button>
+              </td>
+              ${showNextLevelColumn ? `<td class="aggregate-table-muted">${row.nextLevelNodes?.length ? escapeHtml(row.nextLevelNodes.join("、")) : "-"}</td>` : ""}
+            </tr>
+          `).join("")
+          : `<tr><td colspan="${showNextLevelColumn ? 4 : 3}" class="aggregate-table-muted">暂无数据</td></tr>`;
+
+        return `
+          <div class="aggregate-table-wrap">
+            <table class="aggregate-table">
+              <thead>
+                <tr>
+                  <th>${escapeHtml(payload.primaryColumnTitle)}</th>
+                  <th style="text-align: right;">成本调整总金额</th>
+                  <th style="text-align: right;">收入调整总金额</th>
+                  ${showNextLevelColumn ? `<th>${escapeHtml(payload.nextColumnTitle)}</th>` : ""}
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      const rows = payload.rows.length
+        ? payload.rows.map((row) => `
+          <tr>
+            <td>${renderNodeTypeTag(row.nodeType)}</td>
+            <td><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
+            <td style="text-align: right;">
+              <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="cost">${renderTableAmountValue(row.costAmount)}</button>
+            </td>
+            <td style="text-align: right;">
+              <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="income">${renderTableAmountValue(row.incomeAmount)}</button>
+            </td>
+            <td style="text-align: right;">
+              ${renderPlainTableValue(row.diffAmount)}
+            </td>
+            <td style="text-align: right;">${renderPlainTableValue(row.diffRate)}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="6" class="aggregate-table-muted">暂无需求方或供给方</td></tr>`;
+
+      return `
+        <div class="aggregate-table-wrap">
+          <table class="aggregate-table">
+            <thead>
+              <tr>
+                <th>节点类型</th>
+                <th>预算单元名称</th>
+                <th style="text-align: right;">成本调整总金额</th>
+                <th style="text-align: right;">收入调整总金额</th>
+                <th style="text-align: right;">收支偏差金额</th>
+                <th style="text-align: right;">收支偏差比例</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderDrawerTable(payload) {
+      const encodedPayload = escapeHtml(JSON.stringify(payload));
+      return `<div class="tod-drawer-table-wrap is-${escapeHtml(payload.mode)}" data-tod-table="${encodedPayload}">${renderFallbackDrawerTable(payload)}</div>`;
+    }
+
+    function requestTodDrawerSummaryRender() {
+      requestAnimationFrame(() => {
+        window.renderTodDrawerSidebar?.();
+        window.dispatchEvent(new CustomEvent("tod-drawer-summary:render"));
+      });
+    }
+
+    function renderAggregateSummary(costTotalText, incomeTotalText) {
+      return renderSummaryCards([
+        { label: "成本调整总金额", value: costTotalText },
+        { label: "收入调整总金额", value: incomeTotalText }
+      ]);
+    }
+
+    function renderDefaultAggregatePanel() {
+      destroyDrawerTooltips();
+      aggregateDrawerTitle.textContent = "一级供给方明细";
+      aggregateDrawerSubtitle.textContent = "共 6 个节点";
+      aggregateDrawerBody.innerHTML = renderAggregateSummary("0.00元", "1,000.00元");
+      requestTodDrawerSummaryRender();
+      aggregateDrawer.classList.remove("is-collapsed");
+      aggregateDrawer.classList.remove("is-open");
+      aggregateDrawer.setAttribute("aria-hidden", "false");
+    }
+
+    function buildAggregateTableRows(items) {
+      if (!items.length) {
+        return `
+          <tr>
+            <td colspan="4" class="aggregate-table-muted">暂无数据</td>
+          </tr>
+        `;
+      }
+
+      return items.map((item) => `
+        <tr>
+          <td><div class="aggregate-table-node" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
+          <td>
+            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图里查看明细">
+              ${escapeHtml(item.costAmountDisplayText || item.costAmountText)}
+            </button>
+          </td>
+          <td>
+            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图里查看明细">
+              ${escapeHtml(item.incomeAmountDisplayText || item.incomeAmountText)}
+            </button>
+          </td>
+          <td class="aggregate-table-muted">${item.secondLevelNodes.length ? escapeHtml(item.secondLevelNodes.join("、")) : "0"}</td>
+        </tr>
+      `).join("");
+    }
+
+    function getRawDatasetForDrawer() {
+      return datasets[state.mode] || state.graph?.dataset || { nodes: [], edges: [], layers: [] };
+    }
+
+    function getNodeLayerInfo(node, dataset) {
+      const layers = dataset?.layers || [];
+      const layerIndex = Number.isFinite(node?.layerIndex)
+        ? node.layerIndex
+        : getNearestLayerIndex(node?.y || 0, layers);
+      const layer = layers[layerIndex] || {};
+      const layerLabel = formatLayerName(layer.label || "");
+      const layerVariant = getSchemeFiveLayerVariant(dataset, layerIndex, layer.label || "");
+      return { layerIndex, layerLabel, layerVariant };
+    }
+
+    function getBudgetRelationSide(centerNode, connectedNode, edge, dataset) {
+      const connectedLayer = getNodeLayerInfo(connectedNode, dataset);
+      if (connectedLayer.layerVariant === "demand" || /上游|需求方/.test(connectedLayer.layerLabel)) {
+        return "demand";
+      }
+      if (connectedLayer.layerVariant === "supply" || /下游|供给方/.test(connectedLayer.layerLabel)) {
+        return "supply";
+      }
+      if ((connectedNode?.y || 0) < (centerNode?.y || 0)) {
+        return "demand";
+      }
+      if ((connectedNode?.y || 0) > (centerNode?.y || 0)) {
+        return "supply";
+      }
+      return edge.target === centerNode?.id ? "demand" : "supply";
+    }
+
+    function buildNodeDrawerDetail(node) {
+      const rawDataset = getRawDatasetForDrawer();
+      const rawNodes = rawDataset.nodes || [];
+      const rawEdges = rawDataset.edges || [];
+      const rawNodeById = new Map(rawNodes.map((item) => [item.id, item]));
+      const sourceNode = rawNodeById.get(node.id) || node;
+      const rowByKey = new Map();
+
+      rawEdges.forEach((edge) => {
+        if (edge.source !== node.id && edge.target !== node.id) {
+          return;
+        }
+
+        const connectedId = edge.source === node.id ? edge.target : edge.source;
+        const connectedNode = rawNodeById.get(connectedId) || state.graph?.nodeMap?.get(connectedId);
+        if (!connectedNode || connectedNode.aggregate) {
+          return;
+        }
+
+        const side = getBudgetRelationSide(sourceNode, connectedNode, edge, rawDataset);
+        const key = `${side}:${connectedId}`;
+        const amount = parseAmountNumber(edge.amount);
+        if (!rowByKey.has(key)) {
+          rowByKey.set(key, {
+            id: connectedId,
+            title: connectedNode.title,
+            side,
+            sideText: getDrawerNodeTypeLabel(connectedNode, side, rawDataset),
+            costAmount: 0,
+            incomeAmount: 0
+          });
+        }
+
+        const row = rowByKey.get(key);
+        if (side === "demand") {
+          row.costAmount += amount;
+        } else {
+          row.incomeAmount += amount;
+        }
+      });
+
+      const items = Array.from(rowByKey.values()).map((item) => {
+        const diffAmount = item.incomeAmount - item.costAmount;
+        const diffRate = item.costAmount ? (diffAmount / item.costAmount) * 100 : 0;
+        return {
+          ...item,
+          costAmountText: formatAmountNumber(item.costAmount),
+          costAmountDisplayText: formatCompactAmountNumber(item.costAmount),
+          incomeAmountText: formatAmountNumber(item.incomeAmount),
+          incomeAmountDisplayText: formatCompactAmountNumber(item.incomeAmount),
+          diffAmount,
+          diffAmountText: formatAmountNumber(diffAmount),
+          diffAmountDisplayText: formatCompactAmountNumber(diffAmount),
+          diffRate,
+          diffRateText: formatPercentNumber(diffRate)
+        };
+      }).sort((a, b) => {
+        if (a.side !== b.side) {
+          return a.side === "demand" ? -1 : 1;
+        }
+        return Math.abs(b.costAmount || b.incomeAmount) - Math.abs(a.costAmount || a.incomeAmount);
+      });
+
+      const costTotal = items.reduce((sum, item) => sum + item.costAmount, 0);
+      const incomeTotal = items.reduce((sum, item) => sum + item.incomeAmount, 0);
+      const diffAmount = incomeTotal - costTotal;
+      const diffRate = costTotal ? (diffAmount / costTotal) * 100 : 0;
+
+      return {
+        title: sourceNode.title || node.title,
+        count: items.length,
+        costTotalText: formatAmountNumber(costTotal),
+        costTotalDisplayText: formatCompactAmountNumber(costTotal),
+        incomeTotalText: formatAmountNumber(incomeTotal),
+        incomeTotalDisplayText: formatCompactAmountNumber(incomeTotal),
+        diffAmountText: formatAmountNumber(diffAmount),
+        diffAmountDisplayText: formatCompactAmountNumber(diffAmount),
+        diffRateText: formatPercentNumber(diffRate),
+        items
+      };
+    }
+
+    function buildAggregateDrawerTablePayload(detail) {
+      const levelName = getLayerLevelName(detail?.layerLabel || "一级");
+      const roleName = getDrawerRoleName(detail?.layerVariant, detail?.layerLabel || "");
+      const rows = (detail?.items || []).map((item) => ({
+        key: item.id,
+        name: item.title,
+        costAmount: item.costAmountDisplayText || item.costAmountText,
+        incomeAmount: item.incomeAmountDisplayText || item.incomeAmountText,
+        nextLevelNodes: item.secondLevelNodes || []
+      }));
+      return {
+        mode: "aggregate",
+        primaryColumnTitle: `${levelName}${roleName}`,
+        nextColumnTitle: `${getNextLayerLevelName(levelName)}${roleName}`,
+        showNextLevelColumn: rows.some((row) => row.nextLevelNodes.length > 0),
+        rows
+      };
+    }
+
+    function buildNodeDrawerTablePayload(detail) {
+      return {
+        mode: "node",
+        rows: (detail?.items || []).map((item) => ({
+          key: item.id,
+          nodeType: item.sideText,
+          name: item.title,
+          costAmount: item.costAmountDisplayText || item.costAmountText,
+          incomeAmount: item.incomeAmountDisplayText || item.incomeAmountText,
+          diffAmount: item.diffAmountDisplayText || item.diffAmountText,
+          diffRate: item.diffRateText
+        }))
+      };
+    }
+
+    function getBudgetTableChildName(node, index) {
+      const title = String(node?.title || "预算单元");
+      const codeMatch = title.match(/[（(]([^）)]+)[）)]/);
+      const code = codeMatch ? codeMatch[1] : String((index % 9) + 1);
+      const nameWithoutCode = title.replace(/\s*[（(][^）)]+[）)]\s*$/, "");
+      const shortName = nameWithoutCode.includes("-")
+        ? nameWithoutCode.split("-").filter(Boolean).slice(-1)[0]
+        : nameWithoutCode;
+      return `${shortName || "子预算单元"} (${code})`;
+    }
+
+    function getBudgetTableProductName(index) {
+      const products = ["视觉服务", "计算服务", "存储服务", "数据分析服务", "内容审核服务", "安全服务"];
+      return `${products[index % products.length]} (${5678 + index})`;
+    }
+
+    function getBudgetTableBillingUnit(index) {
+      const names = ["XXXX", "CPU标准单元", "对象存储包", "审核资源包", "数据加工单元", "带宽计量单元"];
+      return `${names[index % names.length]}（${7890 + index}）`;
+    }
+
+    const budgetDetailMonths = ["2026-07", "2026-08", "2026-09", "2026-10", "2026-11", "2026-12"];
+    const budgetMonthWeights = [0.14, 0.16, 0.17, 0.18, 0.17, 0.18];
+
+    function buildBudgetMonthlyAmounts(amount, rowIndex) {
+      const monthlyAmounts = {};
+      const rotation = rowIndex % budgetMonthWeights.length;
+      const weights = budgetMonthWeights.map((_, index) => budgetMonthWeights[(index + rotation) % budgetMonthWeights.length]);
+      let allocated = 0;
+
+      budgetDetailMonths.forEach((month, index) => {
+        const monthAmount = index === budgetDetailMonths.length - 1
+          ? amount - allocated
+          : amount * weights[index];
+        allocated += monthAmount;
+        monthlyAmounts[month] = formatCompactAmountNumber(monthAmount);
+      });
+
+      return monthlyAmounts;
+    }
+
+    function buildBudgetTableDetailForNode(node, dataset) {
+      const rawNodes = dataset.nodes || [];
+      const rawEdges = dataset.edges || [];
+      const rawNodeById = new Map(rawNodes.map((item) => [item.id, item]));
+      const demandNodeIds = new Set();
+      const supplyNodeIds = new Set();
+      let costTotal = 0;
+      let incomeTotal = 0;
+
+      const rows = rawEdges
+        .filter((edge) => edge.source === node.id || edge.target === node.id)
+        .map((edge, index) => {
+          const connectedId = edge.source === node.id ? edge.target : edge.source;
+          const connectedNode = rawNodeById.get(connectedId);
+          if (!connectedNode) {
+            return null;
+          }
+
+          const side = getBudgetRelationSide(node, connectedNode, edge, dataset);
+          const amount = parseAmountNumber(edge.amount);
+          const isCost = side === "demand";
+          const demandNode = isCost ? connectedNode : node;
+          const supplyNode = isCost ? node : connectedNode;
+
+          if (isCost) {
+            demandNodeIds.add(demandNode.id);
+            costTotal += amount;
+          } else {
+            supplyNodeIds.add(supplyNode.id);
+            incomeTotal += amount;
+          }
+
+          return {
+            key: edge.id,
+            demandFirst: demandNode.title,
+            demandChild: getBudgetTableChildName(demandNode, index),
+            supplyFirst: supplyNode.title,
+            supplyChild: getBudgetTableChildName(supplyNode, index + 3),
+            product: getBudgetTableProductName(index),
+            billingUnit: getBudgetTableBillingUnit(index),
+            saleRegion: index % 3 === 0 ? "国内（cn-middle-all）" : index % 3 === 1 ? "海外（sg-all）" : "国内（cn-north-all）",
+            amount: formatCompactAmountNumber(amount),
+            monthlyAmounts: buildBudgetMonthlyAmounts(amount, index),
+            type: isCost ? "cost" : "income"
+          };
+        })
+        .filter(Boolean);
+
+      const role = node.role === "initiator"
+        ? "发起方"
+        : getDrawerNodeTypeLabel(node, null, dataset);
+
+      return {
+        title: node.title,
+        role,
+        demandCount: demandNodeIds.size,
+        supplyCount: supplyNodeIds.size,
+        costAmount: formatCompactAmountNumber(costTotal),
+        incomeAmount: formatCompactAmountNumber(incomeTotal),
+        rows
+      };
+    }
+
+    function buildBudgetTablePayload() {
+      const dataset = getRawDatasetForDrawer();
+      const nodes = (dataset.nodes || []).filter((node) => !node.aggregate);
+      const selectedNode = nodes.find((node) => node.role === "initiator") || nodes[0];
+      const focusedNode = state.budgetTableFocus?.unitKey
+        ? nodes.find((node) => node.id === state.budgetTableFocus.unitKey)
+        : null;
+      const detailsByUnit = {};
+
+      nodes.forEach((node) => {
+        detailsByUnit[node.id] = buildBudgetTableDetailForNode(node, dataset);
+      });
+
+      return {
+        title: dataset.label || "预算调整明细",
+        selectedKey: focusedNode?.id || selectedNode?.id || "",
+        activeTab: focusedNode ? state.budgetTableFocus?.tab || "cost" : "cost",
+        options: nodes.map((node) => ({
+          key: node.id,
+          label: node.title,
+          role: detailsByUnit[node.id]?.role || "预算单元"
+        })),
+        detailsByUnit
+      };
+    }
+
+    function renderBudgetTableFallback(payload) {
+      if (!budgetTableView) {
+        return;
+      }
+
+      const selectedKey = payload.selectedKey || payload.options?.[0]?.key || "";
+      const detail = payload.detailsByUnit?.[selectedKey];
+      if (!detail) {
+        budgetTableView.innerHTML = `<div class="budget-table-empty">暂无预算调整明细</div>`;
+        return;
+      }
+
+      const activeTab = payload.activeTab === "income" ? "income" : "cost";
+      const visibleRows = (detail.rows || []).filter((row) => row.type === activeTab);
+      const roleVariant = getRoleTagVariant(detail.role);
+      const optionHtml = (payload.options || []).map((option) => `
+        <option value="${escapeHtml(option.key)}"${option.key === selectedKey ? " selected" : ""}>${escapeHtml(option.label)}</option>
+      `).join("");
+      const rowsHtml = visibleRows.length
+        ? visibleRows.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.demandFirst)}</td>
+            <td>${escapeHtml(row.demandChild)}</td>
+            <td>${escapeHtml(row.supplyFirst)}</td>
+            <td>${escapeHtml(row.supplyChild)}</td>
+            <td>${escapeHtml(row.product)}</td>
+            <td>${escapeHtml(row.billingUnit)}</td>
+            <td style="text-align: right;">${escapeHtml(row.amount)}</td>
+            ${budgetDetailMonths.map((month) => `<td style="text-align: right;">${escapeHtml(row.monthlyAmounts?.[month] || "0元")}</td>`).join("")}
+          </tr>
+        `).join("")
+        : `<tr><td colspan="${7 + budgetDetailMonths.length}" class="aggregate-table-muted">暂无${activeTab === "income" ? "收入" : "成本"}调整明细</td></tr>`;
+
+      budgetTableView.innerHTML = `
+        <div class="budget-table-view">
+          <div class="budget-table-selector-card">
+            <span class="budget-table-selector-label">预算单元</span>
+            <select class="budget-table-main-select" data-budget-table-select>${optionHtml}</select>
+          </div>
+          <div class="budget-table-detail-card">
+            <div class="budget-table-detail-head">
+              <div>
+                <div class="budget-table-title-row">
+                  <span class="budget-table-title">${escapeHtml(detail.title)}</span>
+                  <span class="budget-table-role-tag is-${roleVariant}"><span class="arco-tag-content">${escapeHtml(detail.role)}</span></span>
+                </div>
+                <div class="budget-table-description">
+                  <span>一级需求方 ${detail.demandCount} 个</span>
+                  <span class="budget-table-desc-divider"></span>
+                  <span>一级供给方 ${detail.supplyCount} 个</span>
+                  <span class="budget-table-desc-divider"></span>
+                  <span>成本调整总金额 ${escapeHtml(detail.costAmount)}</span>
+                  <span class="budget-table-desc-divider"></span>
+                  <span>收入调整总金额 ${escapeHtml(detail.incomeAmount)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="budget-table-tabs-row">
+              <div class="budget-table-tabs">
+                <button class="arco-tabs-header-title ${activeTab === "cost" ? "arco-tabs-header-title-active" : ""}" type="button" data-budget-table-tab="cost">成本明细</button>
+                <button class="arco-tabs-header-title ${activeTab === "income" ? "arco-tabs-header-title-active" : ""}" type="button" data-budget-table-tab="income">收入明细</button>
+              </div>
+              <div class="budget-table-tip"><span class="budget-table-info-icon">i</span><span>点击侧边栏金额后自动定位到对应预算单元和页签</span></div>
+            </div>
+            <div class="aggregate-table-wrap budget-table-detail-table">
+              <table class="aggregate-table">
+                <thead>
+                  <tr>
+                    <th>一级需求方</th>
+                    <th>二级需求方</th>
+                    <th>一级供给方</th>
+                    <th>二级供给方</th>
+                    <th>售卖产品</th>
+                    <th>计费单元</th>
+                    <th style="text-align: right;">调整金额</th>
+                    ${budgetDetailMonths.map((month) => `<th style="text-align: right;">${escapeHtml(month)}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+      budgetTableView.classList.add("is-tod-rendered");
+    }
+
+    function syncViewTabs(view) {
+      const nextView = view === "table" ? "table" : "topology";
+      viewTabButtons.forEach((button) => {
+        const isActive = button.dataset.viewKey === nextView;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+      });
+    }
+
+    function updateBudgetTableView() {
+      if (!budgetTableView) {
+        return;
+      }
+
+      const payload = buildBudgetTablePayload();
+      budgetTableView.dataset.todBudgetTableView = JSON.stringify(payload);
+      if (typeof window.renderTodBudgetTableViews === "function") {
+        window.renderTodBudgetTableViews();
+      } else {
+        renderBudgetTableFallback(payload);
+      }
+    }
+
+    function syncTopologyView(view) {
+      const nextView = view === "table" ? "table" : "topology";
+      state.view = nextView;
+      card?.classList.toggle("is-table-view", nextView === "table");
+      syncViewTabs(nextView);
+
+      if (nextView === "table") {
+        updateBudgetTableView();
+        destroyDrawerTooltips();
+      } else if (state.graph) {
+        requestAnimationFrame(fitView);
+      }
+    }
+
+    function buildNodeDrawerTableRows(items) {
+      if (!items.length) {
+        return `
+          <tr>
+            <td colspan="4" class="aggregate-table-muted">暂无一级供给方或一级需求方</td>
+          </tr>
+        `;
+      }
+
+      return items.map((item) => `
+        <tr>
+          <td class="aggregate-table-muted">${escapeHtml(item.sideText)}</td>
+          <td><div class="aggregate-table-node" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
+          <td>
+            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图查看明细">
+              ${escapeHtml(item.costAmountDisplayText || item.costAmountText)}
+            </button>
+          </td>
+          <td>
+            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图查看明细">
+              ${escapeHtml(item.incomeAmountDisplayText || item.incomeAmountText)}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function initDrawerTooltips() {
+      if (typeof window.tippy !== "function") {
+        return;
+      }
+
+      destroyDrawerTooltips();
+      const targets = Array.from(aggregateDrawerBody.querySelectorAll("[data-drawer-tooltip]"));
+      state.drawerTooltipInstances = targets.map((target) => window.tippy(target, {
+        content: target.getAttribute("data-drawer-tooltip"),
+        trigger: "click",
+        arrow: true,
+        theme: "topology",
+        placement: "top",
+        duration: [120, 80],
+        interactive: false,
+        appendTo: () => document.body,
+        onShow(instanceRef) {
+          state.drawerTooltipInstances.forEach((instance) => {
+            if (instance !== instanceRef) {
+              instance.hide();
+            }
+          });
+        }
+      }));
+    }
+
+    function openAggregateDrawer(detail) {
+      if (!detail) {
+        return;
+      }
+
+      destroyDrawerTooltips();
+      const drawerTitle = getAggregatePanelTitle(detail);
+      setDrawerTitle(drawerTitle);
+      aggregateDrawerSubtitle.textContent = `共 ${detail.count} 个节点`;
+      aggregateDrawerBody.innerHTML = `
+        ${renderAggregateSummary(detail.costTotalDisplayText || detail.costTotalText, detail.incomeTotalDisplayText || detail.incomeTotalText)}
+        <div class="aggregate-section-title">${escapeHtml(drawerTitle)}</div>
+        ${renderDrawerTable(buildAggregateDrawerTablePayload(detail))}
+      `;
+      requestTodDrawerSummaryRender();
+      aggregateDrawer.classList.remove("is-collapsed");
+      aggregateDrawer.classList.add("is-open");
+      aggregateDrawer.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(fitView);
+      initDrawerTooltips();
+    }
+
+    function openNodeDrawer(node) {
+      if (!node || node.aggregate) {
+        return;
+      }
+
+      destroyDrawerTooltips();
+      const detail = buildNodeDrawerDetail(node);
+      setDrawerTitle(detail.title, getDrawerTitleTagText(node));
+      aggregateDrawerSubtitle.textContent = "";
+      aggregateDrawerBody.innerHTML = `
+        ${renderSummaryCards([
+          { label: "成本调整总金额", value: detail.costTotalDisplayText || detail.costTotalText },
+          { label: "收入调整总金额", value: detail.incomeTotalDisplayText || detail.incomeTotalText },
+          {
+            label: "收支偏差",
+            value: detail.diffAmountDisplayText || detail.diffAmountText,
+            subtext: `比例 ${detail.diffRateText}`
+          }
+        ])}
+        <div class="aggregate-section-title">需求方和供给方明细</div>
+        ${renderDrawerTable(buildNodeDrawerTablePayload(detail))}
+      `;
+      requestTodDrawerSummaryRender();
+      aggregateDrawer.classList.remove("is-collapsed");
+      aggregateDrawer.classList.add("is-open");
+      aggregateDrawer.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(fitView);
+      initDrawerTooltips();
+    }
+
+    function closeAggregateDrawer() {
+      collapseAggregateDrawer();
+    }
+
+    function collapseAggregateDrawer() {
+      destroyDrawerTooltips();
+      aggregateDrawer.classList.remove("is-open");
+      aggregateDrawer.classList.add("is-collapsed");
+      aggregateDrawer.setAttribute("aria-hidden", "true");
+      requestAnimationFrame(fitView);
+    }
+
+    function hideAggregateDrawerForDataSwitch() {
+      destroyDrawerTooltips();
+      aggregateDrawer.classList.remove("is-open");
+      aggregateDrawer.classList.add("is-collapsed");
+      aggregateDrawer.setAttribute("aria-hidden", "true");
     }
 
     function applyActiveState() {
@@ -3541,8 +7555,13 @@
       });
     }
 
-    function render() {
-      schemeSelect.value = state.scheme;
+    function render(options = {}) {
+      const { resetDrawer = true } = options;
+      if (resetDrawer) {
+        closeAggregateDrawer();
+      }
+      schemeSelect.value = state.scheme === "scheme5" ? "scheme5" : "scheme2";
+      pastSchemeSelect.value = ["scheme1", "scheme3", "scheme4"].includes(state.scheme) ? state.scheme : "";
       svg.dataset.scheme = state.scheme;
       svg.dataset.nodeDefaultShadow = String(state.nodeOptions.defaultShadow);
       svg.dataset.nodeHoverEffect = String(state.nodeOptions.hoverEffect);
@@ -3585,25 +7604,46 @@
       layoutTagsOnEdges(graphRoot, state.graph.edges);
       initTagTooltips(graphRoot);
 
+      updateBudgetTableView();
+      syncTopologyView(state.view);
       fitView();
       syncActiveState();
     }
 
-    modeButtons.tree.addEventListener("click", () => {
-      state.mode = "tree";
-      modeButtons.tree.classList.add("is-active");
-      modeButtons.mesh.classList.remove("is-active");
-      render();
+    function switchMode(modeKey) {
+      clearSelectedState();
+      hideAggregateDrawerForDataSwitch();
+      state.budgetTableFocus = null;
+      state.mode = modeKey;
+      if (["migrationCase1", "migrationCase2", "migrationCase3"].includes(modeKey)) {
+        state.scheme = "scheme5";
+      }
+      Object.entries(modeButtons).forEach(([key, button]) => {
+        button.classList.toggle("is-active", key === modeKey);
+      });
+      render({ resetDrawer: false });
+    }
+
+    Object.entries(modeButtons).forEach(([modeKey, button]) => {
+      button.addEventListener("click", () => switchMode(modeKey));
     });
 
-    modeButtons.mesh.addEventListener("click", () => {
-      state.mode = "mesh";
-      modeButtons.mesh.classList.add("is-active");
-      modeButtons.tree.classList.remove("is-active");
-      render();
+    viewTabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        state.budgetTableFocus = null;
+        syncTopologyView(button.dataset.viewKey);
+      });
     });
 
     schemeSelect.addEventListener("change", (event) => {
+      state.scheme = event.target.value;
+      render();
+    });
+
+    pastSchemeSelect.addEventListener("change", (event) => {
+      if (!event.target.value) {
+        return;
+      }
       state.scheme = event.target.value;
       render();
     });
@@ -3621,6 +7661,51 @@
 
     nodeOptionPanel.addEventListener("click", (event) => {
       event.stopPropagation();
+    });
+
+    aggregateDrawerClose.addEventListener("click", collapseAggregateDrawer);
+    aggregateDrawer.addEventListener("click", (event) => {
+      const amountTarget = event.target.closest(".aggregate-table-amount, .tod-drawer-table-amount");
+      if (amountTarget) {
+        const unitKey = amountTarget.dataset.budgetUnitKey || "";
+        const tab = amountTarget.dataset.budgetTab === "income" ? "income" : "cost";
+        state.budgetTableFocus = unitKey ? { unitKey, tab } : null;
+        syncTopologyView("table");
+        window.dispatchEvent(new CustomEvent("topology-view:set", { detail: { view: "table" } }));
+        return;
+      }
+
+      if (event.target === aggregateDrawer) {
+        closeAggregateDrawer();
+      }
+    });
+
+    budgetTableView?.addEventListener("change", (event) => {
+      const select = event.target.closest("[data-budget-table-select]");
+      if (!select) {
+        return;
+      }
+      state.budgetTableFocus = { unitKey: select.value, tab: state.budgetTableFocus?.tab || "cost" };
+      updateBudgetTableView();
+    });
+
+    budgetTableView?.addEventListener("click", (event) => {
+      const tabButton = event.target.closest("[data-budget-table-tab]");
+      if (!tabButton) {
+        return;
+      }
+      const payload = buildBudgetTablePayload();
+      const unitKey = payload.selectedKey || payload.options?.[0]?.key || "";
+      state.budgetTableFocus = { unitKey, tab: tabButton.dataset.budgetTableTab === "income" ? "income" : "cost" };
+      updateBudgetTableView();
+    });
+
+    window.addEventListener("topology-view:set", (event) => {
+      syncTopologyView(event.detail?.view);
+    });
+
+    window.addEventListener("topology-view:change", (event) => {
+      syncTopologyView(event.detail?.view);
     });
 
     document.getElementById("zoom-in").addEventListener("click", () => {

@@ -3,3 +3,6 @@
 .figma/
 .trae/
 debug-*.md
+node_modules/
+.yarn/
+dist/
