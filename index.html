@@ -149,7 +149,7 @@
 
     .topology-pane {
       display: flex;
-      flex: 1 1 0;
+      flex: 2 1 0;
       min-width: 0;
       flex-direction: column;
       align-self: stretch;
@@ -484,6 +484,7 @@
       align-self: stretch;
       border-left: 1px solid #eaedf1;
       background: #ffffff;
+      scroll-margin-block: 16px;
     }
 
     .aggregate-drawer.is-open {
@@ -2024,7 +2025,7 @@
       stroke-dasharray: 6 8;
     }
 
-    @media (max-width: 1080px) {
+    @media (max-width: 860px) {
       .page {
         padding: 16px;
       }
@@ -7401,6 +7402,30 @@
       }));
     }
 
+    function revealAggregateDrawer() {
+      requestAnimationFrame(() => {
+        fitView();
+
+        requestAnimationFrame(() => {
+          if (state.view !== "topology" || aggregateDrawer.classList.contains("is-collapsed")) {
+            return;
+          }
+
+          const rect = aggregateDrawer.getBoundingClientRect();
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+          const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+          const isFullyVisible = rect.top >= 0
+            && rect.left >= 0
+            && rect.bottom <= viewportHeight
+            && rect.right <= viewportWidth;
+
+          if (!isFullyVisible) {
+            aggregateDrawer.scrollIntoView({ block: "nearest", inline: "nearest" });
+          }
+        });
+      });
+    }
+
     function openAggregateDrawer(detail) {
       if (!detail) {
         return;
@@ -7419,7 +7444,7 @@
       aggregateDrawer.classList.remove("is-collapsed");
       aggregateDrawer.classList.add("is-open");
       aggregateDrawer.setAttribute("aria-hidden", "false");
-      requestAnimationFrame(fitView);
+      revealAggregateDrawer();
       initDrawerTooltips();
     }
 
@@ -7449,7 +7474,7 @@
       aggregateDrawer.classList.remove("is-collapsed");
       aggregateDrawer.classList.add("is-open");
       aggregateDrawer.setAttribute("aria-hidden", "false");
-      requestAnimationFrame(fitView);
+      revealAggregateDrawer();
       initDrawerTooltips();
     }
 
