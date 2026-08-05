@@ -2791,6 +2791,8 @@
       camera: { x: 0, y: 0, scale: 1 },
       dragging: false,
       dragOrigin: null,
+      nodePointerOrigin: null,
+      lastNodeActivation: null,
       graph: null,
       tooltipInstances: [],
       drawerTooltipInstances: []
@@ -6358,10 +6360,7 @@
         renderAggregateNodeContent(group, node);
         group.addEventListener("mouseenter", () => setHoverNode(node.id));
         group.addEventListener("mouseleave", () => clearHoverState());
-        group.addEventListener("click", () => {
-          setSelectedNode(node.id);
-          openAggregateDrawer(node.aggregate);
-        });
+        group.addEventListener("click", () => activateNodeById(node.id));
         graphRoot.appendChild(group);
         return;
       }
@@ -6547,10 +6546,7 @@
 
       group.addEventListener("mouseenter", () => setHoverNode(node.id));
       group.addEventListener("mouseleave", () => clearHoverState());
-      group.addEventListener("click", () => {
-        setSelectedNode(node.id);
-        openNodeDrawer(node);
-      });
+      group.addEventListener("click", () => activateNodeById(node.id));
 
       graphRoot.appendChild(group);
     }
@@ -7402,6 +7398,28 @@
       }));
     }
 
+    function activateNodeById(nodeId) {
+      const node = state.graph?.nodeMap?.get(nodeId);
+      if (!node) {
+        return;
+      }
+
+      const now = Date.now();
+      if (state.lastNodeActivation
+        && state.lastNodeActivation.nodeId === nodeId
+        && now - state.lastNodeActivation.time < 120) {
+        return;
+      }
+
+      state.lastNodeActivation = { nodeId, time: now };
+      setSelectedNode(node.id);
+      if (node.aggregate) {
+        openAggregateDrawer(node.aggregate);
+      } else {
+        openNodeDrawer(node);
+      }
+    }
+
     function revealAggregateDrawer() {
       requestAnimationFrame(() => {
         fitView();
@@ -7752,10 +7770,21 @@
     }, { passive: false });
 
     svg.addEventListener("pointerdown", (event) => {
-      if (event.target.closest("[data-edge-id]") || event.target.closest("[data-node-id]")) {
+      const nodeGroup = event.target.closest("[data-node-id]");
+      if (nodeGroup) {
+        state.nodePointerOrigin = {
+          nodeId: nodeGroup.dataset.nodeId,
+          x: event.clientX,
+          y: event.clientY
+        };
         return;
       }
 
+      if (event.target.closest("[data-edge-id]")) {
+        return;
+      }
+
+      state.nodePointerOrigin = null;
       clearSelectedState();
       state.dragging = true;
       state.dragOrigin = {
@@ -7777,7 +7806,21 @@
       applyCamera();
     });
 
-    window.addEventListener("pointerup", () => {
+    window.addEventListener("pointerup", (event) => {
+      if (state.nodePointerOrigin) {
+        const nodePointerOrigin = state.nodePointerOrigin;
+        state.nodePointerOrigin = null;
+        const upNodeGroup = event.target.closest("[data-node-id]");
+        const moveDistance = Math.hypot(
+          event.clientX - nodePointerOrigin.x,
+          event.clientY - nodePointerOrigin.y
+        );
+
+        if (upNodeGroup?.dataset.nodeId === nodePointerOrigin.nodeId && moveDistance <= 8) {
+          activateNodeById(nodePointerOrigin.nodeId);
+        }
+      }
+
       state.dragging = false;
       state.dragOrigin = null;
       svg.classList.remove("is-dragging");
