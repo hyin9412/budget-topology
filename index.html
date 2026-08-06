@@ -750,6 +750,103 @@
       line-height: 22px;
     }
 
+    .drawer-detail-tabs {
+      margin-top: 16px;
+    }
+
+    .drawer-detail-tab-list {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      border-bottom: 1px solid #eaedf1;
+      width: 100%;
+    }
+
+    .drawer-detail-tab {
+      position: relative;
+      border: 0;
+      background: transparent;
+      padding: 0 16px 10px;
+      color: #737a87;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 22px;
+      cursor: pointer;
+    }
+
+    .drawer-detail-tab:first-child {
+      padding-left: 0;
+    }
+
+    .drawer-detail-tab.is-active {
+      color: #1664ff;
+    }
+
+    .drawer-detail-tab.is-active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 16px;
+      bottom: -1px;
+      height: 2px;
+      border-radius: 999px;
+      background: #1664ff;
+    }
+
+    .drawer-detail-tab:first-child.is-active::after {
+      left: 0;
+    }
+
+    .drawer-detail-panel {
+      display: none;
+      padding-top: 12px;
+    }
+
+    .drawer-detail-panel.is-active {
+      display: block;
+    }
+
+    .child-flow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid #eaedf1;
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 12px;
+    }
+
+    .child-flow-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 10px;
+      color: #1f2329;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      line-height: 22px;
+    }
+
+    .child-flow-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .child-flow-arrow {
+      color: #42464e;
+      text-align: center;
+    }
+
+    .child-flow-amount {
+      color: #1f2329;
+      font-family: Roboto, Inter, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: right;
+      white-space: nowrap;
+    }
+
     .aggregate-list {
       display: flex;
       flex-direction: column;
@@ -1993,8 +2090,29 @@
       font-weight: 500;
     }
 
+    .node-child-flow-hint,
+    .node-child-flow-title,
+    .node-child-flow-name,
+    .node-child-flow-arrow,
+    .node-child-flow-unit {
+      fill: #737a87;
+      font-size: 12px;
+      text-anchor: start;
+      dominant-baseline: middle;
+    }
+
+    .node-child-flow-title {
+      font-weight: 500;
+    }
+
+    .node-child-flow-arrow {
+      fill: #42464e;
+      text-anchor: middle;
+    }
+
     .node-aggregate-summary-value,
-    .node-aggregate-top-value {
+    .node-aggregate-top-value,
+    .node-child-flow-value {
       fill: #42464e;
       font-size: 12px;
       font-weight: 500;
@@ -2003,7 +2121,9 @@
     }
 
     .node-aggregate-top-value,
-    .node-aggregate-top-unit {
+    .node-aggregate-top-unit,
+    .node-child-flow-value,
+    .node-child-flow-unit {
       text-anchor: end;
     }
 
@@ -2279,6 +2399,9 @@
     const SCHEME5_NODE_DETAIL_ICON_SIZE = 12;
     const SCHEME5_LAYER_VERTICAL_GAP = 80;
     const SCHEME5_MIGRATION_AGGREGATE_HEIGHT = 216;
+    const CHILD_FLOW_TOP_COUNT = 3;
+    const CHILD_FLOW_NODE_EXTRA_TOP_GAP = 10;
+    const CHILD_FLOW_NODE_SECTION_HEIGHT = 104;
     const DETAIL_ICON_PATH = "M3.67509 8.53871C3.44164 8.77217 3.44164 9.15067 3.67509 9.38413L4.0978 9.80684C4.33126 10.0403 4.70977 10.0403 4.94322 9.80684L8.32491 6.42516C8.44226 6.3078 8.50062 6.1538 8.49999 5.99999C8.50062 5.84618 8.44226 5.69218 8.32491 5.57482L4.94322 2.19314C4.70977 1.95968 4.33126 1.95968 4.0978 2.19314L3.67509 2.61585C3.44164 2.84931 3.44164 3.22781 3.67509 3.46127L6.21381 5.99999L3.67509 8.53871Z";
 
     const datasets = {
@@ -2510,7 +2633,12 @@
             y: 360,
             title: "研发商品中心-基础架构(292)",
             meta: "收支偏差  +10.00元   +10.00%",
-            role: "initiator"
+            role: "initiator",
+            childBudgetFlows: [
+              { from: "子单元 A", to: "子单元 B", amount: 10 },
+              { from: "子单元 C", to: "子单元 D", amount: 5 },
+              { from: "子单元 E", to: "子单元 F", amount: 3 }
+            ]
           },
           { id: "case1-down-1", x: 420, y: 540, title: "研发商品中心-电商(2480)" },
           { id: "case1-down-2", x: 700, y: 540, title: "Lark(5137)" },
@@ -5241,6 +5369,24 @@
         || (visual.variant === "supply" && nodeLayerIndex === maxLayerIndex);
     }
 
+    function hasChildBudgetFlows(node) {
+      return state.mode === "migrationCase1" && Array.isArray(node?.childBudgetFlows) && node.childBudgetFlows.length > 0;
+    }
+
+    function getTopChildBudgetFlows(node) {
+      return (node?.childBudgetFlows || [])
+        .map((flow) => ({
+          ...flow,
+          amount: Number(flow.amount) || 0
+        }))
+        .sort((flowA, flowB) => Math.abs(flowB.amount) - Math.abs(flowA.amount))
+        .slice(0, CHILD_FLOW_TOP_COUNT);
+    }
+
+    function formatChildBudgetFlowAmount(amount) {
+      return `${Math.abs(Number(amount) || 0).toFixed(2)}元`;
+    }
+
     function getSchemeFiveNodeLayout(node, visual, showMeta) {
       if (!visual) {
         return null;
@@ -5260,7 +5406,8 @@
         iconX: left + node.width - SCHEME5_NODE_PADDING_X - SCHEME5_NODE_DETAIL_ICON_SIZE,
         iconY: cursorY + (SCHEME5_NODE_TAG_HEIGHT - SCHEME5_NODE_DETAIL_ICON_SIZE) / 2,
         titleY: cursorY + SCHEME5_NODE_TEXT_ROW_HEIGHT / 2,
-        metaY: null
+        metaY: null,
+        childFlowStartY: null
       };
 
       if (visual.tagText) {
@@ -5273,12 +5420,18 @@
       if (showMeta) {
         cursorY += SCHEME5_NODE_ROW_GAP;
         layout.metaY = cursorY + SCHEME5_NODE_TEXT_ROW_HEIGHT / 2;
+        cursorY += SCHEME5_NODE_TEXT_ROW_HEIGHT;
+      }
+
+      if (hasChildBudgetFlows(node)) {
+        cursorY += CHILD_FLOW_NODE_EXTRA_TOP_GAP;
+        layout.childFlowStartY = cursorY;
       }
 
       return layout;
     }
 
-    function getSchemeFiveNodeHeight(visual, showMeta) {
+    function getSchemeFiveNodeHeight(node, visual, showMeta) {
       if (!visual) {
         return null;
       }
@@ -5289,6 +5442,9 @@
       }
       if (showMeta) {
         height += SCHEME5_NODE_ROW_GAP + SCHEME5_NODE_TEXT_ROW_HEIGHT;
+      }
+      if (hasChildBudgetFlows(node)) {
+        height += CHILD_FLOW_NODE_EXTRA_TOP_GAP + CHILD_FLOW_NODE_SECTION_HEIGHT;
       }
       return height;
     }
@@ -5302,7 +5458,7 @@
 
         const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, visual, dataset);
         node.width = NODE_WIDTH;
-        node.height = getSchemeFiveNodeHeight(visual, showMeta);
+        node.height = getSchemeFiveNodeHeight(node, visual, showMeta);
       });
     }
 
@@ -6145,6 +6301,112 @@
       return valueWidth + unitWidth + (amount.unit ? 2 : 0);
     }
 
+    function renderEndAmountWithClasses(group, rightX, y, amountText, valueClass, unitClass) {
+      const amount = splitAmountUnit(amountText);
+      const unitWidth = amount.unit ? measureTextWidth(amount.unit, '400 12px "PingFang SC"') : 0;
+
+      if (amount.unit) {
+        const unit = createSvg("text", {
+          x: rightX,
+          y,
+          class: unitClass
+        });
+        unit.textContent = amount.unit;
+        group.appendChild(unit);
+      }
+
+      const value = createSvg("text", {
+        x: rightX - unitWidth - (amount.unit ? 2 : 0),
+        y,
+        class: valueClass
+      });
+      value.textContent = amount.value;
+      group.appendChild(value);
+    }
+
+    function renderChildBudgetFlowNodeContent(group, node, layout) {
+      if (!layout?.childFlowStartY || !hasChildBudgetFlows(node)) {
+        return;
+      }
+
+      const contentLeft = layout.contentX;
+      const contentRight = layout.left + node.width - SCHEME5_NODE_PADDING_X;
+      const dividerY = layout.childFlowStartY;
+      const hintY = dividerY + 18;
+      const titleY = hintY + 20;
+      const rowStartY = titleY + 24;
+      const topFlows = getTopChildBudgetFlows(node);
+
+      group.appendChild(createSvg("line", {
+        x1: contentLeft,
+        y1: dividerY,
+        x2: contentRight,
+        y2: dividerY,
+        class: "node-aggregate-divider is-dashed"
+      }));
+
+      const hint = createSvg("text", {
+        x: contentLeft,
+        y: hintY,
+        class: "node-child-flow-hint"
+      });
+      hint.textContent = `${node.childBudgetFlows.length} 个子预算单元之间有金额流动`;
+      group.appendChild(hint);
+
+      const title = createSvg("text", {
+        x: contentLeft,
+        y: titleY,
+        class: "node-child-flow-title"
+      });
+      title.textContent = `Top ${CHILD_FLOW_TOP_COUNT} 子预算单元`;
+      group.appendChild(title);
+
+      topFlows.forEach((flow, index) => {
+        const rowY = rowStartY + index * 20;
+        const amountText = formatChildBudgetFlowAmount(flow.amount);
+        const amountWidth = measureEndAmountWidth(amountText);
+        const arrowWidth = 16;
+        const columnGap = 8;
+        const nameMaxWidth = Math.max(42, (contentRight - contentLeft - amountWidth - arrowWidth - columnGap * 3) / 2);
+        const fromX = contentLeft;
+        const arrowX = fromX + nameMaxWidth + columnGap + arrowWidth / 2;
+        const toX = arrowX + arrowWidth / 2 + columnGap;
+
+        const fromName = createSvg("text", {
+          x: fromX,
+          y: rowY,
+          class: "node-child-flow-name"
+        });
+        fromName.textContent = truncateTextToWidth(flow.from, nameMaxWidth, '400 12px "PingFang SC"');
+        group.appendChild(fromName);
+
+        const arrow = createSvg("text", {
+          x: arrowX,
+          y: rowY,
+          class: "node-child-flow-arrow"
+        });
+        arrow.textContent = "→";
+        group.appendChild(arrow);
+
+        const toName = createSvg("text", {
+          x: toX,
+          y: rowY,
+          class: "node-child-flow-name"
+        });
+        toName.textContent = truncateTextToWidth(flow.to, nameMaxWidth, '400 12px "PingFang SC"');
+        group.appendChild(toName);
+
+        renderEndAmountWithClasses(
+          group,
+          contentRight,
+          rowY,
+          amountText,
+          "node-child-flow-value",
+          "node-child-flow-unit"
+        );
+      });
+    }
+
     function renderMigrationAggregateNodeContent(group, node) {
       const detail = node.aggregate;
       const variant = node.aggregateVariant || "demand";
@@ -6544,6 +6806,8 @@
         }
       }
 
+      renderChildBudgetFlowNodeContent(group, node, schemeFiveLayout);
+
       group.addEventListener("mouseenter", () => setHoverNode(node.id));
       group.addEventListener("mouseleave", () => clearHoverState());
       group.addEventListener("click", () => activateNodeById(node.id));
@@ -6891,6 +7155,38 @@
       return `<div class="tod-drawer-table-wrap is-${escapeHtml(payload.mode)}" data-tod-table="${encodedPayload}">${renderFallbackDrawerTable(payload)}</div>`;
     }
 
+    function renderChildBudgetFlowList(flows) {
+      const rows = (flows || []).length
+        ? flows.map((flow) => `
+          <div class="child-flow-row">
+            <span class="child-flow-name" title="${escapeHtml(flow.from)}">${escapeHtml(flow.from)}</span>
+            <span class="child-flow-arrow">→</span>
+            <span class="child-flow-name" title="${escapeHtml(flow.to)}">${escapeHtml(flow.to)}</span>
+            <span class="child-flow-amount">${escapeHtml(formatChildBudgetFlowAmount(flow.amount))}</span>
+          </div>
+        `).join("")
+        : `<div class="aggregate-table-muted">暂无子预算单元流动</div>`;
+
+      return `<div class="child-flow-list">${rows}</div>`;
+    }
+
+    function renderNodeDrawerDetailTabs(detail) {
+      return `
+        <div class="drawer-detail-tabs" data-drawer-detail-tabs>
+          <div class="drawer-detail-tab-list" role="tablist" aria-label="明细切换">
+            <button class="drawer-detail-tab is-active" type="button" role="tab" aria-selected="true" data-drawer-detail-tab="child-flow">子预算单元</button>
+            <button class="drawer-detail-tab" type="button" role="tab" aria-selected="false" data-drawer-detail-tab="relation">需求方供给方明细</button>
+          </div>
+          <div class="drawer-detail-panel is-active" role="tabpanel" data-drawer-detail-panel="child-flow">
+            ${renderChildBudgetFlowList(detail.childBudgetFlows)}
+          </div>
+          <div class="drawer-detail-panel" role="tabpanel" data-drawer-detail-panel="relation">
+            ${renderDrawerTable(buildNodeDrawerTablePayload(detail))}
+          </div>
+        </div>
+      `;
+    }
+
     function requestTodDrawerSummaryRender() {
       requestAnimationFrame(() => {
         window.renderTodDrawerSidebar?.();
@@ -7053,6 +7349,7 @@
         diffAmountText: formatAmountNumber(diffAmount),
         diffAmountDisplayText: formatCompactAmountNumber(diffAmount),
         diffRateText: formatPercentNumber(diffRate),
+        childBudgetFlows: hasChildBudgetFlows(sourceNode) ? getTopChildBudgetFlows(sourceNode) : [],
         items
       };
     }
@@ -7473,6 +7770,7 @@
 
       destroyDrawerTooltips();
       const detail = buildNodeDrawerDetail(node);
+      const hasChildFlowTabs = detail.childBudgetFlows?.length > 0;
       setDrawerTitle(detail.title, getDrawerTitleTagText(node));
       aggregateDrawerSubtitle.textContent = "";
       aggregateDrawerBody.innerHTML = `
@@ -7485,8 +7783,10 @@
             subtext: `比例 ${detail.diffRateText}`
           }
         ])}
-        <div class="aggregate-section-title">需求方和供给方明细</div>
-        ${renderDrawerTable(buildNodeDrawerTablePayload(detail))}
+        ${hasChildFlowTabs ? renderNodeDrawerDetailTabs(detail) : `
+          <div class="aggregate-section-title">需求方和供给方明细</div>
+          ${renderDrawerTable(buildNodeDrawerTablePayload(detail))}
+        `}
       `;
       requestTodDrawerSummaryRender();
       aggregateDrawer.classList.remove("is-collapsed");
@@ -7708,6 +8008,21 @@
 
     aggregateDrawerClose.addEventListener("click", collapseAggregateDrawer);
     aggregateDrawer.addEventListener("click", (event) => {
+      const detailTab = event.target.closest("[data-drawer-detail-tab]");
+      if (detailTab) {
+        const tabsRoot = detailTab.closest("[data-drawer-detail-tabs]");
+        const nextTab = detailTab.dataset.drawerDetailTab;
+        tabsRoot?.querySelectorAll("[data-drawer-detail-tab]").forEach((tab) => {
+          const isActive = tab.dataset.drawerDetailTab === nextTab;
+          tab.classList.toggle("is-active", isActive);
+          tab.setAttribute("aria-selected", String(isActive));
+        });
+        tabsRoot?.querySelectorAll("[data-drawer-detail-panel]").forEach((panel) => {
+          panel.classList.toggle("is-active", panel.dataset.drawerDetailPanel === nextTab);
+        });
+        return;
+      }
+
       const amountTarget = event.target.closest(".aggregate-table-amount, .tod-drawer-table-amount");
       if (amountTarget) {
         const unitKey = amountTarget.dataset.budgetUnitKey || "";
