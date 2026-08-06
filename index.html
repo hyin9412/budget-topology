@@ -465,34 +465,36 @@
       padding-left: 0;
     }
 
-    .topology-back-global {
+    .topology-back-global.arco-btn {
       position: absolute;
       top: 12px;
       left: 12px;
       z-index: 3;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      border: 1px solid #cbd7ff;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 4px 12px rgba(22, 100, 255, 0.08);
-      padding: 4px 8px;
-      color: #1664ff;
-      font-size: 12px;
-      line-height: 20px;
-      font-weight: 500;
-      cursor: pointer;
+      justify-content: center;
+      gap: 2px;
+      padding: 5px 12px 5px 8px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+      line-height: 22px;
+      letter-spacing: 0.04px;
     }
 
-    .topology-back-global[hidden] {
+    .topology-back-global.arco-btn[hidden] {
       display: none;
     }
 
-    .topology-back-global::before {
-      content: "←";
-      font-size: 13px;
-      line-height: 1;
+    .topology-back-global-icon {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      background: currentColor;
+      -webkit-mask: url("./icon/向左.svg") center / contain no-repeat;
+      mask: url("./icon/向左.svg") center / contain no-repeat;
+    }
+
+    .topology-back-global-text {
+      white-space: nowrap;
     }
 
     .node-option-panel[hidden] {
@@ -1276,9 +1278,9 @@
       height: 22px;
       border: 1px solid transparent;
       border-radius: 4px;
-      background: rgb(var(--arcoblue-1, 232, 243, 255));
+      background: var(--color-fill-2, #f2f3f5);
       padding: 0 6px;
-      color: rgb(var(--arcoblue-6, 22, 93, 255));
+      color: var(--color-text-2, #646a73);
       font-size: 12px;
       line-height: 20px;
       vertical-align: top;
@@ -2607,7 +2609,10 @@
           </header>
 
           <div class="stage">
-            <button id="topology-back-global" class="topology-back-global" type="button" hidden>返回拓扑图全局</button>
+            <button id="topology-back-global" class="topology-back-global arco-btn arco-btn-secondary arco-btn-size-default" type="button" hidden>
+              <span class="topology-back-global-icon" aria-hidden="true"></span>
+              <span class="topology-back-global-text">返回拓扑图全局</span>
+            </button>
             <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
               <defs>
                 <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -8606,7 +8611,7 @@
           return;
         }
 
-        if (node.role !== "initiator") {
+        if (node.role !== "initiator" && !node.aggregate) {
           return;
         }
       }

@@ -342,7 +342,7 @@ function RelationNodesCell({ nodes }: { nodes?: string[] }) {
   return (
     <div className="tod-drawer-tag-list" title={nodes.join('、')}>
       {visibleNodes.map((node) => (
-        <Tag key={node} size="small" color="arcoblue" bordered={false} fill className="tod-drawer-table-tag">
+        <Tag key={node} size="small" color="gray" bordered={false} fill className="tod-drawer-table-tag">
           {node}
         </Tag>
       ))}
