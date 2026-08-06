@@ -62,10 +62,10 @@
 
     .page-topbar {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 10px;
+      flex-direction: column;
+      gap: 12px;
       margin-bottom: 20px;
     }
 
@@ -253,38 +253,112 @@
       gap: 16px;
     }
 
-    .mode-switch {
-      display: inline-flex;
-      align-items: flex-start;
-      column-gap: 2px;
-      border-radius: 4px;
-      background: #f1f3f5;
-      padding: 3px;
-      height: 32px;
+    .topbar-control-row {
+      display: flex;
+      order: 1;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .mode-btn {
+    .demo-config-panel {
+      display: flex;
+      order: 3;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid #dde2e9;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .demo-config-head {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .demo-config-title {
+      color: #020814;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 500;
+      letter-spacing: 0.04px;
+    }
+
+    .demo-config-hint {
+      color: #737a87;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .demo-config-groups {
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .demo-config-group {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      border: 0;
-      border-radius: 4px;
-      background: transparent;
-      color: #42464e;
-      padding: 2px 12px;
-      line-height: 22px;
-      letter-spacing: 0.04px;
-      font-size: 13px;
-      font-weight: 400;
-      cursor: pointer;
-      transition: 0.18s ease;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 32px;
+      border-radius: 6px;
+      background: #f7f8fa;
+      padding: 6px 8px;
     }
 
-    .mode-btn.is-active {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.05),
-        0 0 0 1px rgba(213, 219, 227, 0.7);
+    .demo-config-group[hidden] {
+      display: none;
+    }
+
+    .demo-config-label {
+      flex-shrink: 0;
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .demo-config-options {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .demo-config-choice {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 48px;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      padding: 2px 9px;
+      color: #42464e;
+      font-size: 12px;
+      line-height: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.16s ease;
+    }
+
+    .demo-config-choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .demo-config-choice:has(input:checked) {
+      border-color: rgba(22, 100, 255, 0.18);
       background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
       color: #1664ff;
       font-weight: 500;
     }
@@ -427,6 +501,7 @@
 
     .node-option-panel {
       display: inline-flex;
+      order: 2;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
@@ -517,17 +592,6 @@
       height: 4px;
       border-radius: 50%;
       background: #ffffff;
-    }
-
-    .legend-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 12px;
-      height: 12px;
-      color: #42464e;
-      font-size: 12px;
-      line-height: 1;
     }
 
     .legend-node {
@@ -795,7 +859,6 @@
       font-weight: 500;
       line-height: 20px;
       letter-spacing: 0.04px;
-      white-space: nowrap;
     }
 
     .aggregate-summary-value {
@@ -863,15 +926,13 @@
       display: inline-flex;
       align-items: center;
       gap: 0;
-      border-bottom: 1px solid #eaedf1;
-      width: 100%;
     }
 
     .drawer-detail-tab {
       position: relative;
       border: 0;
       background: transparent;
-      padding: 0 16px 10px;
+      padding: 0 12px;
       color: #737a87;
       font-size: 13px;
       font-weight: 500;
@@ -883,23 +944,18 @@
       padding-left: 0;
     }
 
+    .drawer-detail-tab:not(:last-child)::after {
+      content: "|";
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #d8dce6;
+      font-weight: 400;
+      pointer-events: none;
+    }
+
     .drawer-detail-tab.is-active {
       color: #1664ff;
-    }
-
-    .drawer-detail-tab.is-active::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 16px;
-      bottom: -1px;
-      height: 2px;
-      border-radius: 999px;
-      background: #1664ff;
-    }
-
-    .drawer-detail-tab:first-child.is-active::after {
-      left: 0;
     }
 
     .drawer-detail-panel {
@@ -1018,6 +1074,19 @@
       white-space: nowrap;
     }
 
+    .aggregate-table .is-fixed-left {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #ffffff;
+      box-shadow: 1px 0 0 #eaedf1;
+    }
+
+    .aggregate-table th.is-fixed-left {
+      z-index: 3;
+      background: #f8fafc;
+    }
+
     .aggregate-table tr:last-child td {
       border-bottom: 0;
     }
@@ -1114,6 +1183,15 @@
       line-height: 20px;
     }
 
+    .tod-drawer-table .arco-table-col-fixed-left {
+      background: #ffffff;
+      box-shadow: 1px 0 0 #eaedf1;
+    }
+
+    .tod-drawer-table .arco-table-th.arco-table-col-fixed-left {
+      background: #f8fafc;
+    }
+
     .aggregate-table-node-type-tag,
     .tod-drawer-table-node-type-tag {
       display: inline-flex;
@@ -1192,9 +1270,34 @@
     }
 
     .tod-drawer-table-tag {
+      display: inline-flex;
+      align-items: center;
+      max-width: 148px;
+      height: 22px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: rgb(var(--arcoblue-1, 232, 243, 255));
+      padding: 0 6px;
+      color: rgb(var(--arcoblue-6, 22, 93, 255));
+      font-size: 12px;
+      line-height: 20px;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .tod-drawer-table-tag.is-more {
+      border-color: transparent;
+      background: var(--color-fill-2, #f2f3f5);
+      color: var(--color-text-2, #646a73);
+      font-weight: 500;
+    }
+
+    .tod-drawer-table-tag,
+    .tod-drawer-table-tag .arco-tag {
       max-width: 148px;
     }
 
+    .tod-drawer-table-tag-text,
     .tod-drawer-table-tag .arco-tag-content {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2200,7 +2303,6 @@
       font-weight: 500;
     }
 
-    .node-child-flow-hint,
     .node-child-flow-title,
     .node-child-flow-name,
     .node-child-flow-arrow,
@@ -2297,15 +2399,9 @@
       }
 
       .scheme-switch,
-      .past-scheme-switch,
-      .mode-switch {
+      .past-scheme-switch {
         width: 100%;
       }
-
-      .mode-btn {
-        flex: 1;
-      }
-
 
       .header {
         align-items: flex-start;
@@ -2327,57 +2423,142 @@
   <div class="page">
     <div class="page-shell">
       <div class="page-topbar">
-        <div class="scheme-switch">
-          <div class="scheme-label">方案</div>
-          <div class="scheme-select-wrap">
-            <select id="scheme-select" class="scheme-select" aria-label="选择方案">
-              <option value="scheme2">方案二：弧线连接+高亮</option>
-              <option value="scheme5" selected>方案五：层级聚合+高亮</option>
-            </select>
-            <span class="scheme-select-arrow">⌄</span>
+          <div class="topbar-control-row">
+            <div class="scheme-switch">
+              <div class="scheme-label">方案</div>
+              <div class="scheme-select-wrap">
+                <select id="scheme-select" class="scheme-select" aria-label="选择方案">
+                  <option value="scheme2">方案二：弧线连接+高亮</option>
+                  <option value="scheme5" selected>方案五：层级聚合+高亮</option>
+                </select>
+                <span class="scheme-select-arrow">⌄</span>
+              </div>
+            </div>
+
+            <div class="scheme-switch past-scheme-switch">
+              <div class="scheme-label">过往方案</div>
+              <div class="scheme-select-wrap">
+                <select id="past-scheme-select" class="scheme-select" aria-label="选择过往方案">
+                  <option value="">选择过往方案</option>
+                  <option value="scheme1">方案一：线上方案+高亮</option>
+                  <option value="scheme3">方案三：合计展示重叠金额+高亮</option>
+                  <option value="scheme4">方案四：横向层级+高亮</option>
+                </select>
+                <span class="scheme-select-arrow">⌄</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="scheme-switch past-scheme-switch">
-          <div class="scheme-label">过往方案</div>
-          <div class="scheme-select-wrap">
-            <select id="past-scheme-select" class="scheme-select" aria-label="选择过往方案">
-              <option value="">选择过往方案</option>
-              <option value="scheme1">方案一：线上方案+高亮</option>
-              <option value="scheme3">方案三：合计展示重叠金额+高亮</option>
-              <option value="scheme4">方案四：横向层级+高亮</option>
-            </select>
-            <span class="scheme-select-arrow">⌄</span>
+          <section class="demo-config-panel" aria-label="拓扑演示数据配置">
+            <div class="demo-config-head">
+              <span class="demo-config-title">数据来源配置</span>
+              <span class="demo-config-hint">按业务特征生成拓扑图演示数据</span>
+            </div>
+            <div class="demo-config-groups">
+              <div class="demo-config-group">
+                <span class="demo-config-label">是否平移场景</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-migration-scene" data-data-config="migrationScene" value="true" />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-migration-scene" data-data-config="migrationScene" value="false" checked />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="demo-config-group" data-config-scope="migration">
+                <span class="demo-config-label">是否多个发起方</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-multiple-initiators" data-data-config="multipleInitiators" value="true" />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-multiple-initiators" data-data-config="multipleInitiators" value="false" checked />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="demo-config-group" data-config-scope="regular">
+                <span class="demo-config-label">是否有二级需求方</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-second-level-demand" data-data-config="hasSecondLevelDemand" value="true" checked />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-second-level-demand" data-data-config="hasSecondLevelDemand" value="false" />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="demo-config-group" data-config-scope="regular" data-config-show-for-single-migration>
+                <span class="demo-config-label">一级需求方个数是否 &gt; 5</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-first-demand-count" data-data-config="firstDemandMoreThan5" value="true" />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-first-demand-count" data-data-config="firstDemandMoreThan5" value="false" checked />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="demo-config-group" data-config-scope="regular" data-config-requires-second-demand>
+                <span class="demo-config-label">二级需求方个数是否 &gt; 5</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-second-demand-count" data-data-config="secondDemandMoreThan5" value="true" checked />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-second-demand-count" data-data-config="secondDemandMoreThan5" value="false" />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="demo-config-group" data-config-scope="regular" data-config-show-for-single-migration>
+                <span class="demo-config-label">一级供给方个数是否 &gt; 5</span>
+                <div class="demo-config-options">
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-first-supply-count" data-data-config="firstSupplyMoreThan5" value="true" checked />
+                    <span>是</span>
+                  </label>
+                  <label class="demo-config-choice">
+                    <input type="radio" name="config-first-supply-count" data-data-config="firstSupplyMoreThan5" value="false" />
+                    <span>否</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div id="node-option-panel" class="node-option-panel" hidden>
+            <label class="node-option-item">
+              <input type="checkbox" id="node-option-detail-icon" data-node-option="detailIcon" checked />
+              <span>节点加详情icon</span>
+            </label>
+            <label class="node-option-item">
+              <input type="checkbox" id="node-option-tooltip" data-node-option="tooltip" />
+              <span>节点hover出tooltip</span>
+            </label>
+            <label class="node-option-item">
+              <input type="checkbox" id="node-option-default-shadow" data-node-option="defaultShadow" checked />
+              <span>节点默认加轻微投影</span>
+            </label>
+            <label class="node-option-item">
+              <input type="checkbox" id="node-option-hover-effect" data-node-option="hoverEffect" checked />
+              <span>节点hover后上浮+扩大投影</span>
+            </label>
           </div>
-        </div>
-
-        <div id="node-option-panel" class="node-option-panel" hidden>
-          <label class="node-option-item">
-            <input type="checkbox" id="node-option-detail-icon" data-node-option="detailIcon" checked />
-            <span>节点加详情icon</span>
-          </label>
-          <label class="node-option-item">
-            <input type="checkbox" id="node-option-tooltip" data-node-option="tooltip" />
-            <span>节点hover出tooltip</span>
-          </label>
-          <label class="node-option-item">
-            <input type="checkbox" id="node-option-default-shadow" data-node-option="defaultShadow" checked />
-            <span>节点默认加轻微投影</span>
-          </label>
-          <label class="node-option-item">
-            <input type="checkbox" id="node-option-hover-effect" data-node-option="hoverEffect" checked />
-            <span>节点hover后上浮+扩大投影</span>
-          </label>
-        </div>
-
-        <div class="mode-switch">
-          <button id="mode-tree" class="mode-btn is-active" type="button">普通数据</button>
-          <button id="mode-mesh" class="mode-btn" type="button">复杂数据</button>
-          <button id="mode-business-extreme" class="mode-btn" type="button">业务极端数据</button>
-          <button id="mode-migration-case1" class="mode-btn" type="button">平移情况1</button>
-          <button id="mode-migration-case2" class="mode-btn" type="button">平移情况2</button>
-          <button id="mode-migration-case3" class="mode-btn" type="button">平移情况3</button>
-        </div>
       </div>
 
       <div class="topology-section-bar" aria-label="调整明细视图切换">
@@ -2413,10 +2594,6 @@
             </div>
             <div class="toolbar">
               <div class="legend">
-                <span class="legend-item">
-                  <span class="legend-icon">◉</span>
-                  <span>点击查看明细</span>
-                </span>
                 <span class="legend-item">
                   <span class="legend-node start"></span>
                   <span>发起方节点</span>
@@ -2540,35 +2717,46 @@
     const datasets = {
       tree: {
         label: "普通数据",
-        canvas: { width: 1520, height: 760 },
+        canvas: { width: 1520, height: 980 },
         compactLayers: true,
         aggregateLayerThreshold: 5,
         layers: [
-          { y: 110, label: "TOP" },
-          { y: 320, label: "CENTER" },
-          { y: 560, label: "BOTTOM" }
+          { y: 110, label: "二级需求方" },
+          { y: 320, label: "一级需求方" },
+          { y: 560, label: "发起方节点" },
+          { y: 820, label: "一级供给方" }
         ],
         nodes: [
-          { id: "a-douyin-video", x: 180, y: 110, width: 168, title: "抖音短视频" },
-          { id: "a-toutiao", x: 430, y: 110, width: 168, title: "今日头条" },
-          { id: "a-fiction", x: 700, y: 110, width: 168, title: "小说" },
-          { id: "a-appbuffer", x: 980, y: 110, width: 172, title: "appbuffer号源池" },
-          { id: "a-mall", x: 1270, y: 110, width: 184, title: "抖音商城capp" },
+          { id: "a-demand-l2-live", x: 120, y: 110, width: 168, title: "直播增长(1101)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-ad", x: 260, y: 110, width: 176, title: "广告投放(1102)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-search", x: 410, y: 110, width: 168, title: "搜索体验(1103)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-feed", x: 560, y: 110, width: 176, title: "推荐增长(1104)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-pay", x: 710, y: 110, width: 168, title: "支付链路(1105)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-member", x: 860, y: 110, width: 176, title: "会员服务(1106)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-content", x: 1010, y: 110, width: 176, title: "内容安全(1107)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-growth", x: 1160, y: 110, width: 176, title: "用户增长(1108)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-mall", x: 1310, y: 110, width: 176, title: "商城履约(1109)", aggregateGroup: "demand-l2" },
+          { id: "a-demand-l2-local", x: 1460, y: 110, width: 176, title: "本地生活(1110)", aggregateGroup: "demand-l2" },
+          { id: "a-douyin-video", x: 180, y: 320, width: 168, title: "抖音短视频" },
+          { id: "a-toutiao", x: 430, y: 320, width: 168, title: "今日头条" },
+          { id: "a-fiction", x: 700, y: 320, width: 168, title: "小说" },
+          { id: "a-appbuffer", x: 980, y: 320, width: 172, title: "appbuffer号源池" },
+          { id: "a-mall", x: 1270, y: 320, width: 184, title: "抖音商城capp" },
           {
             id: "a-core",
             x: 760,
-            y: 320,
+            y: 560,
             width: 164,
             title: "抖音业务",
             meta: "收支偏差  0.31元   0.00%",
             role: "initiator"
           },
-          { id: "a-data-aml", x: 120, y: 560, width: 174, title: "研发商品中心-Data-AML" },
-          { id: "a-data-platform", x: 370, y: 560, width: 198, title: "研发商品中心-Data-数据平台" },
-          { id: "a-dev-infra", x: 620, y: 560, width: 186, title: "研发商品中心-Dev Infra" },
-          { id: "a-basic", x: 890, y: 560, width: 174, title: "研发商品中心-基础架构" },
-          { id: "a-co-build", x: 1160, y: 560, width: 228, title: "研发商品中心-Data-基架中心共建组" },
-          { id: "a-user-platform", x: 1410, y: 560, width: 174, title: "研发商品中心-用户中台" }
+          { id: "a-data-aml", x: 120, y: 820, width: 174, title: "研发商品中心-Data-AML" },
+          { id: "a-data-platform", x: 370, y: 820, width: 198, title: "研发商品中心-Data-数据平台" },
+          { id: "a-dev-infra", x: 620, y: 820, width: 186, title: "研发商品中心-Dev Infra" },
+          { id: "a-basic", x: 890, y: 820, width: 174, title: "研发商品中心-基础架构" },
+          { id: "a-co-build", x: 1160, y: 820, width: 228, title: "研发商品中心-Data-基架中心共建组" },
+          { id: "a-user-platform", x: 1410, y: 820, width: 174, title: "研发商品中心-用户中台" }
         ],
         edges: [
           { id: "a-e1", source: "a-core", target: "a-douyin-video", amount: "+124230364.24元" },
@@ -2581,7 +2769,17 @@
           { id: "a-e8", source: "a-core", target: "a-dev-infra", amount: "+76660.93元" },
           { id: "a-e9", source: "a-core", target: "a-basic", amount: "+50488269.95元" },
           { id: "a-e10", source: "a-core", target: "a-co-build", amount: "+1165080.63元" },
-          { id: "a-e11", source: "a-core", target: "a-user-platform", amount: "+8730.88元" }
+          { id: "a-e11", source: "a-core", target: "a-user-platform", amount: "+8730.88元" },
+          { id: "a-e12", source: "a-douyin-video", target: "a-demand-l2-live", amount: "+37269109.27元" },
+          { id: "a-e13", source: "a-douyin-video", target: "a-demand-l2-feed", amount: "+86961254.97元" },
+          { id: "a-e14", source: "a-toutiao", target: "a-demand-l2-search", amount: "+129.70元" },
+          { id: "a-e15", source: "a-fiction", target: "a-demand-l2-content", amount: "+665761.01元" },
+          { id: "a-e16", source: "a-appbuffer", target: "a-demand-l2-ad", amount: "+20737.84元" },
+          { id: "a-e17", source: "a-mall", target: "a-demand-l2-mall", amount: "+17421838.17元" },
+          { id: "a-e18", source: "a-mall", target: "a-demand-l2-pay", amount: "+6968735.27元" },
+          { id: "a-e19", source: "a-mall", target: "a-demand-l2-member", amount: "+5226551.45元" },
+          { id: "a-e20", source: "a-mall", target: "a-demand-l2-growth", amount: "+3484367.63元" },
+          { id: "a-e21", source: "a-mall", target: "a-demand-l2-local", amount: "+1742183.81元" }
         ]
       },
       mesh: {
@@ -2892,7 +3090,7 @@
             x: 350,
             y: 340,
             title: "研发商品中心-基础架构(292)",
-            meta: "迁出总额  -18.00元   -18.00%",
+            meta: "收支偏差  -36.00元   -36.00%",
             role: "initiator",
             migrationRole: "out"
           },
@@ -2901,7 +3099,7 @@
             x: 880,
             y: 180,
             title: "研发商品中心-Data-数据中心与供应链(293)",
-            meta: "迁入金额  +8.00元   +8.00%",
+            meta: "收支偏差  +16.00元   +16.00%",
             role: "initiator",
             migrationRole: "in"
           },
@@ -2910,7 +3108,7 @@
             x: 880,
             y: 340,
             title: "广告技术(5139)",
-            meta: "迁入金额  +6.00元   +6.00%",
+            meta: "收支偏差  +12.00元   +12.00%",
             role: "initiator",
             migrationRole: "in"
           },
@@ -2919,7 +3117,7 @@
             x: 880,
             y: 500,
             title: "视频架构(55)",
-            meta: "迁入金额  +4.00元   +4.00%",
+            meta: "收支偏差  +8.00元   +8.00%",
             role: "initiator",
             migrationRole: "in"
           }
@@ -3038,6 +3236,7 @@
           edges: globalEdges,
           globalView: {
             canvas: { width: canvasWidth, height: 680 },
+            preserveNodePositions: true,
             layers: [
               { y: 340, label: "发起方节点" }
             ],
@@ -3054,19 +3253,267 @@
       })()
     };
 
+    function distributeX(index, count, centerX, gap) {
+      return centerX + (index - (count - 1) / 2) * gap;
+    }
+
+    function buildSingleMigrationDataset(config) {
+      const firstDemandCount = config.firstDemandMoreThan5 ? 8 : 3;
+      const firstSupplyCount = config.firstSupplyMoreThan5 ? 8 : 4;
+      const maxLayerCount = Math.max(firstDemandCount, firstSupplyCount);
+      const canvasWidth = Math.max(1400, 440 + maxLayerCount * 150);
+      const centerX = canvasWidth / 2;
+      const demandNames = [
+        "抖音短视频(5150)",
+        "今日头条(5136)",
+        "西瓜视频(1689)",
+        "研发商品中心-电商(2480)",
+        "小说(5300)",
+        "Lark(5137)",
+        "抖音业务(2503)",
+        "商业化(56)"
+      ];
+      const supplyNames = [
+        "Data-数据中心与供应链(293)",
+        "广告技术(5139)",
+        "视频架构(55)",
+        "搜索业务研发(2513)",
+        "用户中台(2253)",
+        "Data-基础服务(3188)",
+        "商品中台(2710)",
+        "多媒体平台(2322)"
+      ];
+      const demandAmounts = [4, 3, 2.5, 1.8, 1.4, 1.1, 0.8, 0.6];
+      const supplyAmounts = [2.5, 3.5, 4, 2.2, 1.6, 1.2, 0.9, 0.7];
+      const nodes = [{
+        id: "single-migration-core",
+        x: centerX,
+        y: 360,
+        title: "研发商品中心-基础架构(292)",
+        meta: "收支偏差  +10.00元   +10.00%",
+        role: "initiator",
+        childBudgetFlows: [
+          { from: "子单元 A", to: "子单元 B", amount: 10 },
+          { from: "子单元 C", to: "子单元 D", amount: 5 },
+          { from: "子单元 E", to: "子单元 F", amount: 3 }
+        ]
+      }];
+      const edges = [];
+
+      demandNames.slice(0, firstDemandCount).forEach((title, index) => {
+        const id = `single-migration-demand-${index + 1}`;
+        nodes.push({
+          id,
+          x: distributeX(index, firstDemandCount, centerX, 142),
+          y: 180,
+          title,
+          meta: `收支偏差  +${demandAmounts[index].toFixed(2)}元   +${demandAmounts[index].toFixed(2)}%`,
+          aggregateGroup: config.firstDemandMoreThan5 ? "single-migration-demand" : undefined
+        });
+        edges.push({
+          id: `single-migration-demand-e${index + 1}`,
+          source: "single-migration-core",
+          target: id,
+          amount: `+${demandAmounts[index].toFixed(2)}元`
+        });
+      });
+
+      supplyNames.slice(0, firstSupplyCount).forEach((title, index) => {
+        const id = `single-migration-supply-${index + 1}`;
+        nodes.push({
+          id,
+          x: distributeX(index, firstSupplyCount, centerX, 148),
+          y: 560,
+          title,
+          aggregateGroup: config.firstSupplyMoreThan5 ? "single-migration-supply" : undefined
+        });
+        edges.push({
+          id: `single-migration-supply-e${index + 1}`,
+          source: "single-migration-core",
+          target: id,
+          amount: `-${supplyAmounts[index].toFixed(2)}元`
+        });
+      });
+
+      return {
+        label: "平移情况1",
+        canvas: { width: canvasWidth, height: 700 },
+        compactLayers: true,
+        useSchemeFiveAggregateCardStyle: true,
+        aggregateLayerThreshold: AGGREGATE_LAYER_THRESHOLD,
+        layers: [
+          { y: 180, label: "一级需求方" },
+          { y: 360, label: "发起方节点" },
+          { y: 560, label: "一级供给方" }
+        ],
+        nodes,
+        edges
+      };
+    }
+
+    function buildConfiguredDataset(config) {
+      const firstDemandCount = config.firstDemandMoreThan5 ? 9 : 3;
+      const hasSecondLevelDemand = Boolean(config.hasSecondLevelDemand);
+      const secondDemandCount = hasSecondLevelDemand ? (config.secondDemandMoreThan5 ? 20 : 4) : 0;
+      const firstSupplyCount = config.firstSupplyMoreThan5 ? 12 : 4;
+      const maxLayerCount = Math.max(firstDemandCount, secondDemandCount, firstSupplyCount);
+      const canvasWidth = Math.max(1400, 420 + maxLayerCount * 150);
+      const centerX = canvasWidth / 2;
+      const layers = hasSecondLevelDemand
+        ? [
+          { y: 110, label: "二级需求方" },
+          { y: 310, label: "一级需求方" },
+          { y: 520, label: "发起方节点" },
+          { y: 760, label: "一级供给方" }
+        ]
+        : [
+          { y: 170, label: "一级需求方" },
+          { y: 410, label: "发起方节点" },
+          { y: 660, label: "一级供给方" }
+        ];
+      const demandY = hasSecondLevelDemand ? 310 : 170;
+      const coreY = hasSecondLevelDemand ? 520 : 410;
+      const supplyY = hasSecondLevelDemand ? 760 : 660;
+      const nodes = [];
+      const edges = [];
+
+      nodes.push({
+        id: "configured-core",
+        x: centerX,
+        y: coreY,
+        width: 220,
+        title: "研发商品中心-基础架构(292)",
+        meta: "收支偏差  +0.31元   +0.00%",
+        role: "initiator",
+        childBudgetFlows: [
+          { from: "子单元 A", to: "子单元 B", amount: 12 },
+          { from: "子单元 C", to: "子单元 D", amount: 8 },
+          { from: "子单元 E", to: "子单元 F", amount: 5 }
+        ]
+      });
+
+      const firstDemandNames = [
+        "抖音短视频(5150)",
+        "今日头条(5136)",
+        "西瓜视频(1689)",
+        "小说(5300)",
+        "抖音商城(2480)",
+        "Lark(5137)",
+        "抖音业务(2503)",
+        "商业化(56)",
+        "火山引擎(1842)"
+      ];
+      const secondDemandNames = [
+        "直播增长(1101)",
+        "广告投放(1102)",
+        "搜索体验(1103)",
+        "推荐增长(1104)",
+        "支付链路(1105)",
+        "会员服务(1106)",
+        "内容安全(1107)",
+        "用户增长(1108)",
+        "商城履约(1109)",
+        "本地生活(1110)",
+        "搜索广告(1111)",
+        "直播电商(1112)",
+        "内容生态(1113)",
+        "创作者服务(1114)",
+        "小游戏平台(1115)",
+        "增长实验(1116)",
+        "品牌投放(1117)",
+        "交易链路(1118)",
+        "国际化增长(1119)",
+        "数据治理(1120)"
+      ];
+      const supplyNames = [
+        "研发商品中心-Data-AML",
+        "研发商品中心-Data-数据平台",
+        "研发商品中心-Dev Infra",
+        "研发商品中心-基础架构",
+        "Data-基架中心共建组",
+        "研发商品中心-用户中台",
+        "研发商品中心-视频架构",
+        "研发商品中心-搜索业务",
+        "研发商品中心-计算平台",
+        "研发商品中心-存储平台",
+        "研发商品中心-安全平台",
+        "研发商品中心-网络平台"
+      ];
+
+      firstDemandNames.slice(0, firstDemandCount).forEach((title, index) => {
+        const id = `configured-demand-${index + 1}`;
+        nodes.push({
+          id,
+          x: distributeX(index, firstDemandCount, centerX, 142),
+          y: demandY,
+          title,
+          aggregateGroup: config.firstDemandMoreThan5 ? "configured-demand-l1" : undefined
+        });
+        edges.push({
+          id: `configured-demand-e${index + 1}`,
+          source: "configured-core",
+          target: id,
+          amount: `+${(120 + index * 37).toFixed(2)}元`
+        });
+      });
+
+      if (hasSecondLevelDemand) {
+        secondDemandNames.slice(0, secondDemandCount).forEach((title, index) => {
+          const id = `configured-demand-l2-${index + 1}`;
+          const parentIndex = index % firstDemandCount;
+          nodes.push({
+            id,
+            x: distributeX(index, secondDemandCount, centerX, 132),
+            y: 110,
+            title,
+            aggregateGroup: config.secondDemandMoreThan5 ? "configured-demand-l2" : undefined
+          });
+          edges.push({
+            id: `configured-demand-l2-e${index + 1}`,
+            source: `configured-demand-${parentIndex + 1}`,
+            target: id,
+            amount: `+${(42 + index * 11).toFixed(2)}元`
+          });
+        });
+      }
+
+      supplyNames.slice(0, firstSupplyCount).forEach((title, index) => {
+        const id = `configured-supply-${index + 1}`;
+        nodes.push({
+          id,
+          x: distributeX(index, firstSupplyCount, centerX, 148),
+          y: supplyY,
+          title,
+          aggregateGroup: config.firstSupplyMoreThan5 ? "configured-supply-l1" : undefined
+        });
+        edges.push({
+          id: `configured-supply-e${index + 1}`,
+          source: "configured-core",
+          target: id,
+          amount: `+${(90 + index * 29).toFixed(2)}元`
+        });
+      });
+
+      return {
+        label: "配置场景",
+        canvas: { width: canvasWidth, height: hasSecondLevelDemand ? 880 : 780 },
+        compactLayers: true,
+        useSchemeFiveAggregateCardStyle: true,
+        aggregateLayerThreshold: AGGREGATE_LAYER_THRESHOLD,
+        layers,
+        nodes,
+        edges
+      };
+    }
+
     const stage = document.querySelector(".stage");
     const svg = document.getElementById("topology-canvas");
     const viewportLayer = document.getElementById("viewport-layer");
     const schemeSelect = document.getElementById("scheme-select");
     const pastSchemeSelect = document.getElementById("past-scheme-select");
-    const modeButtons = {
-      tree: document.getElementById("mode-tree"),
-      mesh: document.getElementById("mode-mesh"),
-      businessExtreme: document.getElementById("mode-business-extreme"),
-      migrationCase1: document.getElementById("mode-migration-case1"),
-      migrationCase2: document.getElementById("mode-migration-case2"),
-      migrationCase3: document.getElementById("mode-migration-case3")
-    };
+    const modeButtons = {};
+    const dataConfigInputs = Array.from(document.querySelectorAll("[data-data-config]"));
+    const dataConfigScopes = Array.from(document.querySelectorAll("[data-config-scope]"));
     const nodeOptionPanel = document.getElementById("node-option-panel");
     const nodeOptionInputs = Array.from(nodeOptionPanel.querySelectorAll("[data-node-option]"));
     const aggregateDrawer = document.getElementById("aggregate-drawer");
@@ -3084,8 +3531,16 @@
     const measureContext = measureCanvas.getContext("2d");
 
     const state = {
-      mode: "tree",
+      mode: "configured",
       scheme: "scheme5",
+      dataConfig: {
+        migrationScene: false,
+        multipleInitiators: false,
+        hasSecondLevelDemand: true,
+        firstDemandMoreThan5: false,
+        secondDemandMoreThan5: true,
+        firstSupplyMoreThan5: true
+      },
       nodeOptions: {
         detailIcon: true,
         tooltip: false,
@@ -3362,14 +3817,24 @@
       return d;
     }
 
+    function getRegularNodeAutoHeight(node) {
+      const hasMeta = Boolean(node.meta);
+      if (node.role === "initiator") {
+        return hasMeta ? 46 : 28;
+      }
+      return hasMeta ? 46 : 28;
+    }
+
     function normalizeNodes(rawNodes) {
       const map = new Map();
       rawNodes.forEach((node) => {
-        const hasMeta = Boolean(node.meta);
+        const height = node.role === "initiator"
+          ? (node.__autoHeight === true && Number.isFinite(node.height) ? node.height : getRegularNodeAutoHeight(node))
+          : node.height || getRegularNodeAutoHeight(node);
         map.set(node.id, {
           ...node,
           width: node.width || NODE_WIDTH,
-          height: node.height || (node.role === "initiator" || hasMeta ? 46 : 28)
+          height
         });
       });
       return map;
@@ -3413,7 +3878,45 @@
       return state.mode === "migrationCase3" && !state.migrationCase3FocusId;
     }
 
+    function syncDataConfigFromInputs() {
+      dataConfigInputs.forEach((input) => {
+        if (!input.checked) {
+          return;
+        }
+        state.dataConfig[input.dataset.dataConfig] = input.value === "true";
+      });
+    }
+
+    function getModeFromDataConfig() {
+      return state.dataConfig.migrationScene
+        ? (state.dataConfig.multipleInitiators ? "migrationCase3" : "singleMigrationConfigured")
+        : "configured";
+    }
+
+    function syncDataConfigVisibility() {
+      const isMigrationScene = Boolean(state.dataConfig.migrationScene);
+      const isSingleMigrationScene = isMigrationScene && !state.dataConfig.multipleInitiators;
+      dataConfigScopes.forEach((group) => {
+        const scope = group.dataset.configScope;
+        const requiresSecondDemand = group.hasAttribute("data-config-requires-second-demand");
+        const showForSingleMigration = group.hasAttribute("data-config-show-for-single-migration");
+        const shouldShow = scope === "migration"
+          ? isMigrationScene
+          : (!isMigrationScene && (!requiresSecondDemand || state.dataConfig.hasSecondLevelDemand))
+            || (isSingleMigrationScene && showForSingleMigration);
+        group.hidden = !shouldShow;
+      });
+    }
+
     function getActiveDataset(modeKey = state.mode) {
+      if (modeKey === "singleMigrationConfigured") {
+        return buildSingleMigrationDataset(state.dataConfig);
+      }
+
+      if (modeKey === "configured") {
+        return buildConfiguredDataset(state.dataConfig);
+      }
+
       const dataset = datasets[modeKey];
       if (!dataset) {
         return { nodes: [], edges: [], layers: [] };
@@ -3434,6 +3937,7 @@
         layers: (drillView ? dataset.drillLayers : view.layers || dataset.layers || []).map((layer) => ({ ...layer })),
         nodes: (view.nodes || []).map((node) => ({ ...node })),
         edges: (view.edges || []).map((edge) => ({ ...edge })),
+        preserveNodePositions: Boolean(view.preserveNodePositions),
         aggregateAllGroupsInScheme5: Boolean(drillView) || dataset.aggregateAllGroupsInScheme5,
         isMigrationCase3Global: !drillView
       };
@@ -3487,7 +3991,8 @@
     }
 
     function useSchemeFiveAggregateCardStyle(dataset) {
-      return ["平移情况2", "平移情况3", "业务极端数据", "普通数据", "复杂数据"].includes(dataset?.label);
+      return Boolean(dataset?.useSchemeFiveAggregateCardStyle)
+        || ["平移情况2", "平移情况3", "业务极端数据", "普通数据", "复杂数据"].includes(dataset?.label);
     }
 
     function getSchemeFiveAggregateNodeHeight(dataset, detail, useNewAggregateCardStyle) {
@@ -4993,7 +5498,7 @@
       edges.forEach((edge) => {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
-        if (edge.flow === "horizontal-right" || edge.flow === "migration-core-amount") {
+        if (edge.flow === "horizontal-right") {
           edge.isHorizontalFlow = true;
           edge.sourcePortX = source.x + source.width / 2;
           edge.targetPortX = target.x - target.width / 2;
@@ -5003,7 +5508,16 @@
           edge.targetNode = target;
           return;
         }
-
+        if (edge.flow === "migration-core-amount") {
+          edge.isMigrationCoreFlow = true;
+          edge.sourcePortX = source.x + source.width / 2;
+          edge.targetPortX = target.x - target.width / 2;
+          edge.sourcePortY = source.y;
+          edge.targetPortY = target.y;
+          edge.sourceNode = source;
+          edge.targetNode = target;
+          return;
+        }
         const sourceIndex = source.outgoing.findIndex((item) => item.id === edge.id);
         const targetIndex = target.incoming.findIndex((item) => item.id === edge.id);
         const sourcePortCount = source.outgoing.length || 1;
@@ -5083,6 +5597,23 @@
       edges.forEach((edge) => {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
+        if (edge.isMigrationCoreFlow) {
+          const exitOffset = Math.max(80, Math.min(180, Math.abs(edge.targetPortX - edge.sourcePortX) * 0.28));
+          edge.points = [
+            { x: edge.sourcePortX, y: edge.sourcePortY },
+            { x: edge.sourcePortX + exitOffset, y: edge.sourcePortY },
+            { x: edge.targetPortX - exitOffset, y: edge.targetPortY },
+            { x: edge.targetPortX, y: edge.targetPortY }
+          ];
+          edge.path = smoothCurvePath(edge.points);
+          edge.tagPresentation = resolveEdgeTagPresentation(edge);
+          edge.tagVariant = edge.tagPresentation.variant;
+          edge.tagWidth = edge.tagPresentation.width;
+          edge.tagHeight = edge.tagPresentation.height;
+          edge.sourceNode = source;
+          edge.targetNode = target;
+          return;
+        }
         if (edge.isHorizontalFlow) {
           edge.points = [
             { x: edge.sourcePortX, y: edge.sourcePortY },
@@ -5510,6 +6041,14 @@
         return "发起方（迁入）";
       }
 
+      if (node.migrationRole === "out") {
+        return "发起方（迁出）";
+      }
+
+      if (node.migrationRole === "in") {
+        return "发起方（迁入）";
+      }
+
       return "发起方";
     }
 
@@ -5585,7 +6124,7 @@
     }
 
     function hasChildBudgetFlows(node) {
-      return state.mode === "migrationCase1" && Array.isArray(node?.childBudgetFlows) && node.childBudgetFlows.length > 0;
+      return Array.isArray(node?.childBudgetFlows) && node.childBudgetFlows.length > 0;
     }
 
     function getTopChildBudgetFlows(node) {
@@ -5600,6 +6139,17 @@
 
     function formatChildBudgetFlowAmount(amount) {
       return `${Math.abs(Number(amount) || 0).toFixed(2)}元`;
+    }
+
+    function getChildFlowNodeSectionHeight(node) {
+      const rowCount = getTopChildBudgetFlows(node).length;
+      if (!rowCount) {
+        return 0;
+      }
+      const rowStartOffset = 46;
+      const rowGap = 20;
+      const bottomPadding = 14;
+      return rowStartOffset + (rowCount - 1) * rowGap + bottomPadding;
     }
 
     function getSchemeFiveNodeLayout(node, visual, showMeta) {
@@ -5659,7 +6209,7 @@
         height += SCHEME5_NODE_ROW_GAP + SCHEME5_NODE_TEXT_ROW_HEIGHT;
       }
       if (hasChildBudgetFlows(node)) {
-        height += CHILD_FLOW_NODE_EXTRA_TOP_GAP + CHILD_FLOW_NODE_SECTION_HEIGHT;
+        height += CHILD_FLOW_NODE_EXTRA_TOP_GAP + getChildFlowNodeSectionHeight(node);
       }
       return height;
     }
@@ -5674,6 +6224,7 @@
         const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, visual, dataset);
         node.width = NODE_WIDTH;
         node.height = getSchemeFiveNodeHeight(node, visual, showMeta);
+        node.__autoHeight = true;
       });
     }
 
@@ -5831,14 +6382,14 @@
       }, 0);
     }
 
-    function getNextLevelRelatedTitles(nodeId, layerVariant, aggregateNodeIds, rawEdges, rawNodeById, dataset) {
-      const titles = [];
+    function getAggregateDirectRelations(nodeId, aggregateNodeIds, rawEdges, rawNodeById, dataset) {
+      const upstreamTitles = [];
+      const downstreamTitles = [];
       const layers = dataset?.layers || [];
       const currentNode = rawNodeById.get(nodeId);
       const currentLayerIndex = currentNode && layers.length
         ? getNearestLayerIndex(currentNode.y || 0, layers)
         : -1;
-      const initiatorLayerIndex = getSchemeFiveInitiatorLayerIndex(dataset);
 
       rawEdges.forEach((edge) => {
         const relatedId = edge.source === nodeId
@@ -5852,29 +6403,39 @@
         }
 
         const relatedNode = rawNodeById.get(relatedId);
-        if (!relatedNode || relatedNode.role === "initiator") {
+        if (!relatedNode) {
           return;
         }
 
         if (currentLayerIndex >= 0 && layers.length) {
           const relatedLayerIndex = getNearestLayerIndex(relatedNode.y || 0, layers);
-          const isNextLevel = layerVariant === "supply"
-            ? relatedLayerIndex > currentLayerIndex
-            : relatedLayerIndex < currentLayerIndex;
-          const isSameSide = initiatorLayerIndex < 0
-            ? true
-            : layerVariant === "supply"
-              ? relatedLayerIndex > initiatorLayerIndex
-              : relatedLayerIndex < initiatorLayerIndex;
-
-          if (!isNextLevel || !isSameSide) {
+          if (relatedLayerIndex < currentLayerIndex) {
+            upstreamTitles.push(relatedNode.title);
+            return;
+          }
+          if (relatedLayerIndex > currentLayerIndex) {
+            downstreamTitles.push(relatedNode.title);
             return;
           }
         }
 
-        titles.push(relatedNode.title);
+        if (edge.target === nodeId) {
+          upstreamTitles.push(relatedNode.title);
+          return;
+        }
+        if (edge.source === nodeId) {
+          downstreamTitles.push(relatedNode.title);
+          return;
+        }
       });
-      return Array.from(new Set(titles));
+
+      const uniqueUpstreamTitles = Array.from(new Set(upstreamTitles));
+      const uniqueDownstreamTitles = Array.from(new Set(downstreamTitles));
+
+      return {
+        upstreamNodes: uniqueUpstreamTitles,
+        downstreamNodes: uniqueDownstreamTitles
+      };
     }
 
     function buildAggregateDetail(layerLabel, nodes, rawEdges, options = {}) {
@@ -5898,9 +6459,8 @@
           : useLayerRoleAmounts && isDemandLayer
             ? 0
             : Math.max(-amount, 0);
-        const secondLevelNodes = getNextLevelRelatedTitles(
+        const directRelations = getAggregateDirectRelations(
           node.id,
-          isSupplyLayer ? "supply" : "demand",
           aggregateNodeIds,
           rawEdges,
           rawNodeById,
@@ -5918,7 +6478,12 @@
           incomeAmount,
           incomeAmountText: formatAmountNumber(incomeAmount),
           incomeAmountDisplayText: formatCompactAmountNumber(incomeAmount),
-          secondLevelNodes
+          upstreamNodes: directRelations.upstreamNodes,
+          downstreamNodes: directRelations.downstreamNodes,
+          secondLevelNodes: [
+            ...directRelations.upstreamNodes,
+            ...directRelations.downstreamNodes
+          ]
         };
       }).sort((a, b) => {
         if (useLayerRoleAmounts) {
@@ -6088,12 +6653,18 @@
       };
       applySchemeFiveNodeMetrics(schemeDataset);
       const nodeMap = normalizeNodes(schemeDataset.nodes);
-      alignSchemeFiveLayersByGap(schemeDataset, nodeMap);
       const edgeSeed = schemeDataset.edges.map((edge) => ({ ...edge }));
       const layerGapByLayer = (schemeDataset.layers || []).map(() => 0);
-      compactNodesByLayer(schemeDataset, nodeMap, layerGapByLayer);
-      alignSchemeFiveOddNodeLayersToInitiator(schemeDataset, nodeMap);
-      alignMigrationCase2TreeGap(schemeDataset, nodeMap);
+      if (!schemeDataset.preserveNodePositions) {
+        alignSchemeFiveLayersByGap(schemeDataset, nodeMap);
+        compactNodesByLayer(schemeDataset, nodeMap, layerGapByLayer);
+        alignSchemeFiveOddNodeLayersToInitiator(schemeDataset, nodeMap);
+        alignMigrationCase2TreeGap(schemeDataset, nodeMap);
+      } else {
+        nodeMap.forEach((node) => {
+          node.layerIndex = getNearestLayerIndex(node.y, schemeDataset.layers || []);
+        });
+      }
       const layoutResult = buildRegularGraphLayoutLegacy(schemeDataset, nodeMap, edgeSeed);
 
       return {
@@ -6280,7 +6851,7 @@
     }
 
     function renderEdge(edgeLayer, tagLayer, edge) {
-      const isMigrationCoreEdge = (edge.flow === "horizontal-right" || edge.flow === "migration-core-amount")
+      const isMigrationCoreEdge = edge.flow === "horizontal-right"
         && edge.sourceNode?.role === "initiator"
         && edge.targetNode?.role === "initiator";
       const group = createSvg("g", {
@@ -6455,6 +7026,13 @@
       };
     }
 
+    function isZeroAmountText(amountText) {
+      const amount = splitAmountUnit(amountText);
+      const numericText = String(amount.value || "").replace(/,/g, "").trim();
+      const numericValue = Number(numericText);
+      return Number.isFinite(numericValue) && numericValue === 0;
+    }
+
     function renderStartAmount(group, x, y, labelText, amountText) {
       const amount = splitAmountUnit(amountText);
       const labelWidth = measureTextWidth(labelText, '400 12px "PingFang SC"');
@@ -6547,8 +7125,7 @@
       const contentLeft = layout.contentX;
       const contentRight = layout.left + node.width - SCHEME5_NODE_PADDING_X;
       const dividerY = layout.childFlowStartY;
-      const hintY = dividerY + 18;
-      const titleY = hintY + 20;
+      const titleY = dividerY + 22;
       const rowStartY = titleY + 24;
       const topFlows = getTopChildBudgetFlows(node);
 
@@ -6559,14 +7136,6 @@
         y2: dividerY,
         class: "node-aggregate-divider is-dashed"
       }));
-
-      const hint = createSvg("text", {
-        x: contentLeft,
-        y: hintY,
-        class: "node-child-flow-hint"
-      });
-      hint.textContent = `${node.childBudgetFlows.length} 个子预算单元之间有金额流动`;
-      group.appendChild(hint);
 
       const title = createSvg("text", {
         x: contentLeft,
@@ -7288,6 +7857,43 @@
       `;
     }
 
+    function renderDrawerAmountCell(amountText, unitKey, budgetTab) {
+      if (isZeroAmountText(amountText)) {
+        return renderPlainTableValue(amountText);
+      }
+
+      return `<button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(unitKey)}" data-budget-tab="${escapeHtml(budgetTab)}">${renderTableAmountValue(amountText)}</button>`;
+    }
+
+    function renderLegacyDrawerAmountCell(amountText, tooltipText) {
+      if (isZeroAmountText(amountText)) {
+        return renderPlainTableValue(amountText);
+      }
+
+      return `<button class="aggregate-table-amount" type="button" data-drawer-tooltip="${escapeHtml(tooltipText)}">${renderTableAmountValue(amountText)}</button>`;
+    }
+
+    const RELATION_TAG_VISIBLE_COUNT = 2;
+
+    function renderRelationNodeTags(nodes = []) {
+      if (!nodes.length) {
+        return `<span class="tod-drawer-table-empty">-</span>`;
+      }
+
+      const visibleNodes = nodes.slice(0, RELATION_TAG_VISIBLE_COUNT);
+      const hiddenCount = Math.max(0, nodes.length - visibleNodes.length);
+      return `
+        <div class="tod-drawer-tag-list" title="${escapeHtml(nodes.join("、"))}">
+          ${visibleNodes.map((node) => `
+            <span class="tod-drawer-table-tag">
+              <span class="tod-drawer-table-tag-text">${escapeHtml(node)}</span>
+            </span>
+          `).join("")}
+          ${hiddenCount ? `<span class="tod-drawer-table-tag is-more">+${hiddenCount}</span>` : ""}
+        </div>
+      `;
+    }
+
     function getRoleTagVariant(text) {
       if (/供给方/.test(text || "")) {
         return "supply";
@@ -7305,31 +7911,33 @@
 
     function renderFallbackDrawerTable(payload) {
       if (payload.mode === "aggregate") {
-        const showNextLevelColumn = payload.showNextLevelColumn !== false;
+        const showRelationColumns = payload.showRelationColumns !== false;
         const rows = payload.rows.length
           ? payload.rows.map((row) => `
             <tr>
-              <td><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
+              <td class="is-fixed-left"><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
               <td style="text-align: right;">
-                <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="cost">${renderTableAmountValue(row.costAmount)}</button>
+                ${renderDrawerAmountCell(row.costAmount, row.key, "cost")}
               </td>
               <td style="text-align: right;">
-                <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="income">${renderTableAmountValue(row.incomeAmount)}</button>
+                ${renderDrawerAmountCell(row.incomeAmount, row.key, "income")}
               </td>
-              ${showNextLevelColumn ? `<td class="aggregate-table-muted">${row.nextLevelNodes?.length ? escapeHtml(row.nextLevelNodes.join("、")) : "-"}</td>` : ""}
+              ${showRelationColumns ? `<td>${renderRelationNodeTags(row.upstreamNodes || [])}</td>` : ""}
+              ${showRelationColumns ? `<td>${renderRelationNodeTags(row.downstreamNodes || [])}</td>` : ""}
             </tr>
           `).join("")
-          : `<tr><td colspan="${showNextLevelColumn ? 4 : 3}" class="aggregate-table-muted">暂无数据</td></tr>`;
+          : `<tr><td colspan="${showRelationColumns ? 5 : 3}" class="aggregate-table-muted">暂无数据</td></tr>`;
 
         return `
           <div class="aggregate-table-wrap">
-            <table class="aggregate-table">
+            <table class="aggregate-table is-aggregate-drawer-table">
               <thead>
                 <tr>
-                  <th>${escapeHtml(payload.primaryColumnTitle)}</th>
+                  <th class="is-fixed-left">${escapeHtml(payload.primaryColumnTitle)}</th>
                   <th style="text-align: right;">成本调整总金额</th>
                   <th style="text-align: right;">收入调整总金额</th>
-                  ${showNextLevelColumn ? `<th>${escapeHtml(payload.nextColumnTitle)}</th>` : ""}
+                  ${showRelationColumns ? `<th>上游</th>` : ""}
+                  ${showRelationColumns ? `<th>下游</th>` : ""}
                 </tr>
               </thead>
               <tbody>${rows}</tbody>
@@ -7342,12 +7950,12 @@
         ? payload.rows.map((row) => `
           <tr>
             <td>${renderNodeTypeTag(row.nodeType)}</td>
-            <td><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
+            <td class="is-fixed-left"><div class="aggregate-table-node" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div></td>
             <td style="text-align: right;">
-              <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="cost">${renderTableAmountValue(row.costAmount)}</button>
+              ${renderDrawerAmountCell(row.costAmount, row.key, "cost")}
             </td>
             <td style="text-align: right;">
-              <button class="aggregate-table-amount" type="button" data-drawer-tooltip="在表格中查看明细" data-budget-unit-key="${escapeHtml(row.key)}" data-budget-tab="income">${renderTableAmountValue(row.incomeAmount)}</button>
+              ${renderDrawerAmountCell(row.incomeAmount, row.key, "income")}
             </td>
             <td style="text-align: right;">
               ${renderPlainTableValue(row.diffAmount)}
@@ -7359,11 +7967,11 @@
 
       return `
         <div class="aggregate-table-wrap">
-          <table class="aggregate-table">
+          <table class="aggregate-table is-node-drawer-table">
             <thead>
               <tr>
                 <th>节点类型</th>
-                <th>预算单元名称</th>
+                <th class="is-fixed-left">预算单元名称</th>
                 <th style="text-align: right;">成本调整总金额</th>
                 <th style="text-align: right;">收入调整总金额</th>
                 <th style="text-align: right;">收支偏差金额</th>
@@ -7400,8 +8008,8 @@
       return `
         <div class="drawer-detail-tabs" data-drawer-detail-tabs>
           <div class="drawer-detail-tab-list" role="tablist" aria-label="明细切换">
-            <button class="drawer-detail-tab is-active" type="button" role="tab" aria-selected="true" data-drawer-detail-tab="child-flow">子预算单元</button>
-            <button class="drawer-detail-tab" type="button" role="tab" aria-selected="false" data-drawer-detail-tab="relation">需求方供给方明细</button>
+            <button class="drawer-detail-tab is-active" type="button" role="tab" aria-selected="true" data-drawer-detail-tab="child-flow">含金额流转子预算单元</button>
+            <button class="drawer-detail-tab" type="button" role="tab" aria-selected="false" data-drawer-detail-tab="relation">一级需求方和供给方明细</button>
           </div>
           <div class="drawer-detail-panel is-active" role="tabpanel" data-drawer-detail-panel="child-flow">
             ${renderChildBudgetFlowList(detail.childBudgetFlows)}
@@ -7504,16 +8112,12 @@
         <tr>
           <td><div class="aggregate-table-node" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
           <td>
-            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图里查看明细">
-              ${escapeHtml(item.costAmountDisplayText || item.costAmountText)}
-            </button>
+            ${renderLegacyDrawerAmountCell(item.costAmountDisplayText || item.costAmountText, "去表格视图里查看明细")}
           </td>
           <td>
-            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图里查看明细">
-              ${escapeHtml(item.incomeAmountDisplayText || item.incomeAmountText)}
-            </button>
+            ${renderLegacyDrawerAmountCell(item.incomeAmountDisplayText || item.incomeAmountText, "去表格视图里查看明细")}
           </td>
-          <td class="aggregate-table-muted">${item.secondLevelNodes.length ? escapeHtml(item.secondLevelNodes.join("、")) : "0"}</td>
+          <td class="aggregate-table-muted">${item.secondLevelNodes.length ? escapeHtml(item.secondLevelNodes.join("；")) : "0"}</td>
         </tr>
       `).join("");
     }
@@ -7641,13 +8245,14 @@
         name: item.title,
         costAmount: item.costAmountDisplayText || item.costAmountText,
         incomeAmount: item.incomeAmountDisplayText || item.incomeAmountText,
+        upstreamNodes: item.upstreamNodes || [],
+        downstreamNodes: item.downstreamNodes || [],
         nextLevelNodes: item.secondLevelNodes || []
       }));
       return {
         mode: "aggregate",
         primaryColumnTitle: `${levelName}${roleName}`,
-        nextColumnTitle: `${getNextLayerLevelName(levelName)}${roleName}`,
-        showNextLevelColumn: rows.some((row) => row.nextLevelNodes.length > 0),
+        showRelationColumns: true,
         rows
       };
     }
@@ -7936,14 +8541,10 @@
           <td class="aggregate-table-muted">${escapeHtml(item.sideText)}</td>
           <td><div class="aggregate-table-node" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
           <td>
-            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图查看明细">
-              ${escapeHtml(item.costAmountDisplayText || item.costAmountText)}
-            </button>
+            ${renderLegacyDrawerAmountCell(item.costAmountDisplayText || item.costAmountText, "去表格视图查看明细")}
           </td>
           <td>
-            <button class="aggregate-table-amount" type="button" data-drawer-tooltip="去表格视图查看明细">
-              ${escapeHtml(item.incomeAmountDisplayText || item.incomeAmountText)}
-            </button>
+            ${renderLegacyDrawerAmountCell(item.incomeAmountDisplayText || item.incomeAmountText, "去表格视图查看明细")}
           </td>
         </tr>
       `).join("");
@@ -8277,6 +8878,9 @@
         state.scheme = "scheme5";
       }
       Object.entries(modeButtons).forEach(([key, button]) => {
+        if (!button) {
+          return;
+        }
         button.classList.toggle("is-active", key === modeKey);
       });
       render({ resetDrawer: false });
@@ -8296,7 +8900,24 @@
     });
 
     Object.entries(modeButtons).forEach(([modeKey, button]) => {
+      if (!button) {
+        return;
+      }
       button.addEventListener("click", () => switchMode(modeKey));
+    });
+
+    dataConfigInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        syncDataConfigFromInputs();
+        syncDataConfigVisibility();
+        clearSelectedState();
+        hideAggregateDrawerForDataSwitch();
+        state.budgetTableFocus = null;
+        state.migrationCase3FocusId = null;
+        state.mode = getModeFromDataConfig();
+        state.scheme = "scheme5";
+        render({ resetDrawer: false });
+      });
     });
 
     viewTabButtons.forEach((button) => {
@@ -8543,6 +9164,9 @@
       }
     });
 
+    syncDataConfigFromInputs();
+    syncDataConfigVisibility();
+    state.mode = getModeFromDataConfig();
     render();
   </script>
 </body>

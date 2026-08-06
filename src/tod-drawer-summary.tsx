@@ -12,6 +12,8 @@ type AggregateTableRow = {
   name: string;
   costAmount: string;
   incomeAmount: string;
+  upstreamNodes?: string[];
+  downstreamNodes?: string[];
   nextLevelNodes: string[];
 };
 
@@ -29,8 +31,9 @@ type DrawerTablePayload =
   | {
       mode: 'aggregate';
       primaryColumnTitle: string;
-      nextColumnTitle: string;
+      nextColumnTitle?: string;
       showNextLevelColumn?: boolean;
+      showRelationColumns?: boolean;
       rows: AggregateTableRow[];
     }
   | {
@@ -78,6 +81,7 @@ type BudgetTablePayload = {
 };
 
 const roots = new WeakMap<Element, Root>();
+const RELATION_TAG_VISIBLE_COUNT = 2;
 type TopologyViewKey = 'table' | 'topology';
 type BudgetDetailTabKey = 'cost' | 'income';
 const BUDGET_DETAIL_MONTHS = ['2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
@@ -252,6 +256,13 @@ function splitAmountUnit(rawValue: string) {
   };
 }
 
+function isZeroAmountText(rawValue: string) {
+  const amount = splitAmountUnit(rawValue);
+  const numericText = amount.value.replace(/,/g, '').trim();
+  const numericValue = Number(numericText);
+  return Number.isFinite(numericValue) && numericValue === 0;
+}
+
 function AmountCell({
   value,
   unitKey,
@@ -262,6 +273,10 @@ function AmountCell({
   budgetTab?: BudgetDetailTabKey;
 }) {
   const amount = splitAmountUnit(value);
+
+  if (isZeroAmountText(value)) {
+    return <PlainValueCell value={value} />;
+  }
 
   return (
     <Tooltip content="在表格中查看明细" trigger="hover" position="top">
@@ -316,27 +331,38 @@ function NodeTypeTag({ value }: { value: string }) {
   );
 }
 
-function NextLevelNodesCell({ nodes }: { nodes: string[] }) {
-  if (!nodes.length) {
+function RelationNodesCell({ nodes }: { nodes?: string[] }) {
+  if (!nodes?.length) {
     return <span className="tod-drawer-table-empty">-</span>;
   }
 
+  const visibleNodes = nodes.slice(0, RELATION_TAG_VISIBLE_COUNT);
+  const hiddenCount = Math.max(0, nodes.length - visibleNodes.length);
+
   return (
-    <div className="tod-drawer-tag-list">
-      {nodes.map((node) => (
-        <Tag key={node} size="small" className="tod-drawer-table-tag">
+    <div className="tod-drawer-tag-list" title={nodes.join('、')}>
+      {visibleNodes.map((node) => (
+        <Tag key={node} size="small" color="arcoblue" bordered={false} fill className="tod-drawer-table-tag">
           {node}
         </Tag>
       ))}
+      {hiddenCount > 0 && (
+        <Tag size="small" color="gray" bordered={false} fill className="tod-drawer-table-tag is-more">
+          +{hiddenCount}
+        </Tag>
+      )}
     </div>
   );
 }
 
 function TodAggregateTable({ payload }: { payload: Extract<DrawerTablePayload, { mode: 'aggregate' }> }) {
+  const showRelationColumns = payload.showRelationColumns !== false && payload.showNextLevelColumn !== false;
   const columns = [
     {
       title: payload.primaryColumnTitle,
       dataIndex: 'name',
+      fixed: 'left' as const,
+      width: 180,
       render: (value: string) => <NameCell value={value} />,
     },
     {
@@ -355,13 +381,26 @@ function TodAggregateTable({ payload }: { payload: Extract<DrawerTablePayload, {
         <AmountCell value={value} unitKey={row.key} budgetTab="income" />
       ),
     },
-    ...(payload.showNextLevelColumn === false
+    ...(showRelationColumns
+      ? [
+          {
+            title: '上游',
+            dataIndex: 'upstreamNodes',
+            render: (value: string[]) => <RelationNodesCell nodes={value || []} />,
+          },
+          {
+            title: '下游',
+            dataIndex: 'downstreamNodes',
+            render: (value: string[]) => <RelationNodesCell nodes={value || []} />,
+          },
+        ]
+      : payload.showNextLevelColumn === false
       ? []
       : [
           {
-            title: payload.nextColumnTitle,
+            title: payload.nextColumnTitle || '上下游节点',
             dataIndex: 'nextLevelNodes',
-            render: (value: string[]) => <NextLevelNodesCell nodes={value || []} />,
+            render: (value: string[]) => <RelationNodesCell nodes={value || []} />,
           },
         ]),
   ];
@@ -372,7 +411,7 @@ function TodAggregateTable({ payload }: { payload: Extract<DrawerTablePayload, {
       columns={columns}
       data={payload.rows}
       pagination={false}
-      scroll={{ x: payload.showNextLevelColumn === false ? 540 : 720 }}
+      scroll={{ x: showRelationColumns ? 860 : payload.showNextLevelColumn === false ? 540 : 720 }}
       className="tod-drawer-table"
     />
   );
@@ -389,6 +428,8 @@ function TodNodeTable({ payload }: { payload: Extract<DrawerTablePayload, { mode
     {
       title: '预算单元名称',
       dataIndex: 'name',
+      fixed: 'left' as const,
+      width: 180,
       render: (value: string) => <NameCell value={value} />,
     },
     {
