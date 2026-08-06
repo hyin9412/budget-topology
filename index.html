@@ -818,7 +818,7 @@
 
     .child-flow-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) auto;
+      grid-template-columns: 72px 16px minmax(0, 1fr) auto;
       align-items: center;
       column-gap: 10px;
       color: #1f2329;
@@ -2401,7 +2401,7 @@
     const SCHEME5_MIGRATION_AGGREGATE_HEIGHT = 216;
     const CHILD_FLOW_TOP_COUNT = 3;
     const CHILD_FLOW_NODE_EXTRA_TOP_GAP = 10;
-    const CHILD_FLOW_NODE_SECTION_HEIGHT = 104;
+    const CHILD_FLOW_NODE_SECTION_HEIGHT = 111;
     const DETAIL_ICON_PATH = "M3.67509 8.53871C3.44164 8.77217 3.44164 9.15067 3.67509 9.38413L4.0978 9.80684C4.33126 10.0403 4.70977 10.0403 4.94322 9.80684L8.32491 6.42516C8.44226 6.3078 8.50062 6.1538 8.49999 5.99999C8.50062 5.84618 8.44226 5.69218 8.32491 5.57482L4.94322 2.19314C4.70977 1.95968 4.33126 1.95968 4.0978 2.19314L3.67509 2.61585C3.44164 2.84931 3.44164 3.22781 3.67509 3.46127L6.21381 5.99999L3.67509 8.53871Z";
 
     const datasets = {
@@ -6358,26 +6358,37 @@
         y: titleY,
         class: "node-child-flow-title"
       });
-      title.textContent = `Top ${CHILD_FLOW_TOP_COUNT} 子预算单元`;
+      title.textContent = `Top${CHILD_FLOW_TOP_COUNT} 金额流转子预算单元`;
       group.appendChild(title);
 
       topFlows.forEach((flow, index) => {
         const rowY = rowStartY + index * 20;
         const amountText = formatChildBudgetFlowAmount(flow.amount);
         const amountWidth = measureEndAmountWidth(amountText);
-        const arrowWidth = 16;
-        const columnGap = 8;
-        const nameMaxWidth = Math.max(42, (contentRight - contentLeft - amountWidth - arrowWidth - columnGap * 3) / 2);
+        const arrowText = "→";
+        const arrowGap = 4;
+        const amountGap = 12;
+        const arrowWidth = measureTextWidth(arrowText, '400 12px "PingFang SC"');
+        const availableTextWidth = Math.max(84, contentRight - contentLeft - amountWidth - amountGap);
+        const fromNaturalWidth = measureTextWidth(flow.from, '400 12px "PingFang SC"');
+        const toNaturalWidth = measureTextWidth(flow.to, '400 12px "PingFang SC"');
+        const namesAvailableWidth = Math.max(42, availableTextWidth - arrowWidth - arrowGap * 2);
+        const naturalNamesWidth = fromNaturalWidth + toNaturalWidth;
+        const fromMaxWidth = naturalNamesWidth <= namesAvailableWidth
+          ? fromNaturalWidth
+          : Math.max(42, Math.min(fromNaturalWidth, namesAvailableWidth * (fromNaturalWidth / naturalNamesWidth)));
+        const toMaxWidth = Math.max(42, namesAvailableWidth - fromMaxWidth);
+        const fromDisplayWidth = Math.min(fromNaturalWidth, fromMaxWidth);
         const fromX = contentLeft;
-        const arrowX = fromX + nameMaxWidth + columnGap + arrowWidth / 2;
-        const toX = arrowX + arrowWidth / 2 + columnGap;
+        const arrowX = fromX + fromDisplayWidth + arrowGap + arrowWidth / 2;
+        const toX = arrowX + arrowWidth / 2 + arrowGap;
 
         const fromName = createSvg("text", {
           x: fromX,
           y: rowY,
           class: "node-child-flow-name"
         });
-        fromName.textContent = truncateTextToWidth(flow.from, nameMaxWidth, '400 12px "PingFang SC"');
+        fromName.textContent = truncateTextToWidth(flow.from, fromMaxWidth, '400 12px "PingFang SC"');
         group.appendChild(fromName);
 
         const arrow = createSvg("text", {
@@ -6385,7 +6396,7 @@
           y: rowY,
           class: "node-child-flow-arrow"
         });
-        arrow.textContent = "→";
+        arrow.textContent = arrowText;
         group.appendChild(arrow);
 
         const toName = createSvg("text", {
@@ -6393,7 +6404,7 @@
           y: rowY,
           class: "node-child-flow-name"
         });
-        toName.textContent = truncateTextToWidth(flow.to, nameMaxWidth, '400 12px "PingFang SC"');
+        toName.textContent = truncateTextToWidth(flow.to, toMaxWidth, '400 12px "PingFang SC"');
         group.appendChild(toName);
 
         renderEndAmountWithClasses(
