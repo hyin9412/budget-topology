@@ -391,6 +391,36 @@
       padding-left: 0;
     }
 
+    .topology-back-global {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #cbd7ff;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 4px 12px rgba(22, 100, 255, 0.08);
+      padding: 4px 8px;
+      color: #1664ff;
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .topology-back-global[hidden] {
+      display: none;
+    }
+
+    .topology-back-global::before {
+      content: "←";
+      font-size: 13px;
+      line-height: 1;
+    }
+
     .node-option-panel[hidden] {
       display: none;
     }
@@ -1763,6 +1793,11 @@
       marker-end: url(#arrow-migration);
     }
 
+    .edge-group.is-migration-core .tag-bg {
+      stroke: rgba(22, 100, 255, 0.18);
+      fill: #eef4ff;
+    }
+
     .edge-hit {
       fill: none;
       stroke: transparent;
@@ -2395,6 +2430,7 @@
           </header>
 
           <div class="stage">
+            <button id="topology-back-global" class="topology-back-global" type="button" hidden>返回拓扑图全局</button>
             <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
               <defs>
                 <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -2849,98 +2885,171 @@
         };
       })(),
       migrationCase3: (() => {
-        const firstLevelNames = [
-          "抖音短视频(5150)",
-          "今日头条(5136)",
-          "西瓜视频(1689)",
-          "研发商品中心-电商(2480)",
-          "小说(5300)",
-          "Lark(5137)"
-        ];
-        const supplyNames = [
-          "Data-数据中心与供应链(293)",
-          "广告技术(5139)",
-          "视频架构(55)",
-          "搜索业务研发(2513)"
-        ];
-        const firstLevelAmounts = [2.4, 2, 1.8, 1.4, 1.2, 0.8];
-        const supplyAmounts = [2.8, 2.4, 1.6, 1.2];
-        const costBudgetAmount = firstLevelAmounts.reduce((sum, amount) => sum + amount, 0);
-        const incomeBudgetAmount = supplyAmounts.reduce((sum, amount) => sum + amount, 0);
-        const balanceDiffAmount = incomeBudgetAmount - costBudgetAmount;
-        const nodes = [];
-        const edges = [];
         const canvasWidth = 1400;
-        const treeCenterDistance = NODE_WIDTH + MIGRATION_CASE2_GROUP_GAP;
-        const leftTreeX = canvasWidth / 2 - treeCenterDistance / 2;
-        const rightTreeX = canvasWidth / 2 + treeCenterDistance / 2;
+        const globalNodes = [
+          {
+            id: "case3-out-core",
+            x: 350,
+            y: 340,
+            title: "研发商品中心-基础架构(292)",
+            meta: "迁出总额  -18.00元   -18.00%",
+            role: "initiator",
+            migrationRole: "out"
+          },
+          {
+            id: "case3-in-core-1",
+            x: 880,
+            y: 180,
+            title: "研发商品中心-Data-数据中心与供应链(293)",
+            meta: "迁入金额  +8.00元   +8.00%",
+            role: "initiator",
+            migrationRole: "in"
+          },
+          {
+            id: "case3-in-core-2",
+            x: 880,
+            y: 340,
+            title: "广告技术(5139)",
+            meta: "迁入金额  +6.00元   +6.00%",
+            role: "initiator",
+            migrationRole: "in"
+          },
+          {
+            id: "case3-in-core-3",
+            x: 880,
+            y: 500,
+            title: "视频架构(55)",
+            meta: "迁入金额  +4.00元   +4.00%",
+            role: "initiator",
+            migrationRole: "in"
+          }
+        ];
+        const globalEdges = [
+          { id: "case3-global-e1", source: "case3-out-core", target: "case3-in-core-1", amount: "+8.00元", flow: "migration-core-amount" },
+          { id: "case3-global-e2", source: "case3-out-core", target: "case3-in-core-2", amount: "+6.00元", flow: "migration-core-amount" },
+          { id: "case3-global-e3", source: "case3-out-core", target: "case3-in-core-3", amount: "+4.00元", flow: "migration-core-amount" }
+        ];
+        const drillConfigs = {
+          "case3-out-core": {
+            core: globalNodes[0],
+            costSign: 1,
+            incomeSign: -1,
+            demandNames: ["抖音短视频(5150)", "今日头条(5136)", "西瓜视频(1689)", "Lark(5137)", "小说(5300)", "研发商品中心-电商(2480)"],
+            demandAmounts: [4.2, 3.6, 3.2, 2.8, 2.4, 1.8],
+            supplyNames: ["Data-数据中心与供应链(293)", "广告技术(5139)", "视频架构(55)"],
+            supplyAmounts: [8, 6, 4]
+          },
+          "case3-in-core-1": {
+            core: globalNodes[1],
+            costSign: -1,
+            incomeSign: 1,
+            demandNames: ["研发商品中心-基础架构(292)", "抖音短视频(5150)", "今日头条(5136)", "Lark(5137)"],
+            demandAmounts: [3.4, 2.2, 1.6, 0.8],
+            supplyNames: ["商品中台(2710)", "数据平台-基础服务(3188)", "数据产品研发(1931)"],
+            supplyAmounts: [3.2, 2.8, 2]
+          },
+          "case3-in-core-2": {
+            core: globalNodes[2],
+            costSign: -1,
+            incomeSign: 1,
+            demandNames: ["研发商品中心-基础架构(292)", "商业化(56)", "抖音业务(2503)", "搜索业务研发(2513)"],
+            demandAmounts: [2.8, 1.4, 1, 0.8],
+            supplyNames: ["广告投放平台(5139)", "商业数据产品(2390)", "巨量引擎(2871)"],
+            supplyAmounts: [2.6, 2, 1.4]
+          },
+          "case3-in-core-3": {
+            core: globalNodes[3],
+            costSign: -1,
+            incomeSign: 1,
+            demandNames: ["研发商品中心-基础架构(292)", "西瓜视频(1689)", "视频云(420)", "直播业务(2601)"],
+            demandAmounts: [1.8, 1, 0.8, 0.4],
+            supplyNames: ["视频架构-转码(55)", "视频架构-播放(4201)", "多媒体平台(2322)"],
+            supplyAmounts: [1.8, 1.4, 0.8]
+          }
+        };
 
-        [
-          { side: "left", x: leftTreeX, amountSign: -1, title: "研发商品中心-基础架构(292)", role: "initiator" },
-          { side: "right", x: rightTreeX, amountSign: 1, title: "研发商品中心-Data-数据中心与供应链(293)", role: "initiator" }
-        ].forEach((tree) => {
-          nodes.push({
-            id: `${tree.side}-core`,
-            x: tree.x,
+        const buildDrillDataset = (config) => {
+          const nodes = [];
+          const edges = [];
+          const core = {
+            ...config.core,
+            x: 700,
             y: 430,
-            title: tree.title,
-            meta: `收支偏差  ${formatAmountNumber(tree.amountSign * balanceDiffAmount)}   ${formatPercentNumber(tree.amountSign * balanceDiffAmount)}`,
-            role: tree.role
+            meta: config.core.meta,
+            role: "initiator"
+          };
+          nodes.push({
+            ...core
           });
 
-          firstLevelNames.forEach((title, index) => {
+          config.demandNames.forEach((title, index) => {
             nodes.push({
-              id: `${tree.side}-up-${index + 1}`,
-              x: tree.x - 150 + index * 60,
+              id: `${config.core.id}-demand-${index + 1}`,
+              x: 520 + index * 72,
               y: 240,
               title,
-              aggregateGroup: `${tree.side}-up`
+              aggregateGroup: `${config.core.id}-demand`
             });
             edges.push({
-              id: `${tree.side}-up-e${index + 1}`,
-              source: `${tree.side}-core`,
-              target: `${tree.side}-up-${index + 1}`,
-              amount: `${tree.amountSign > 0 ? "+" : "-"}${firstLevelAmounts[index].toFixed(2)}元`
+              id: `${config.core.id}-demand-e${index + 1}`,
+              source: config.core.id,
+              target: `${config.core.id}-demand-${index + 1}`,
+              amount: `${config.costSign > 0 ? "+" : "-"}${config.demandAmounts[index].toFixed(2)}元`
             });
           });
 
-          supplyNames.forEach((title, index) => {
+          config.supplyNames.forEach((title, index) => {
             nodes.push({
-              id: `${tree.side}-down-${index + 1}`,
-              x: tree.x - 105 + index * 70,
+              id: `${config.core.id}-supply-${index + 1}`,
+              x: 560 + index * 140,
               y: 680,
               title,
-              aggregateGroup: `${tree.side}-down`
+              aggregateGroup: `${config.core.id}-supply`
             });
             edges.push({
-              id: `${tree.side}-down-e${index + 1}`,
-              source: `${tree.side}-core`,
-              target: `${tree.side}-down-${index + 1}`,
-              amount: `${tree.amountSign > 0 ? "+" : "-"}${supplyAmounts[index].toFixed(2)}元`
+              id: `${config.core.id}-supply-e${index + 1}`,
+              source: config.core.id,
+              target: `${config.core.id}-supply-${index + 1}`,
+              amount: `${config.incomeSign > 0 ? "+" : "-"}${config.supplyAmounts[index].toFixed(2)}元`
             });
           });
-        });
+          return {
+            canvas: { width: canvasWidth, height: 840 },
+            nodes,
+            edges
+          };
+        };
 
-        edges.push({
-          id: "migration-case3-core-e",
-          source: "left-core",
-          target: "right-core",
-          amount: "+8.00元",
-          flow: "horizontal-right"
+        Object.values(drillConfigs).forEach((config) => {
+          config.costAmountsTotal = config.demandAmounts.reduce((sum, amount) => sum + config.costSign * amount, 0);
+          config.incomeAmountsTotal = config.supplyAmounts.reduce((sum, amount) => sum + config.incomeSign * amount, 0);
         });
+        const drillViews = Object.fromEntries(Object.entries(drillConfigs).map(([coreId, config]) => [coreId, buildDrillDataset(config)]));
 
         return {
           label: "平移情况3",
-          canvas: { width: canvasWidth, height: 840 },
+          canvas: { width: canvasWidth, height: 680 },
           compactLayers: false,
           aggregateAllGroupsInScheme5: true,
           layers: [
+            { y: 340, label: "发起方节点" }
+          ],
+          nodes: globalNodes,
+          edges: globalEdges,
+          globalView: {
+            canvas: { width: canvasWidth, height: 680 },
+            layers: [
+              { y: 340, label: "发起方节点" }
+            ],
+            nodes: globalNodes,
+            edges: globalEdges
+          },
+          drillViews,
+          drillLayers: [
             { y: 240, label: "一级需求方" },
             { y: 430, label: "发起方节点" },
             { y: 680, label: "一级供给方" }
-          ],
-          nodes,
-          edges
+          ]
         };
       })()
     };
@@ -2965,6 +3074,7 @@
     const aggregateDrawerSubtitle = document.getElementById("aggregate-drawer-subtitle");
     const aggregateDrawerBody = document.getElementById("aggregate-drawer-body");
     const aggregateDrawerClose = document.getElementById("aggregate-drawer-close");
+    const topologyBackGlobal = document.getElementById("topology-back-global");
     const drawerResizer = document.getElementById("drawer-resizer");
     const card = document.querySelector(".card");
     const viewTabButtons = Array.from(document.querySelectorAll(".topology-view-tab[data-view-key]"));
@@ -2987,6 +3097,7 @@
       selectedActive: null,
       view: "topology",
       budgetTableFocus: null,
+      migrationCase3FocusId: null,
       camera: { x: 0, y: 0, scale: 1 },
       dragging: false,
       dragOrigin: null,
@@ -3298,16 +3409,46 @@
       return ["平移情况2", "平移情况3"].includes(dataset?.label);
     }
 
+    function isMigrationCase3GlobalView() {
+      return state.mode === "migrationCase3" && !state.migrationCase3FocusId;
+    }
+
+    function getActiveDataset(modeKey = state.mode) {
+      const dataset = datasets[modeKey];
+      if (!dataset) {
+        return { nodes: [], edges: [], layers: [] };
+      }
+
+      if (modeKey !== "migrationCase3") {
+        return dataset;
+      }
+
+      const drillView = state.migrationCase3FocusId
+        ? dataset.drillViews?.[state.migrationCase3FocusId]
+        : null;
+      const view = drillView || dataset.globalView || dataset;
+
+      return {
+        ...dataset,
+        canvas: { ...(view.canvas || dataset.canvas) },
+        layers: (drillView ? dataset.drillLayers : view.layers || dataset.layers || []).map((layer) => ({ ...layer })),
+        nodes: (view.nodes || []).map((node) => ({ ...node })),
+        edges: (view.edges || []).map((edge) => ({ ...edge })),
+        aggregateAllGroupsInScheme5: Boolean(drillView) || dataset.aggregateAllGroupsInScheme5,
+        isMigrationCase3Global: !drillView
+      };
+    }
+
     function getBudgetAdjustmentBreakdown(node, parsedMeta, dataset = state.graph?.dataset) {
       const diffAmount = parsePlainNumber(parsedMeta?.amount);
 
       if (isMigrationDataset(dataset) && node?.role === "initiator") {
-        const sign = node.id === "left-core" ? -1 : 1;
+        const sign = node.migrationRole === "out" || node.id === "left-core" ? -1 : 1;
         const cost = (dataset.edges || [])
-          .filter((edge) => edge.source === node.id && /-up-/.test(edge.target))
+          .filter((edge) => edge.source === node.id && /-(up|demand)-/.test(edge.target))
           .reduce((sum, edge) => sum + parseAmountNumber(edge.amount), 0);
         const income = (dataset.edges || [])
-          .filter((edge) => edge.source === node.id && /-down-/.test(edge.target))
+          .filter((edge) => edge.source === node.id && /-(down|supply)-/.test(edge.target))
           .reduce((sum, edge) => sum + parseAmountNumber(edge.amount), 0);
 
         return {
@@ -3942,7 +4083,7 @@
     }
 
     function buildGraph(modeKey) {
-      const dataset = datasets[modeKey];
+      const dataset = getActiveDataset(modeKey);
 
       if (dataset.layout === "radial-core") {
         return buildRadialGraph(dataset);
@@ -4852,7 +4993,7 @@
       edges.forEach((edge) => {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
-        if (edge.flow === "horizontal-right") {
+        if (edge.flow === "horizontal-right" || edge.flow === "migration-core-amount") {
           edge.isHorizontalFlow = true;
           edge.sourcePortX = source.x + source.width / 2;
           edge.targetPortX = target.x - target.width / 2;
@@ -6139,7 +6280,7 @@
     }
 
     function renderEdge(edgeLayer, tagLayer, edge) {
-      const isMigrationCoreEdge = edge.flow === "horizontal-right"
+      const isMigrationCoreEdge = (edge.flow === "horizontal-right" || edge.flow === "migration-core-amount")
         && edge.sourceNode?.role === "initiator"
         && edge.targetNode?.role === "initiator";
       const group = createSvg("g", {
@@ -7378,7 +7519,7 @@
     }
 
     function getRawDatasetForDrawer() {
-      return datasets[state.mode] || state.graph?.dataset || { nodes: [], edges: [], layers: [] };
+      return getActiveDataset(state.mode);
     }
 
     function getNodeLayerInfo(node, dataset) {
@@ -7848,6 +7989,26 @@
       }
 
       state.lastNodeActivation = { nodeId, time: now };
+      if (state.mode === "migrationCase3") {
+        setSelectedNode(node.id);
+        if (node.role === "initiator" && isMigrationCase3GlobalView()) {
+          state.migrationCase3FocusId = node.id;
+          hideAggregateDrawerForDataSwitch();
+          render({ resetDrawer: false });
+          return;
+        }
+
+        if (node.role === "initiator" && node.id !== state.migrationCase3FocusId) {
+          state.migrationCase3FocusId = node.id;
+          hideAggregateDrawerForDataSwitch();
+          render({ resetDrawer: false });
+          return;
+        }
+
+        if (node.role !== "initiator") {
+          return;
+        }
+      }
       setSelectedNode(node.id);
       if (node.aggregate) {
         openAggregateDrawer(node.aggregate);
@@ -7958,6 +8119,15 @@
       syncDrawerResizeState();
     }
 
+    function syncMigrationCase3DrillControls() {
+      if (!topologyBackGlobal) {
+        return;
+      }
+
+      const isDrilling = state.mode === "migrationCase3" && Boolean(state.migrationCase3FocusId);
+      topologyBackGlobal.hidden = !isDrilling;
+    }
+
     function applyActiveState() {
       const edgeGroups = viewportLayer.querySelectorAll(".edge-group");
       const tagGroups = viewportLayer.querySelectorAll(".tag-group");
@@ -8053,6 +8223,7 @@
       svg.dataset.nodeHoverEffect = String(state.nodeOptions.hoverEffect);
       syncNodeOptionPanel();
       state.graph = buildGraph(state.mode);
+      syncMigrationCase3DrillControls();
       syncSvgSize();
       destroyTooltips();
       clearElement(viewportLayer);
@@ -8100,6 +8271,7 @@
       clearSelectedState();
       hideAggregateDrawerForDataSwitch();
       state.budgetTableFocus = null;
+      state.migrationCase3FocusId = null;
       state.mode = modeKey;
       if (["migrationCase1", "migrationCase2", "migrationCase3"].includes(modeKey)) {
         state.scheme = "scheme5";
@@ -8109,6 +8281,19 @@
       });
       render({ resetDrawer: false });
     }
+
+    topologyBackGlobal?.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    topologyBackGlobal?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      state.migrationCase3FocusId = null;
+      state.budgetTableFocus = null;
+      clearSelectedState();
+      hideAggregateDrawerForDataSwitch();
+      render({ resetDrawer: false });
+    });
 
     Object.entries(modeButtons).forEach(([modeKey, button]) => {
       button.addEventListener("click", () => switchMode(modeKey));
