@@ -136,9 +136,10 @@
     }
 
     .card {
-      --drawer-resizer-width: 8px;
-      --topology-pane-width: calc((100% - var(--drawer-resizer-width)) / 2);
-      --drawer-width: calc((100% - var(--drawer-resizer-width)) / 2);
+      --drawer-divider-width: 1px;
+      --drawer-resizer-hit-width: 17px;
+      --topology-pane-width: calc((100% - var(--drawer-divider-width)) / 2);
+      --drawer-width: calc((100% - var(--drawer-divider-width)) / 2);
       width: 100%;
       display: flex;
       align-items: stretch;
@@ -165,15 +166,14 @@
     .drawer-resizer {
       position: relative;
       display: none;
-      flex: 0 0 var(--drawer-resizer-width);
+      z-index: 2;
+      flex: 0 0 var(--drawer-resizer-hit-width);
       align-self: stretch;
       border: 0;
-      border-left: 1px solid #eaedf1;
-      border-right: 1px solid #eaedf1;
-      background: #ffffff;
+      margin: 0 -8px;
+      background: transparent;
       padding: 0;
       cursor: col-resize;
-      transition: border-color 0.14s ease, background 0.14s ease;
       touch-action: none;
     }
 
@@ -187,18 +187,17 @@
       top: 0;
       bottom: 0;
       left: 50%;
-      width: 2px;
+      width: 1px;
       border-radius: 999px;
-      background: transparent;
+      background: #eaedf1;
       transform: translateX(-50%);
-      transition: background 0.14s ease;
+      transition: width 0.14s ease, background 0.14s ease;
     }
 
     .drawer-resizer:hover,
     .drawer-resizer:focus-visible,
     .drawer-resizer.is-hovering,
     .drawer-resizer.is-dragging {
-      border-color: #1664ff;
       outline: none;
     }
 
@@ -206,6 +205,7 @@
     .drawer-resizer:focus-visible::before,
     .drawer-resizer.is-hovering::before,
     .drawer-resizer.is-dragging::before {
+      width: 2px;
       background: #1664ff;
     }
 
@@ -7313,8 +7313,8 @@
       }
 
       const cardRect = card.getBoundingClientRect();
-      const resizerWidth = drawerResizer?.offsetWidth || 0;
-      return Math.max(0, cardRect.width - resizerWidth);
+      const dividerWidth = parseFloat(getComputedStyle(card).getPropertyValue("--drawer-divider-width")) || 1;
+      return Math.max(0, cardRect.width - dividerWidth);
     }
 
     function updateDrawerSummaryLayout() {
