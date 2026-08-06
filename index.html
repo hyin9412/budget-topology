@@ -2714,13 +2714,11 @@
         canvas: { width: 1400, height: 660 },
         compactLayers: false,
         layers: [
-          { y: 90, label: "二级上游" },
           { y: 220, label: "一级上游" },
           { y: 360, label: "发起方节点" },
           { y: 540, label: "一级下游" }
         ],
         nodes: [
-          { id: "case1-second-up", x: 700, y: 90, title: "集团信息系统部(4790)" },
           { id: "case1-up-1", x: 420, y: 220, title: "抖音短视频(5150)", meta: "收支偏差  +4.00元   +4.00%" },
           { id: "case1-up-2", x: 700, y: 220, title: "今日头条(5136)", meta: "收支偏差  +3.00元   +3.00%" },
           { id: "case1-up-3", x: 980, y: 220, title: "西瓜视频(1689)", meta: "收支偏差  +3.00元   +3.00%" },
@@ -2742,7 +2740,6 @@
           { id: "case1-down-3", x: 980, y: 540, title: "商业化(56)" }
         ],
         edges: [
-          { id: "case1-e1", source: "case1-up-2", target: "case1-second-up", amount: "+3.00元" },
           { id: "case1-e2", source: "case1-core", target: "case1-up-1", amount: "+4.00元" },
           { id: "case1-e3", source: "case1-core", target: "case1-up-2", amount: "+3.00元" },
           { id: "case1-e4", source: "case1-core", target: "case1-up-3", amount: "+3.00元" },
@@ -2860,11 +2857,6 @@
           "小说(5300)",
           "Lark(5137)"
         ];
-        const secondLevelNames = [
-          "集团信息系统部(4790)",
-          "火山引擎-公共职能官网平台(1842)",
-          "Project Luna(780)"
-        ];
         const supplyNames = [
           "Data-数据中心与供应链(293)",
           "广告技术(5139)",
@@ -2872,7 +2864,6 @@
           "搜索业务研发(2513)"
         ];
         const firstLevelAmounts = [2.4, 2, 1.8, 1.4, 1.2, 0.8];
-        const secondLevelAmounts = [2.4, 2, 1.8];
         const supplyAmounts = [2.8, 2.4, 1.6, 1.2];
         const costBudgetAmount = firstLevelAmounts.reduce((sum, amount) => sum + amount, 0);
         const incomeBudgetAmount = supplyAmounts.reduce((sum, amount) => sum + amount, 0);
@@ -2897,18 +2888,7 @@
             role: tree.role
           });
 
-          secondLevelNames.forEach((title, index) => {
-            nodes.push({
-              id: `${tree.side}-second-up-${index + 1}`,
-              x: tree.x - 90 + index * 90,
-              y: 80,
-              title,
-              aggregateGroup: `${tree.side}-second-up`
-            });
-          });
-
           firstLevelNames.forEach((title, index) => {
-            const secondLevelIndex = index % secondLevelNames.length;
             nodes.push({
               id: `${tree.side}-up-${index + 1}`,
               x: tree.x - 150 + index * 60,
@@ -2921,12 +2901,6 @@
               source: `${tree.side}-core`,
               target: `${tree.side}-up-${index + 1}`,
               amount: `${tree.amountSign > 0 ? "+" : "-"}${firstLevelAmounts[index].toFixed(2)}元`
-            });
-            edges.push({
-              id: `${tree.side}-second-up-e${index + 1}`,
-              source: `${tree.side}-up-${index + 1}`,
-              target: `${tree.side}-second-up-${secondLevelIndex + 1}`,
-              amount: `${tree.amountSign > 0 ? "+" : "-"}${secondLevelAmounts[secondLevelIndex].toFixed(2)}元`
             });
           });
 
@@ -2961,7 +2935,6 @@
           compactLayers: false,
           aggregateAllGroupsInScheme5: true,
           layers: [
-            { y: 80, label: "二级需求方" },
             { y: 240, label: "一级需求方" },
             { y: 430, label: "发起方节点" },
             { y: 680, label: "一级供给方" }
