@@ -136,6 +136,9 @@
     }
 
     .card {
+      --drawer-resizer-width: 8px;
+      --topology-pane-width: calc((100% - var(--drawer-resizer-width)) / 2);
+      --drawer-width: calc((100% - var(--drawer-resizer-width)) / 2);
       width: 100%;
       display: flex;
       align-items: stretch;
@@ -153,6 +156,63 @@
       min-width: 0;
       flex-direction: column;
       align-self: stretch;
+    }
+
+    .card.has-open-drawer .topology-pane {
+      flex: 0 0 var(--topology-pane-width);
+    }
+
+    .drawer-resizer {
+      position: relative;
+      display: none;
+      flex: 0 0 var(--drawer-resizer-width);
+      align-self: stretch;
+      border: 0;
+      border-left: 1px solid #eaedf1;
+      border-right: 1px solid #eaedf1;
+      background: #ffffff;
+      padding: 0;
+      cursor: col-resize;
+      transition: border-color 0.14s ease, background 0.14s ease;
+      touch-action: none;
+    }
+
+    .card.has-open-drawer .drawer-resizer {
+      display: block;
+    }
+
+    .drawer-resizer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      border-radius: 999px;
+      background: transparent;
+      transform: translateX(-50%);
+      transition: background 0.14s ease;
+    }
+
+    .drawer-resizer:hover,
+    .drawer-resizer:focus-visible,
+    .drawer-resizer.is-hovering,
+    .drawer-resizer.is-dragging {
+      border-color: #1664ff;
+      outline: none;
+    }
+
+    .drawer-resizer:hover::before,
+    .drawer-resizer:focus-visible::before,
+    .drawer-resizer.is-hovering::before,
+    .drawer-resizer.is-dragging::before {
+      background: #1664ff;
+    }
+
+    .card.is-resizing-drawer,
+    .card.is-resizing-drawer * {
+      cursor: col-resize !important;
+      user-select: none;
     }
 
     .header {
@@ -487,6 +547,11 @@
       scroll-margin-block: 16px;
     }
 
+    .card.has-open-drawer .aggregate-drawer {
+      flex: 0 0 var(--drawer-width);
+      min-width: 0;
+    }
+
     .aggregate-drawer.is-open {
       display: flex;
     }
@@ -632,6 +697,11 @@
       grid-template-columns: minmax(0, 172fr) minmax(0, 172fr) minmax(0, 254fr);
     }
 
+    .aggregate-drawer.is-summary-narrow .aggregate-summary-grid,
+    .aggregate-drawer.is-summary-narrow .aggregate-summary-grid.has-diff {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
     .aggregate-summary-card {
       border: 0;
       background: transparent;
@@ -655,12 +725,14 @@
       font-weight: 500;
       line-height: 20px;
       letter-spacing: 0.04px;
+      white-space: nowrap;
     }
 
     .tod-summary-card .arco-statistic-content {
       display: flex;
       align-items: flex-start;
       min-width: 0;
+      white-space: nowrap;
     }
 
     .tod-summary-card .arco-statistic-content .arco-statistic-value,
@@ -683,6 +755,7 @@
       font-weight: 500;
       line-height: 20px;
       letter-spacing: 0.04px;
+      white-space: nowrap;
     }
 
     .aggregate-summary-label {
@@ -692,6 +765,7 @@
       font-weight: 500;
       line-height: 20px;
       letter-spacing: 0.04px;
+      white-space: nowrap;
     }
 
     .aggregate-summary-value {
@@ -713,6 +787,7 @@
       gap: 8px;
       margin-top: 8px;
       min-width: 0;
+      white-space: nowrap;
     }
 
     .aggregate-summary-unit {
@@ -2165,8 +2240,18 @@
         min-height: 480px;
       }
 
+      .card.has-open-drawer .topology-pane {
+        flex: 1 1 auto;
+      }
+
+      .drawer-resizer,
+      .card.has-open-drawer .drawer-resizer {
+        display: none;
+      }
+
       .aggregate-drawer {
         min-width: 0;
+        flex: 1 1 auto;
         border-left: 0;
         border-top: 1px solid #eaedf1;
       }
@@ -2344,6 +2429,18 @@
           </div>
           <div id="budget-table-view" class="budget-table-panel" data-tod-budget-table-view></div>
         </div>
+
+        <button
+          id="drawer-resizer"
+          class="drawer-resizer"
+          type="button"
+          aria-label="拖动调整侧边栏宽度"
+          aria-orientation="vertical"
+          aria-valuemin="33"
+          aria-valuemax="67"
+          aria-valuenow="50"
+          hidden
+        ></button>
 
         <aside id="aggregate-drawer" class="aggregate-drawer is-collapsed" aria-hidden="true">
           <div class="aggregate-drawer-panel">
@@ -2895,6 +2992,7 @@
     const aggregateDrawerSubtitle = document.getElementById("aggregate-drawer-subtitle");
     const aggregateDrawerBody = document.getElementById("aggregate-drawer-body");
     const aggregateDrawerClose = document.getElementById("aggregate-drawer-close");
+    const drawerResizer = document.getElementById("drawer-resizer");
     const card = document.querySelector(".card");
     const viewTabButtons = Array.from(document.querySelectorAll(".topology-view-tab[data-view-key]"));
     const budgetTableView = document.getElementById("budget-table-view");
@@ -2919,6 +3017,9 @@
       camera: { x: 0, y: 0, scale: 1 },
       dragging: false,
       dragOrigin: null,
+      drawerRatio: 0.5,
+      drawerResizing: false,
+      drawerResizeOrigin: null,
       nodePointerOrigin: null,
       lastNodeActivation: null,
       graph: null,
@@ -7202,7 +7303,60 @@
       requestAnimationFrame(() => {
         window.renderTodDrawerSidebar?.();
         window.dispatchEvent(new CustomEvent("tod-drawer-summary:render"));
+        updateDrawerSummaryLayout();
       });
+    }
+
+    function getDrawerResizableAreaWidth() {
+      if (!card) {
+        return 0;
+      }
+
+      const cardRect = card.getBoundingClientRect();
+      const resizerWidth = drawerResizer?.offsetWidth || 0;
+      return Math.max(0, cardRect.width - resizerWidth);
+    }
+
+    function updateDrawerSummaryLayout() {
+      const drawerWidth = aggregateDrawer.getBoundingClientRect().width;
+      aggregateDrawer.classList.toggle("is-summary-narrow", drawerWidth > 0 && drawerWidth < 560);
+    }
+
+    function applyDrawerWidthRatio(nextRatio = state.drawerRatio) {
+      if (!card || !drawerResizer) {
+        return;
+      }
+
+      const clampedRatio = Math.max(1 / 3, Math.min(2 / 3, nextRatio));
+      const availableWidth = getDrawerResizableAreaWidth();
+      state.drawerRatio = clampedRatio;
+      drawerResizer.setAttribute("aria-valuenow", String(Math.round(clampedRatio * 100)));
+
+      if (availableWidth <= 0) {
+        return;
+      }
+
+      const drawerWidth = availableWidth * clampedRatio;
+      const topologyWidth = availableWidth - drawerWidth;
+      card.style.setProperty("--drawer-width", `${drawerWidth}px`);
+      card.style.setProperty("--topology-pane-width", `${topologyWidth}px`);
+      updateDrawerSummaryLayout();
+      requestAnimationFrame(() => {
+        updateDrawerSummaryLayout();
+        fitView();
+      });
+    }
+
+    function syncDrawerResizeState() {
+      const shouldShowResizer = state.view === "topology" && !aggregateDrawer.classList.contains("is-collapsed");
+      card?.classList.toggle("has-open-drawer", shouldShowResizer);
+      if (drawerResizer) {
+        drawerResizer.hidden = !shouldShowResizer;
+      }
+
+      if (shouldShowResizer) {
+        requestAnimationFrame(() => applyDrawerWidthRatio(state.drawerRatio));
+      }
     }
 
     function renderAggregateSummary(costTotalText, incomeTotalText) {
@@ -7644,6 +7798,7 @@
       state.view = nextView;
       card?.classList.toggle("is-table-view", nextView === "table");
       syncViewTabs(nextView);
+      syncDrawerResizeState();
 
       if (nextView === "table") {
         updateBudgetTableView();
@@ -7770,6 +7925,7 @@
       aggregateDrawer.classList.remove("is-collapsed");
       aggregateDrawer.classList.add("is-open");
       aggregateDrawer.setAttribute("aria-hidden", "false");
+      syncDrawerResizeState();
       revealAggregateDrawer();
       initDrawerTooltips();
     }
@@ -7803,6 +7959,7 @@
       aggregateDrawer.classList.remove("is-collapsed");
       aggregateDrawer.classList.add("is-open");
       aggregateDrawer.setAttribute("aria-hidden", "false");
+      syncDrawerResizeState();
       revealAggregateDrawer();
       initDrawerTooltips();
     }
@@ -7816,6 +7973,7 @@
       aggregateDrawer.classList.remove("is-open");
       aggregateDrawer.classList.add("is-collapsed");
       aggregateDrawer.setAttribute("aria-hidden", "true");
+      syncDrawerResizeState();
       requestAnimationFrame(fitView);
     }
 
@@ -7824,6 +7982,7 @@
       aggregateDrawer.classList.remove("is-open");
       aggregateDrawer.classList.add("is-collapsed");
       aggregateDrawer.setAttribute("aria-hidden", "true");
+      syncDrawerResizeState();
     }
 
     function applyActiveState() {
@@ -8018,6 +8177,48 @@
     });
 
     aggregateDrawerClose.addEventListener("click", collapseAggregateDrawer);
+
+    drawerResizer?.addEventListener("pointerenter", () => {
+      drawerResizer.classList.add("is-hovering");
+    });
+
+    drawerResizer?.addEventListener("pointerleave", () => {
+      drawerResizer.classList.remove("is-hovering");
+    });
+
+    drawerResizer?.addEventListener("pointerdown", (event) => {
+      if (aggregateDrawer.classList.contains("is-collapsed")) {
+        return;
+      }
+
+      event.preventDefault();
+      state.drawerResizing = true;
+      state.drawerResizeOrigin = {
+        x: event.clientX,
+        ratio: state.drawerRatio
+      };
+      drawerResizer.setPointerCapture?.(event.pointerId);
+      drawerResizer.classList.add("is-dragging");
+      card?.classList.add("is-resizing-drawer");
+    });
+
+    drawerResizer?.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+        return;
+      }
+
+      event.preventDefault();
+      if (event.key === "Home") {
+        applyDrawerWidthRatio(1 / 3);
+        return;
+      }
+      if (event.key === "End") {
+        applyDrawerWidthRatio(2 / 3);
+        return;
+      }
+      applyDrawerWidthRatio(state.drawerRatio + (event.key === "ArrowLeft" ? 0.02 : -0.02));
+    });
+
     aggregateDrawer.addEventListener("click", (event) => {
       const detailTab = event.target.closest("[data-drawer-detail-tab]");
       if (detailTab) {
@@ -8123,6 +8324,15 @@
     });
 
     window.addEventListener("pointermove", (event) => {
+      if (state.drawerResizing && state.drawerResizeOrigin) {
+        const availableWidth = getDrawerResizableAreaWidth();
+        if (availableWidth > 0) {
+          const deltaX = event.clientX - state.drawerResizeOrigin.x;
+          applyDrawerWidthRatio(state.drawerResizeOrigin.ratio - deltaX / availableWidth);
+        }
+        return;
+      }
+
       if (!state.dragging || !state.dragOrigin) {
         return;
       }
@@ -8133,6 +8343,15 @@
     });
 
     window.addEventListener("pointerup", (event) => {
+      if (state.drawerResizing) {
+        state.drawerResizing = false;
+        state.drawerResizeOrigin = null;
+        drawerResizer?.releasePointerCapture?.(event.pointerId);
+        drawerResizer?.classList.remove("is-dragging");
+        card?.classList.remove("is-resizing-drawer");
+        return;
+      }
+
       if (state.nodePointerOrigin) {
         const nodePointerOrigin = state.nodePointerOrigin;
         state.nodePointerOrigin = null;
@@ -8158,7 +8377,13 @@
       }
     });
 
-    window.addEventListener("resize", fitView);
+    window.addEventListener("resize", () => {
+      if (card?.classList.contains("has-open-drawer")) {
+        applyDrawerWidthRatio(state.drawerRatio);
+      } else {
+        fitView();
+      }
+    });
 
     render();
   </script>
