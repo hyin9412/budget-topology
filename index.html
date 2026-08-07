@@ -2021,6 +2021,16 @@
       pointer-events: none;
     }
 
+    .node-selection-glow {
+      fill: none;
+      stroke: rgba(22, 100, 255, 0.2);
+      stroke-width: 4;
+      opacity: 0;
+      filter: drop-shadow(0 0 6px rgba(22, 100, 255, 0.2));
+      transition: opacity 0.14s ease;
+      pointer-events: none;
+    }
+
     .node-group {
       cursor: pointer;
     }
@@ -2044,6 +2054,20 @@
     .node-group.is-initiator .node-title {
       fill: #1664ff;
       font-weight: 500;
+    }
+
+    .node-group.is-selected .node-selection-glow {
+      opacity: 1;
+    }
+
+    .node-group.is-selected .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-selected .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-migration-aggregate.is-selected .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-demand.is-selected .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-supply.is-selected .node-card,
+    svg[data-scheme="scheme5"] .node-group.is-scheme5-initiator.is-selected .node-card {
+      stroke: #1664ff;
+      stroke-width: 2;
     }
 
     svg[data-scheme="scheme2"][data-node-default-shadow="true"] .node-card,
@@ -7416,6 +7440,18 @@
       });
 
       group.appendChild(shadow);
+
+      const selectionGlow = createSvg("rect", {
+        x: node.x - node.width / 2 - 2,
+        y: node.y - node.height / 2 - 2,
+        width: node.width + 4,
+        height: node.height + 4,
+        rx: 6,
+        ry: 6,
+        class: "node-selection-glow"
+      });
+
+      group.appendChild(selectionGlow);
       group.appendChild(rect);
 
       if (node.aggregate) {
@@ -7803,6 +7839,11 @@
       return visual?.tagText || "";
     }
 
+    function formatDrawerTitleText(titleText) {
+      const text = String(titleText || "");
+      return text.startsWith("当前选中：") ? text : `当前选中：${text}`;
+    }
+
     function setDrawerTitle(titleText, tagText = "") {
       const tagVariant = /供给方/.test(tagText)
         ? "supply"
@@ -7812,7 +7853,7 @@
             ? "initiator"
             : "";
       aggregateDrawerTitle.innerHTML = `
-        <span class="aggregate-drawer-title-text">${escapeHtml(titleText)}</span>
+        <span class="aggregate-drawer-title-text">${escapeHtml(formatDrawerTitleText(titleText))}</span>
         ${tagText ? `<span class="aggregate-drawer-title-tag ${tagVariant ? `is-${tagVariant}` : ""}">${escapeHtml(tagText)}</span>` : ""}
       `;
     }
@@ -8095,7 +8136,7 @@
 
     function renderDefaultAggregatePanel() {
       destroyDrawerTooltips();
-      aggregateDrawerTitle.textContent = "一级供给方明细";
+      setDrawerTitle("一级供给方明细");
       aggregateDrawerSubtitle.textContent = "共 6 个节点";
       aggregateDrawerBody.innerHTML = renderAggregateSummary("0.00元", "1,000.00元");
       requestTodDrawerSummaryRender();
@@ -8764,6 +8805,7 @@
           }
         });
         nodeGroups.forEach((group) => {
+          group.classList.remove("is-selected");
           group.classList.remove("is-active");
           if (nodeLayer) {
             nodeLayer.appendChild(group);
@@ -8808,6 +8850,8 @@
       nodeGroups.forEach((group) => {
         const nodeId = group.getAttribute("data-node-id");
         const isActive = state.active.nodeIds.has(nodeId);
+        const isSelected = state.selectedActive?.kind === "node" && state.selectedActive.key === nodeId;
+        group.classList.toggle("is-selected", isSelected);
         group.classList.toggle("is-active", isActive);
         if (isActive && activeNodeLayer) {
           activeNodeLayer.appendChild(group);
