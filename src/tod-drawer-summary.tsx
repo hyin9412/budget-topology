@@ -308,7 +308,7 @@ function getBudgetTablePayload(container: HTMLElement): BudgetTablePayload | nul
 
 function splitAmountUnit(rawValue: string) {
   const text = String(rawValue || '-');
-  const matched = text.match(/^(.*?)(亿元|万元|元)$/);
+  const matched = text.match(/^(.*?)(亿元|万元|元|%)$/);
   if (!matched) {
     return { value: text, unit: '' };
   }

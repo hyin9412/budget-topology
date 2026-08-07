@@ -1034,6 +1034,11 @@
       white-space: nowrap;
     }
 
+    .child-flow-amount-unit {
+      color: #737a87;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+    }
+
     .aggregate-list {
       display: flex;
       flex-direction: column;
@@ -7154,7 +7159,7 @@
 
     function splitAmountUnit(amountText) {
       const text = String(amountText || "0元");
-      const matched = text.match(/^(.*?)(亿元|万元|元)$/);
+      const matched = text.match(/^(.*?)(亿元|万元|元|%)$/);
       if (matched) {
         return {
           value: matched[1],
@@ -8018,6 +8023,13 @@
       `;
     }
 
+    function renderChildBudgetFlowAmountValue(amountText) {
+      const amount = splitAmountUnit(amountText);
+      return `
+        <span>${escapeHtml(amount.value)}</span>${amount.unit ? `<span class="child-flow-amount-unit">${escapeHtml(amount.unit)}</span>` : ""}
+      `;
+    }
+
     function renderDrawerAmountCell(amountText, unitKey, budgetTab) {
       if (isZeroAmountText(amountText)) {
         return renderPlainTableValue(amountText);
@@ -8157,7 +8169,7 @@
             <span class="child-flow-name" title="${escapeHtml(flow.from)}">${escapeHtml(flow.from)}</span>
             <span class="child-flow-arrow">→</span>
             <span class="child-flow-name" title="${escapeHtml(flow.to)}">${escapeHtml(flow.to)}</span>
-            <span class="child-flow-amount">${escapeHtml(formatChildBudgetFlowAmount(flow.amount, signedAmount))}</span>
+            <span class="child-flow-amount">${renderChildBudgetFlowAmountValue(formatChildBudgetFlowAmount(flow.amount, signedAmount))}</span>
           </div>
         `).join("")
         : `<div class="aggregate-table-muted">暂无子预算单元流动</div>`;
@@ -8721,7 +8733,7 @@
       const targets = Array.from(aggregateDrawerBody.querySelectorAll("[data-drawer-tooltip]"));
       state.drawerTooltipInstances = targets.map((target) => window.tippy(target, {
         content: target.getAttribute("data-drawer-tooltip"),
-        trigger: "click",
+        trigger: "mouseenter focus",
         arrow: true,
         theme: "topology",
         placement: "top",
