@@ -216,6 +216,41 @@ function TopologyViewTabs() {
   );
 }
 
+function TopologyBackBreadcrumb({ currentTitle }: { currentTitle: string }) {
+  return (
+    <div className="topology-back-breadcrumb-wrap">
+      <div className="topology-back-breadcrumb topology-back-breadcrumb-visible">
+        <button className="topology-back-breadcrumb-action" type="button">拓扑图全局</button>
+        <span className="topology-back-breadcrumb-separator" aria-hidden="true">
+          <span className="topology-back-breadcrumb-separator-line" />
+        </span>
+        <span className="topology-back-breadcrumb-current">{currentTitle || '当前发起方'}</span>
+      </div>
+    </div>
+  );
+}
+
+function renderFallbackBackBreadcrumb(container: HTMLElement, currentTitle: string) {
+  container.innerHTML = `
+    <div class="topology-back-breadcrumb topology-back-breadcrumb-fallback">
+      <button class="topology-back-breadcrumb-action" type="button">拓扑图全局</button>
+      <span class="topology-back-breadcrumb-separator" aria-hidden="true">
+        <span class="topology-back-breadcrumb-separator-line"></span>
+      </span>
+      <span class="topology-back-breadcrumb-current">${escapeHtml(currentTitle || '当前发起方')}</span>
+    </div>
+  `;
+}
+
+function escapeHtml(value: string) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function getCards(container: HTMLElement): SummaryCard[] {
   try {
     const cards = JSON.parse(container.dataset.todSummaryCards || '[]');
@@ -362,7 +397,7 @@ function TodAggregateTable({ payload }: { payload: Extract<DrawerTablePayload, {
       title: payload.primaryColumnTitle,
       dataIndex: 'name',
       fixed: 'left' as const,
-      width: 180,
+      width: 200,
       render: (value: string) => <NameCell value={value} />,
     },
     {
@@ -429,7 +464,7 @@ function TodNodeTable({ payload }: { payload: Extract<DrawerTablePayload, { mode
       title: '预算单元名称',
       dataIndex: 'name',
       fixed: 'left' as const,
-      width: 180,
+      width: 200,
       render: (value: string) => <NameCell value={value} />,
     },
     {
@@ -809,14 +844,30 @@ function renderTodViewTabs() {
   });
 }
 
+function renderTodBackBreadcrumb() {
+  document.querySelectorAll<HTMLElement>('[data-tod-back-global]').forEach((container) => {
+    const currentTitle = container.dataset.currentTitle || '';
+    let root = roots.get(container);
+    if (!root) {
+      root = createRoot(container);
+      roots.set(container, root);
+    }
+    container.classList.add('is-tod-rendered');
+    renderFallbackBackBreadcrumb(container, currentTitle);
+    root.render(<TopologyBackBreadcrumb currentTitle={currentTitle} />);
+  });
+}
+
 function renderTodDrawerSidebar() {
   renderTodViewTabs();
+  renderTodBackBreadcrumb();
   renderTodDrawerSummaryCards();
   renderTodDrawerTables();
   renderTodBudgetTableViews();
 }
 
 window.addEventListener('tod-drawer-summary:render', renderTodDrawerSidebar);
+window.addEventListener('tod-back-breadcrumb:render', renderTodBackBreadcrumb);
 renderTodDrawerSidebar();
 
 declare global {
@@ -824,9 +875,11 @@ declare global {
     renderTodDrawerSummaryCards?: () => void;
     renderTodDrawerSidebar?: () => void;
     renderTodBudgetTableViews?: () => void;
+    renderTodBackBreadcrumb?: () => void;
   }
 }
 
 window.renderTodDrawerSummaryCards = renderTodDrawerSidebar;
 window.renderTodDrawerSidebar = renderTodDrawerSidebar;
 window.renderTodBudgetTableViews = renderTodBudgetTableViews;
+window.renderTodBackBreadcrumb = renderTodBackBreadcrumb;

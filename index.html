@@ -465,36 +465,69 @@
       padding-left: 0;
     }
 
-    .topology-back-global.arco-btn {
+    .topology-back-global {
       position: absolute;
       top: 12px;
-      left: 12px;
+      left: 15px;
       z-index: 3;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 2px;
-      padding: 5px 12px 5px 8px;
       font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
-      line-height: 22px;
+      font-size: 12px;
+      line-height: 20px;
       letter-spacing: 0.04px;
     }
 
-    .topology-back-global.arco-btn[hidden] {
+    .topology-back-global[hidden] {
       display: none;
     }
 
-    .topology-back-global-icon {
-      flex: 0 0 auto;
-      width: 16px;
-      height: 16px;
-      background: currentColor;
-      -webkit-mask: url("./icon/向左.svg") center / contain no-repeat;
-      mask: url("./icon/向左.svg") center / contain no-repeat;
+    .topology-back-breadcrumb-wrap {
+      display: inline-flex;
+      align-items: center;
     }
 
-    .topology-back-global-text {
-      white-space: nowrap;
+    .topology-back-breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      color: #42464e;
+    }
+
+    .topology-back-breadcrumb-action {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: #42464e;
+      font: inherit;
+      font-weight: 500;
+      line-height: inherit;
+      cursor: pointer;
+    }
+
+    .topology-back-breadcrumb-action:hover {
+      color: #1664ff;
+    }
+
+    .topology-back-breadcrumb-current {
+      color: #737a87;
+    }
+
+    .topology-back-breadcrumb-separator {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      padding: 6px 12px 6px 11px;
+      overflow: hidden;
+    }
+
+    .topology-back-breadcrumb-separator-line {
+      display: block;
+      border-radius: 1px;
+      background: #42464e;
+      width: 1px;
+      height: 12px;
+      transform: rotate(30deg);
     }
 
     .node-option-panel[hidden] {
@@ -1080,6 +1113,7 @@
       position: sticky;
       left: 0;
       z-index: 2;
+      width: 200px;
       background: #ffffff;
       box-shadow: 1px 0 0 #eaedf1;
     }
@@ -1094,7 +1128,7 @@
     }
 
     .aggregate-table-node {
-      max-width: 180px;
+      max-width: 200px;
       overflow: hidden;
       color: #42464e;
       text-overflow: ellipsis;
@@ -1197,34 +1231,36 @@
     .aggregate-table-node-type-tag,
     .tod-drawer-table-node-type-tag {
       display: inline-flex;
-      align-items: center;
+      align-items: flex-start;
       height: 20px;
-      border: 1px solid rgba(102, 110, 124, 0.2);
+      border: 1px solid #24758e33;
       border-radius: 4px;
-      background: #ffffff;
-      padding: 0 6px;
-      color: #666e7c;
+      background: transparent;
+      padding: 0 7px;
+      color: #24758e;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
       font-size: 12px;
       font-weight: 500;
-      line-height: 18px;
+      line-height: 20px;
+      letter-spacing: 0.04px;
       white-space: nowrap;
     }
 
     .aggregate-table-node-type-tag.is-initiator,
     .tod-drawer-table-node-type-tag.is-initiator {
-      border-color: rgba(57, 115, 229, 0.2);
-      color: #3973e5;
+      border-color: #1664ff33;
+      color: #1664ff;
     }
 
     .aggregate-table-node-type-tag.is-supply,
     .tod-drawer-table-node-type-tag.is-supply {
-      border-color: rgba(84, 91, 241, 0.2);
-      color: #545bf1;
+      border-color: #6e4c9f33;
+      color: #6e4c9f;
     }
 
     .tod-drawer-table-name {
       display: inline-block;
-      max-width: 180px;
+      max-width: 200px;
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: top;
@@ -2217,39 +2253,40 @@
     }
 
     .node-role-tag-rect {
-      fill: #ffffff;
-      stroke-width: 1;
+      stroke-width: 0;
     }
 
     .node-role-tag-text {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
       font-size: 10px;
       font-weight: 500;
+      letter-spacing: 0.03px;
       dominant-baseline: middle;
       text-anchor: middle;
     }
 
     .node-role-tag.is-demand .node-role-tag-rect {
-      stroke: rgba(102, 110, 124, 0.2);
+      fill: #e4f3fc;
     }
 
     .node-role-tag.is-demand .node-role-tag-text {
-      fill: #666e7c;
+      fill: #24758e;
     }
 
     .node-role-tag.is-initiator .node-role-tag-rect {
-      stroke: rgba(57, 115, 229, 0.2);
+      fill: #ebf1ff;
     }
 
     .node-role-tag.is-initiator .node-role-tag-text {
-      fill: #3973e5;
+      fill: #1664ff;
     }
 
     .node-role-tag.is-supply .node-role-tag-rect {
-      stroke: rgba(84, 91, 241, 0.2);
+      fill: #f2eafb;
     }
 
     .node-role-tag.is-supply .node-role-tag-text {
-      fill: #545bf1;
+      fill: #6e4c9f;
     }
 
     .node-aggregate-title {
@@ -2633,10 +2670,15 @@
           </header>
 
           <div class="stage">
-            <button id="topology-back-global" class="topology-back-global arco-btn arco-btn-secondary arco-btn-size-default" type="button" hidden>
-              <span class="topology-back-global-icon" aria-hidden="true"></span>
-              <span class="topology-back-global-text">返回拓扑图全局</span>
-            </button>
+            <div id="topology-back-global" class="topology-back-global" data-tod-back-global hidden>
+              <div class="topology-back-breadcrumb topology-back-breadcrumb-visible">
+                <button class="topology-back-breadcrumb-action" type="button">拓扑图全局</button>
+                <span class="topology-back-breadcrumb-separator" aria-hidden="true">
+                  <span class="topology-back-breadcrumb-separator-line"></span>
+                </span>
+                <span class="topology-back-breadcrumb-current" data-topology-back-current>当前发起方</span>
+              </div>
+            </div>
             <svg id="topology-canvas" class="canvas" aria-label="Interactive topology demo">
               <defs>
                 <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -2734,11 +2776,14 @@
     const SCHEME5_NODE_PADDING_Y = 7;
     const SCHEME5_NODE_ROW_GAP = 4;
     const SCHEME5_NODE_TAG_HEIGHT = 18;
+    const NODE_ROLE_TAG_HORIZONTAL_PADDING = 8;
+    const NODE_ROLE_TAG_FONT = '500 10px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif';
     const SCHEME5_NODE_TEXT_ROW_HEIGHT = 20;
     const SCHEME5_NODE_DETAIL_ICON_SIZE = 12;
     const SCHEME5_LAYER_VERTICAL_GAP = 80;
     const SCHEME5_MIGRATION_AGGREGATE_HEIGHT = 216;
     const CHILD_FLOW_TOP_COUNT = 3;
+    const SINGLE_MIGRATION_CHILD_FLOW_TOP_COUNT = 5;
     const CHILD_FLOW_NODE_EXTRA_TOP_GAP = 10;
     const CHILD_FLOW_NODE_SECTION_HEIGHT = 110;
     const DETAIL_ICON_PATH = "M3.67509 8.53871C3.44164 8.77217 3.44164 9.15067 3.67509 9.38413L4.0978 9.80684C4.33126 10.0403 4.70977 10.0403 4.94322 9.80684L8.32491 6.42516C8.44226 6.3078 8.50062 6.1538 8.49999 5.99999C8.50062 5.84618 8.44226 5.69218 8.32491 5.57482L4.94322 2.19314C4.70977 1.95968 4.33126 1.95968 4.0978 2.19314L3.67509 2.61585C3.44164 2.84931 3.44164 3.22781 3.67509 3.46127L6.21381 5.99999L3.67509 8.53871Z";
@@ -2994,8 +3039,10 @@
             role: "initiator",
             childBudgetFlows: [
               { from: "子单元 A", to: "子单元 B", amount: 10 },
-              { from: "子单元 C", to: "子单元 D", amount: 5 },
-              { from: "子单元 E", to: "子单元 F", amount: 3 }
+              { from: "子单元 C", to: "子单元 D", amount: -8 },
+              { from: "子单元 E", to: "子单元 F", amount: 5 },
+              { from: "子单元 G", to: "子单元 H", amount: -3.5 },
+              { from: "子单元 I", to: "子单元 J", amount: 2.2 }
             ]
           },
           { id: "case1-down-1", x: 420, y: 540, title: "研发商品中心-电商(2480)" },
@@ -3323,8 +3370,10 @@
         role: "initiator",
         childBudgetFlows: [
           { from: "子单元 A", to: "子单元 B", amount: 10 },
-          { from: "子单元 C", to: "子单元 D", amount: 5 },
-          { from: "子单元 E", to: "子单元 F", amount: 3 }
+          { from: "子单元 C", to: "子单元 D", amount: -8 },
+          { from: "子单元 E", to: "子单元 F", amount: 5 },
+          { from: "子单元 G", to: "子单元 H", amount: -3.5 },
+          { from: "子单元 I", to: "子单元 J", amount: 2.2 }
         ]
       }];
       const edges = [];
@@ -6156,22 +6205,47 @@
       return Array.isArray(node?.childBudgetFlows) && node.childBudgetFlows.length > 0;
     }
 
-    function getTopChildBudgetFlows(node) {
+    function isChildBudgetFlowDataset(dataset = state.graph?.dataset) {
+      return /^平移情况/.test(dataset?.label || "");
+    }
+
+    function shouldShowChildBudgetFlows(node, dataset = state.graph?.dataset) {
+      return isChildBudgetFlowDataset(dataset) && hasChildBudgetFlows(node);
+    }
+
+    function isSingleInitiatorMigrationDataset(dataset = state.graph?.dataset) {
+      return dataset?.label === "平移情况1"
+        && (dataset?.nodes || []).filter((item) => item.role === "initiator").length === 1;
+    }
+
+    function getChildBudgetFlowTopCount(dataset = state.graph?.dataset) {
+      return isSingleInitiatorMigrationDataset(dataset)
+        ? SINGLE_MIGRATION_CHILD_FLOW_TOP_COUNT
+        : CHILD_FLOW_TOP_COUNT;
+    }
+
+    function shouldUseSignedChildBudgetFlowAmount(dataset = state.graph?.dataset) {
+      return isSingleInitiatorMigrationDataset(dataset);
+    }
+
+    function getTopChildBudgetFlows(node, dataset = state.graph?.dataset) {
       return (node?.childBudgetFlows || [])
         .map((flow) => ({
           ...flow,
           amount: Number(flow.amount) || 0
         }))
         .sort((flowA, flowB) => Math.abs(flowB.amount) - Math.abs(flowA.amount))
-        .slice(0, CHILD_FLOW_TOP_COUNT);
+        .slice(0, getChildBudgetFlowTopCount(dataset));
     }
 
-    function formatChildBudgetFlowAmount(amount) {
-      return `${Math.abs(Number(amount) || 0).toFixed(2)}元`;
+    function formatChildBudgetFlowAmount(amount, signed = false) {
+      const value = Number(amount) || 0;
+      const sign = signed && value !== 0 ? (value > 0 ? "+" : "-") : "";
+      return `${sign}${Math.abs(value).toFixed(2)}元`;
     }
 
-    function getChildFlowNodeSectionHeight(node) {
-      const rowCount = getTopChildBudgetFlows(node).length;
+    function getChildFlowNodeSectionHeight(node, dataset = state.graph?.dataset) {
+      const rowCount = getTopChildBudgetFlows(node, dataset).length;
       if (!rowCount) {
         return 0;
       }
@@ -6181,7 +6255,7 @@
       return rowStartOffset + (rowCount - 1) * rowGap + bottomPadding;
     }
 
-    function getSchemeFiveNodeLayout(node, visual, showMeta) {
+    function getSchemeFiveNodeLayout(node, visual, showMeta, dataset = state.graph?.dataset) {
       if (!visual) {
         return null;
       }
@@ -6217,7 +6291,7 @@
         cursorY += SCHEME5_NODE_TEXT_ROW_HEIGHT;
       }
 
-      if (hasChildBudgetFlows(node)) {
+      if (shouldShowChildBudgetFlows(node, dataset)) {
         cursorY += CHILD_FLOW_NODE_EXTRA_TOP_GAP;
         layout.childFlowStartY = cursorY;
       }
@@ -6225,7 +6299,7 @@
       return layout;
     }
 
-    function getSchemeFiveNodeHeight(node, visual, showMeta) {
+    function getSchemeFiveNodeHeight(node, visual, showMeta, dataset = state.graph?.dataset) {
       if (!visual) {
         return null;
       }
@@ -6237,8 +6311,8 @@
       if (showMeta) {
         height += SCHEME5_NODE_ROW_GAP + SCHEME5_NODE_TEXT_ROW_HEIGHT;
       }
-      if (hasChildBudgetFlows(node)) {
-        height += CHILD_FLOW_NODE_EXTRA_TOP_GAP + getChildFlowNodeSectionHeight(node);
+      if (shouldShowChildBudgetFlows(node, dataset)) {
+        height += CHILD_FLOW_NODE_EXTRA_TOP_GAP + getChildFlowNodeSectionHeight(node, dataset);
       }
       return height;
     }
@@ -6252,7 +6326,7 @@
 
         const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, visual, dataset);
         node.width = NODE_WIDTH;
-        node.height = getSchemeFiveNodeHeight(node, visual, showMeta);
+        node.height = getSchemeFiveNodeHeight(node, visual, showMeta, dataset);
         node.__autoHeight = true;
       });
     }
@@ -6369,7 +6443,7 @@
         return;
       }
 
-      const tagWidth = measureTextWidth(visual.tagText, '500 10px Inter') + 14;
+      const tagWidth = measureTextWidth(visual.tagText, NODE_ROLE_TAG_FONT) + NODE_ROLE_TAG_HORIZONTAL_PADDING * 2;
       const tag = createSvg("g", {
         class: `node-role-tag is-${visual.variant}`
       });
@@ -7147,7 +7221,8 @@
     }
 
     function renderChildBudgetFlowNodeContent(group, node, layout) {
-      if (!layout?.childFlowStartY || !hasChildBudgetFlows(node)) {
+      const dataset = state.graph?.dataset;
+      if (!layout?.childFlowStartY || !shouldShowChildBudgetFlows(node, dataset)) {
         return;
       }
 
@@ -7156,7 +7231,9 @@
       const dividerY = layout.childFlowStartY;
       const titleY = dividerY + 22;
       const rowStartY = titleY + 24;
-      const topFlows = getTopChildBudgetFlows(node);
+      const topCount = getChildBudgetFlowTopCount(dataset);
+      const signedAmount = shouldUseSignedChildBudgetFlowAmount(dataset);
+      const topFlows = getTopChildBudgetFlows(node, dataset);
 
       group.appendChild(createSvg("line", {
         x1: contentLeft,
@@ -7171,12 +7248,12 @@
         y: titleY,
         class: "node-child-flow-title"
       });
-      title.textContent = `Top${CHILD_FLOW_TOP_COUNT} 金额流转子预算单元`;
+      title.textContent = `Top ${topCount} 金额流转子预算单元`;
       group.appendChild(title);
 
       topFlows.forEach((flow, index) => {
         const rowY = rowStartY + index * 20;
-        const amountText = formatChildBudgetFlowAmount(flow.amount);
+        const amountText = formatChildBudgetFlowAmount(flow.amount, signedAmount);
         const amountWidth = measureEndAmountWidth(amountText);
         const arrowText = "→";
         const arrowGap = 4;
@@ -7247,7 +7324,7 @@
         variant
       );
       const tagText = `${levelName}${variant === "supply" ? "供给方" : "需求方"}`;
-      const tagWidth = measureTextWidth(tagText, '500 10px Inter') + 14;
+      const tagWidth = measureTextWidth(tagText, NODE_ROLE_TAG_FONT) + NODE_ROLE_TAG_HORIZONTAL_PADDING * 2;
       const countText = String(detail?.count || 0);
       const countWidth = Math.max(22, measureTextWidth(countText, '500 10px Inter') + 12);
       const actionText = "查看全部";
@@ -7465,7 +7542,7 @@
 
       const showDetailIcon = isNodeOptionScheme() && state.nodeOptions.detailIcon && !schemeFiveVisual;
       const showMeta = Boolean(node.meta) && !isSchemeFiveEndpointMetaHidden(node, schemeFiveVisual);
-      const schemeFiveLayout = getSchemeFiveNodeLayout(node, schemeFiveVisual, showMeta);
+      const schemeFiveLayout = getSchemeFiveNodeLayout(node, schemeFiveVisual, showMeta, state.graph?.dataset);
       renderNodeRoleTag(group, node, schemeFiveVisual, schemeFiveLayout);
       renderSchemeFiveDetailIcon(group, schemeFiveLayout);
 
@@ -8035,14 +8112,14 @@
       return `<div class="tod-drawer-table-wrap is-${escapeHtml(payload.mode)}" data-tod-table="${encodedPayload}">${renderFallbackDrawerTable(payload)}</div>`;
     }
 
-    function renderChildBudgetFlowList(flows) {
+    function renderChildBudgetFlowList(flows, signedAmount = false) {
       const rows = (flows || []).length
         ? flows.map((flow) => `
           <div class="child-flow-row">
             <span class="child-flow-name" title="${escapeHtml(flow.from)}">${escapeHtml(flow.from)}</span>
             <span class="child-flow-arrow">→</span>
             <span class="child-flow-name" title="${escapeHtml(flow.to)}">${escapeHtml(flow.to)}</span>
-            <span class="child-flow-amount">${escapeHtml(formatChildBudgetFlowAmount(flow.amount))}</span>
+            <span class="child-flow-amount">${escapeHtml(formatChildBudgetFlowAmount(flow.amount, signedAmount))}</span>
           </div>
         `).join("")
         : `<div class="aggregate-table-muted">暂无子预算单元流动</div>`;
@@ -8058,7 +8135,7 @@
             <button class="drawer-detail-tab" type="button" role="tab" aria-selected="false" data-drawer-detail-tab="relation">一级需求方和供给方明细</button>
           </div>
           <div class="drawer-detail-panel is-active" role="tabpanel" data-drawer-detail-panel="child-flow">
-            ${renderChildBudgetFlowList(detail.childBudgetFlows)}
+            ${renderChildBudgetFlowList(detail.childBudgetFlows, detail.childBudgetFlowSigned)}
           </div>
           <div class="drawer-detail-panel" role="tabpanel" data-drawer-detail-panel="relation">
             ${renderDrawerTable(buildNodeDrawerTablePayload(detail))}
@@ -8278,7 +8355,8 @@
         diffAmountText: formatAmountNumber(diffAmount),
         diffAmountDisplayText: formatCompactAmountNumber(diffAmount),
         diffRateText: formatPercentNumber(diffRate),
-        childBudgetFlows: hasChildBudgetFlows(sourceNode) ? getTopChildBudgetFlows(sourceNode) : [],
+        childBudgetFlows: shouldShowChildBudgetFlows(sourceNode, rawDataset) ? getTopChildBudgetFlows(sourceNode, rawDataset) : [],
+        childBudgetFlowSigned: shouldUseSignedChildBudgetFlowAmount(rawDataset),
         items
       };
     }
@@ -8773,6 +8851,16 @@
 
       const isDrilling = state.mode === "migrationCase3" && Boolean(state.migrationCase3FocusId);
       topologyBackGlobal.hidden = !isDrilling;
+      const currentNode = isDrilling
+        ? state.graph?.nodeMap?.get(state.migrationCase3FocusId)
+        : null;
+      topologyBackGlobal.dataset.currentTitle = currentNode?.title || "当前发起方";
+      const currentTitleElement = topologyBackGlobal.querySelector("[data-topology-back-current]");
+      if (currentTitleElement) {
+        currentTitleElement.textContent = topologyBackGlobal.dataset.currentTitle;
+      }
+      window.renderTodBackBreadcrumb?.();
+      window.dispatchEvent(new CustomEvent("tod-back-breadcrumb:render"));
     }
 
     function applyActiveState() {
