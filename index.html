@@ -635,34 +635,25 @@
       justify-content: center;
       width: 8px;
       height: 8px;
-      border-radius: 50%;
-      padding: 1px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
     }
 
     .legend-node.start {
-      background: rgba(61, 125, 254, 0.2);
-      border: 1px solid rgba(61, 125, 254, 0.12);
+      background-image: url("./icon/发起方图例.svg");
     }
 
     .legend-node.start::after {
-      content: "";
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 1px solid #3d7dfe;
+      content: none;
     }
 
     .legend-node.regular {
-      background: #dde2e9;
+      background-image: url("./icon/上下游图例.svg");
     }
 
     .legend-node.regular::after {
-      content: "";
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #ffffff;
+      content: none;
     }
 
     .aggregate-drawer {
@@ -3520,18 +3511,23 @@
 
       firstDemandNames.slice(0, firstDemandCount).forEach((title, index) => {
         const id = `configured-demand-${index + 1}`;
+        const amount = 120 + index * 37;
+        const shouldShowFirstDemandMeta = hasSecondLevelDemand && firstDemandCount < 5;
         nodes.push({
           id,
           x: distributeX(index, firstDemandCount, centerX, 142),
           y: demandY,
           title,
+          meta: shouldShowFirstDemandMeta
+            ? `收支偏差  ${formatAmountNumber(amount)}   ${formatPercentNumber(amount)}`
+            : undefined,
           aggregateGroup: config.firstDemandMoreThan5 ? "configured-demand-l1" : undefined
         });
         edges.push({
           id: `configured-demand-e${index + 1}`,
           source: "configured-core",
           target: id,
-          amount: `+${(120 + index * 37).toFixed(2)}元`
+          amount: formatAmountNumber(amount)
         });
       });
 
@@ -6617,6 +6613,47 @@
       };
     }
 
+    function applyFirstDemandMetaForCompactSecondDemand(dataset) {
+      const layers = dataset?.layers || [];
+      const hasSecondDemandLayer = layers.some((layer) => /二级需求方/.test(layer.label || ""));
+      const firstDemandLayerIndex = layers.findIndex((layer, index) => {
+        return /一级需求方/.test(layer.label || "")
+          && getSchemeFiveLayerVariant(dataset, index, layer.label) === "demand";
+      });
+
+      if (!hasSecondDemandLayer || firstDemandLayerIndex < 0) {
+        return;
+      }
+
+      const firstDemandNodes = (dataset.nodes || []).filter((node) => {
+        return !node.aggregate
+          && node.role !== "initiator"
+          && getNearestLayerIndex(node.y, layers) === firstDemandLayerIndex;
+      });
+
+      if (!firstDemandNodes.length || firstDemandNodes.length >= 5) {
+        return;
+      }
+
+      const initiatorIds = new Set(
+        (dataset.nodes || [])
+          .filter((node) => node.role === "initiator")
+          .map((node) => node.id)
+      );
+
+      firstDemandNodes.forEach((node) => {
+        const amount = (dataset.edges || []).reduce((sum, edge) => {
+          const isConnectedToNode = edge.source === node.id || edge.target === node.id;
+          const isConnectedToInitiator = initiatorIds.has(edge.source) || initiatorIds.has(edge.target);
+          return isConnectedToNode && isConnectedToInitiator
+            ? sum + parseAmountNumber(edge.amount)
+            : sum;
+        }, 0);
+
+        node.meta = `收支偏差  ${formatAmountNumber(amount)}   ${formatPercentNumber(amount)}`;
+      });
+    }
+
     function buildSchemeFiveGraph(dataset) {
       const rawNodes = dataset.nodes.map((node) => ({ ...node }));
       const rawEdges = dataset.edges.map((edge) => ({ ...edge }));
@@ -6754,6 +6791,7 @@
           rawEdgeIds: edge.rawEdgeIds
         }))
       };
+      applyFirstDemandMetaForCompactSecondDemand(schemeDataset);
       applySchemeFiveNodeMetrics(schemeDataset);
       const nodeMap = normalizeNodes(schemeDataset.nodes);
       const edgeSeed = schemeDataset.edges.map((edge) => ({ ...edge }));
@@ -8806,7 +8844,7 @@
           {
             label: "收支偏差",
             value: detail.diffAmountDisplayText || detail.diffAmountText,
-            subtext: `比例 ${detail.diffRateText}`
+            subtext: detail.diffRateText
           }
         ])}
         ${hasChildFlowTabs ? renderNodeDrawerDetailTabs(detail) : `
@@ -8832,6 +8870,7 @@
       aggregateDrawer.classList.remove("is-open");
       aggregateDrawer.classList.add("is-collapsed");
       aggregateDrawer.setAttribute("aria-hidden", "true");
+      clearSelectedState();
       syncDrawerResizeState();
       requestAnimationFrame(fitView);
     }

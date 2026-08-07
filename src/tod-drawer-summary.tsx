@@ -5,6 +5,7 @@ import { Button, InputTag, Select, Statistic, Table, Tabs, Tag, Tooltip } from '
 type SummaryCard = {
   label: string;
   value: string;
+  subtext?: string;
 };
 
 type AggregateTableRow = {
@@ -101,7 +102,34 @@ function parseSummaryValue(rawValue: string) {
   };
 }
 
-function TodDrawerSummaryCard({ label, value }: SummaryCard) {
+function renderSummaryValue(value: string) {
+  const text = String(value || '').trim();
+  const matched = text.match(/^([+-]?[\d,]+(?:\.\d+)?)(亿元|万元|元|%)?$/);
+  const valueText = matched ? matched[1] : text || '0';
+  const suffix = matched?.[2] || '';
+
+  return (
+    <>
+      <span>{valueText}</span>
+      {suffix ? <span className="aggregate-summary-unit">{suffix}</span> : null}
+    </>
+  );
+}
+
+function TodDrawerSummaryCard({ label, value, subtext }: SummaryCard) {
+  if (subtext) {
+    return (
+      <div className="aggregate-summary-card tod-summary-card is-diff">
+        <div className="aggregate-summary-label">{label}</div>
+        <div className="aggregate-summary-metric-row">
+          <div className="aggregate-summary-value">{renderSummaryValue(value)}</div>
+          <span className="aggregate-summary-divider" aria-hidden="true" />
+          <span className="aggregate-summary-subtext">{subtext}</span>
+        </div>
+      </div>
+    );
+  }
+
   const parsed = parseSummaryValue(value);
 
   return (
